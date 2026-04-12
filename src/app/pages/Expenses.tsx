@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useOwner } from '../context/OwnerContext';
+import { StatusBadge, type PaymentStatus } from '../components/StatusBadge';
 import svgPaths from "../../imports/svg-zayt9vop9f";
 
 function DotsHorizontal() {
@@ -32,28 +33,17 @@ interface ExpenseRowProps {
   property: string;
   amount: string;
   date: string;
-  paymentStatus: 'paid' | 'pending' | 'overdue';
+  paymentStatus: PaymentStatus;
+  onPaymentStatusChange?: (status: PaymentStatus) => void;
 }
 
-function ExpenseRow({ category, description, property, amount, date, paymentStatus }: ExpenseRowProps) {
+function ExpenseRow({ category, description, property, amount, date, paymentStatus, onPaymentStatusChange }: ExpenseRowProps) {
   const categoryColors: Record<string, string> = {
     'Utilities': 'text-[#FFB84D]',
     'Maintenance': 'text-[#928dd3]',
     'Insurance': 'text-[#4D9FFF]',
     'Taxes': 'text-[#FF6B6B]',
     'Other': 'text-[#0DC44A]'
-  };
-
-  const statusColors = {
-    paid: 'text-[#0DC44A]',
-    pending: 'text-[#928dd3]',
-    overdue: 'text-[#FF6B6B]'
-  };
-
-  const statusText = {
-    paid: 'Paid',
-    pending: 'Pending',
-    overdue: 'Overdue'
   };
 
   return (
@@ -85,17 +75,7 @@ function ExpenseRow({ category, description, property, amount, date, paymentStat
         </p>
       </div>
       <div className="flex-[1_0_0]">
-        <div className="bg-black content-stretch flex gap-[8px] items-center justify-center px-[8px] py-[4px] relative rounded-[8px] shrink-0 w-fit">
-          <div aria-hidden="true" className="absolute border border-solid border-white inset-0 pointer-events-none rounded-[8px]" />
-          <div className="relative shrink-0 size-[6px]">
-            <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 6 6">
-              <circle cx="3" cy="3" fill={paymentStatus === 'paid' ? '#0DC44A' : paymentStatus === 'pending' ? '#928dd3' : '#FF6B6B'} r="3" />
-            </svg>
-          </div>
-          <p className={`font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] whitespace-nowrap ${statusColors[paymentStatus]}`} style={{ fontVariationSettings: "'wdth' 100" }}>
-            {statusText[paymentStatus]}
-          </p>
-        </div>
+        <StatusBadge status={paymentStatus} onStatusChange={onPaymentStatusChange} />
       </div>
       <button className="hover:opacity-70 transition-opacity">
         <DotsHorizontal />
@@ -128,8 +108,7 @@ function CategoryCard({ category, amount, percentage }: { category: string; amou
 export function Expenses() {
   const { currentOwner } = useOwner();
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  
-  const expenses: ExpenseRowProps[] = [
+  const [expenses, setExpenses] = useState<ExpenseRowProps[]>([
     {
       category: "Utilities",
       description: "Electricity Bill - March",
@@ -194,7 +173,13 @@ export function Expenses() {
       date: "Mar 14, 2026",
       paymentStatus: "pending"
     }
-  ];
+  ]);
+
+  const handleExpenseStatusChange = (index: number, newStatus: PaymentStatus) => {
+    const updatedExpenses = [...expenses];
+    updatedExpenses[index].paymentStatus = newStatus;
+    setExpenses(updatedExpenses);
+  };
 
   const filteredExpenses = selectedCategory === 'All' 
     ? expenses 
@@ -269,9 +254,16 @@ export function Expenses() {
             </p>
             <div className="w-[24px]" />
           </div>
-          {filteredExpenses.map((expense, index) => (
-            <ExpenseRow key={index} {...expense} />
-          ))}
+          {filteredExpenses.map((expense, expenseIndex) => {
+            const originalIndex = expenses.indexOf(expense);
+            return (
+              <ExpenseRow 
+                key={expenseIndex} 
+                {...expense} 
+                onPaymentStatusChange={(newStatus) => handleExpenseStatusChange(originalIndex, newStatus)}
+              />
+            );
+          })}
         </div>
       </div>
     </div>

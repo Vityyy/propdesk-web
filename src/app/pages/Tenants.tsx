@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useOwner } from '../context/OwnerContext';
+import { StatusBadge, type PaymentStatus } from '../components/StatusBadge';
 import svgPaths from "../../imports/svg-zayt9vop9f";
 
 function Phone() {
@@ -16,25 +17,14 @@ interface TenantRowProps {
   unit: string;
   amount: string;
   dueDate: string;
-  status: 'paid' | 'pending' | 'overdue';
+  status: PaymentStatus;
   ownerPhone?: string;
   tenantPhone?: string;
+  onStatusChange?: (status: PaymentStatus) => void;
 }
 
-function TenantRow({ tenant, property, unit, amount, dueDate, status, ownerPhone = '+1 (555) 123-4567', tenantPhone = '+1 (555) 987-6543' }: TenantRowProps) {
+function TenantRow({ tenant, property, unit, amount, dueDate, status, onStatusChange, ownerPhone = '+1 (555) 123-4567', tenantPhone = '+1 (555) 987-6543' }: TenantRowProps) {
   const [showContactMenu, setShowContactMenu] = useState(false);
-
-  const statusColors = {
-    paid: 'text-[#0DC44A]',
-    pending: 'text-[#928dd3]',
-    overdue: 'text-[#FF6B6B]'
-  };
-
-  const statusText = {
-    paid: 'Paid',
-    pending: 'Pending',
-    overdue: 'Overdue'
-  };
 
   const handleContact = (type: 'owner' | 'tenant', phone: string) => {
     setShowContactMenu(false);
@@ -63,17 +53,7 @@ function TenantRow({ tenant, property, unit, amount, dueDate, status, ownerPhone
         </p>
       </div>
       <div className="flex-[1_0_0]">
-        <div className="bg-black content-stretch flex gap-[8px] items-center justify-center px-[8px] py-[4px] relative rounded-[8px] shrink-0 w-fit">
-          <div aria-hidden="true" className="absolute border border-solid border-white inset-0 pointer-events-none rounded-[8px]" />
-          <div className="relative shrink-0 size-[6px]">
-            <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 6 6">
-              <circle cx="3" cy="3" fill={status === 'paid' ? '#0DC44A' : status === 'pending' ? '#928dd3' : '#FF6B6B'} r="3" />
-            </svg>
-          </div>
-          <p className={`font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] whitespace-nowrap ${statusColors[status]}`} style={{ fontVariationSettings: "'wdth' 100" }}>
-            {statusText[status]}
-          </p>
-        </div>
+        <StatusBadge status={status} onStatusChange={onStatusChange} />
       </div>
       <div className="relative">
         <button 
@@ -144,8 +124,7 @@ function SummaryCard({ title, value, subtitle }: { title: string; value: string;
 
 export function Tenants() {
   const { currentOwner } = useOwner();
-
-  const tenants: TenantRowProps[] = [
+  const [tenants, setTenants] = useState<TenantRowProps[]>([
     {
       tenant: "John Smith",
       property: "Sunset Apartments",
@@ -206,7 +185,13 @@ export function Tenants() {
       tenantPhone: "+1 (555) 789-0123",
       ownerPhone: "+1 (555) 123-4567"
     }
-  ];
+  ]);
+
+  const handleTenantStatusChange = (index: number, newStatus: PaymentStatus) => {
+    const updatedTenants = [...tenants];
+    updatedTenants[index].status = newStatus;
+    setTenants(updatedTenants);
+  };
 
   return (
     <div className="bg-black min-h-full w-full">
@@ -257,7 +242,11 @@ export function Tenants() {
             </div>
           </div>
           {tenants.map((tenant, index) => (
-            <TenantRow key={index} {...tenant} />
+            <TenantRow 
+              key={index} 
+              {...tenant} 
+              onStatusChange={(newStatus) => handleTenantStatusChange(index, newStatus)}
+            />
           ))}
         </div>
       </div>
