@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { useOwner } from '../context/OwnerContext';
+import { CreateTenantDialog } from '../components/dialogs/CreateTenantDialog';
+import { LinkAdditionalUnitDialog } from '../components/dialogs/LinkAdditionalUnitDialog';
 import { StatusBadge, type PaymentStatus } from '../components/StatusBadge';
+import { propertyService } from '../../services/propertyService';
+import { tenantService } from '../../services/tenantService';
 import svgPaths from "../../imports/svg-zayt9vop9f";
 
 function Phone() {
@@ -12,34 +16,47 @@ function Phone() {
 }
 
 interface TenantRowProps {
+  id: string;
   tenant: string;
+  email: string;
+  phone: string;
   property: string;
+  propertyId: string;
   unit: string;
+  unitId: string;
   amount: string;
-  dueDate: string;
   status: PaymentStatus;
+  hasAssignment: boolean;
   ownerPhone?: string;
-  tenantPhone?: string;
+  onDelete?: () => void;
+  onLinkUnit?: () => void;
+  onDeleteTenant?: () => void;
   onStatusChange?: (status: PaymentStatus) => void;
 }
 
-function TenantRow({ tenant, property, unit, amount, dueDate, status, onStatusChange, ownerPhone = '+1 (555) 123-4567', tenantPhone = '+1 (555) 987-6543' }: TenantRowProps) {
-  const [showContactMenu, setShowContactMenu] = useState(false);
-
-  const handleContact = (type: 'owner' | 'tenant', phone: string) => {
-    setShowContactMenu(false);
-    // In a real app, this would initiate a call or open a messaging interface
-    console.log(`Contacting ${type}: ${phone}`);
-  };
+function TenantRow({ id, tenant, email, phone, property, propertyId, unit, unitId, amount, status, hasAssignment, ownerPhone = '+1 (555) 123-4567', onDelete, onLinkUnit, onDeleteTenant, onStatusChange }: TenantRowProps) {
+  const [showOptionsMenu, setShowOptionsMenu] = useState(false);
+  const [showPaymentMenu, setShowPaymentMenu] = useState(false);
 
   return (
     <div className="content-stretch flex items-center justify-between py-[16px] px-[24px] relative shrink-0 w-full border-b border-[rgba(255,255,255,0.16)] hover:bg-[rgba(255,255,255,0.03)] transition-colors">
-      <div className="flex-[2_0_0]">
+      <div className="flex-[2.5_0_0]">
         <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
           {tenant}
         </p>
         <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
-          {property} - {unit}
+          {email}
+        </p>
+        <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
+          {phone}
+        </p>
+      </div>
+      <div className="flex-[2_0_0]">
+        <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
+          {property}
+        </p>
+        <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
+          {unit}
         </p>
       </div>
       <div className="flex-[1_0_0]">
@@ -48,49 +65,100 @@ function TenantRow({ tenant, property, unit, amount, dueDate, status, onStatusCh
         </p>
       </div>
       <div className="flex-[1_0_0]">
-        <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] text-[15px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
-          {dueDate}
-        </p>
+        <div className="relative w-fit">
+          <button
+            onClick={() => setShowPaymentMenu(!showPaymentMenu)}
+            className={`transition-opacity ${hasAssignment ? 'hover:opacity-80 cursor-pointer' : 'cursor-not-allowed opacity-50'}`}
+            title={hasAssignment ? "Cambiar estado de pago" : "Este inquilino no tiene asignaciones"}
+            disabled={!hasAssignment}
+          >
+            <StatusBadge status={status} />
+          </button>
+
+          {showPaymentMenu && hasAssignment && (
+            <>
+              <div 
+                className="fixed inset-0 z-[10]" 
+                onClick={() => setShowPaymentMenu(false)}
+              />
+              <div className="absolute top-[calc(100%+8px)] left-0 bg-black border border-[rgba(255,255,255,0.16)] rounded-[8px] min-w-[160px] z-[11] overflow-hidden">
+                {(['paid', 'pending', 'overdue', 'partial'] as const).map((paymentStatus) => (
+                  <button
+                    key={paymentStatus}
+                    onClick={() => {
+                      setShowPaymentMenu(false);
+                      onStatusChange?.(paymentStatus);
+                    }}
+                    className={`w-full text-left px-[12px] py-[8px] text-sm transition-colors ${
+                      status === paymentStatus
+                        ? 'bg-[#928dd3] text-black font-semibold'
+                        : 'hover:bg-[rgba(255,255,255,0.05)] text-white'
+                    }`}
+                  >
+                    {paymentStatus === 'paid' && 'Pagado'}
+                    {paymentStatus === 'pending' && 'Pendiente'}
+                    {paymentStatus === 'overdue' && 'Vencido'}
+                    {paymentStatus === 'partial' && 'Parcial'}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
       </div>
-      <div className="flex-[1_0_0]">
-        <StatusBadge status={status} onStatusChange={onStatusChange} />
-      </div>
-      <div className="relative">
+      <div className="flex items-center gap-2">
         <button 
-          onClick={() => setShowContactMenu(!showContactMenu)}
+          onClick={() => setShowOptionsMenu(!showOptionsMenu)}
           className="hover:bg-[rgba(255,255,255,0.05)] transition-colors p-[8px] rounded-[8px] text-white hover:text-[#928dd3]"
+          title="Opciones"
         >
-          <Phone />
+          ⋮
         </button>
 
-        {showContactMenu && (
+        {showOptionsMenu && (
           <>
             <div 
               className="fixed inset-0 z-[10]" 
-              onClick={() => setShowContactMenu(false)}
+              onClick={() => setShowOptionsMenu(false)}
             />
-            <div className="absolute top-[calc(100%+8px)] right-0 bg-black border border-[rgba(255,255,255,0.16)] rounded-[8px] min-w-[220px] z-[11] overflow-hidden">
+            <div className="absolute top-[calc(100%+8px)] right-[100px] bg-black border border-[rgba(255,255,255,0.16)] rounded-[8px] min-w-[200px] z-[11] overflow-hidden">
               <button
-                onClick={() => handleContact('tenant', tenantPhone)}
+                onClick={() => {
+                  setShowOptionsMenu(false);
+                  onLinkUnit?.();
+                }}
                 className="w-full text-left px-[16px] py-[12px] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
               >
-                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white mb-[2px]" style={{ fontVariationSettings: "'wdth' 100" }}>
-                  Contact Tenant
-                </p>
-                <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
-                  {tenantPhone}
+                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
+                  {hasAssignment ? '+Vincular unidad' : 'Vincular unidad'}
                 </p>
               </button>
+              {hasAssignment && (
+                <>
+                  <div className="border-t border-[rgba(255,255,255,0.16)]" />
+                  <button
+                    onClick={() => {
+                      setShowOptionsMenu(false);
+                      onDelete?.();
+                    }}
+                    className="w-full text-left px-[16px] py-[12px] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
+                  >
+                    <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
+                      Eliminar vínculo
+                    </p>
+                  </button>
+                </>
+              )}
               <div className="border-t border-[rgba(255,255,255,0.16)]" />
               <button
-                onClick={() => handleContact('owner', ownerPhone)}
-                className="w-full text-left px-[16px] py-[12px] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
+                onClick={() => {
+                  setShowOptionsMenu(false);
+                  onDeleteTenant?.();
+                }}
+                className="w-full text-left px-[16px] py-[12px] hover:bg-[#ff6b6b]/10 transition-colors"
               >
-                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white mb-[2px]" style={{ fontVariationSettings: "'wdth' 100" }}>
-                  Contact Owner
-                </p>
-                <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
-                  {ownerPhone}
+                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-[#ff6b6b]" style={{ fontVariationSettings: "'wdth' 100" }}>
+                  Eliminar Tenant
                 </p>
               </button>
             </div>
@@ -123,74 +191,127 @@ function SummaryCard({ title, value, subtitle }: { title: string; value: string;
 }
 
 export function Tenants() {
-  const { currentOwner } = useOwner();
-  const [tenants, setTenants] = useState<TenantRowProps[]>([
-    {
-      tenant: "John Smith",
-      property: "Sunset Apartments",
-      unit: "Unit 101",
-      amount: "$1,200",
-      dueDate: "Mar 1, 2026",
-      status: "paid",
-      tenantPhone: "+1 (555) 234-5678",
-      ownerPhone: "+1 (555) 123-4567"
-    },
-    {
-      tenant: "Sarah Johnson",
-      property: "Harbor View",
-      unit: "Unit 205",
-      amount: "$1,350",
-      dueDate: "Mar 1, 2026",
-      status: "paid",
-      tenantPhone: "+1 (555) 345-6789",
-      ownerPhone: "+1 (555) 123-4567"
-    },
-    {
-      tenant: "Michael Chen",
-      property: "Downtown Lofts",
-      unit: "Unit 304",
-      amount: "$1,800",
-      dueDate: "Mar 1, 2026",
-      status: "pending",
-      tenantPhone: "+1 (555) 456-7890",
-      ownerPhone: "+1 (555) 123-4567"
-    },
-    {
-      tenant: "Emily Davis",
-      property: "Parkside",
-      unit: "Unit 112",
-      amount: "$1,150",
-      dueDate: "Feb 1, 2026",
-      status: "overdue",
-      tenantPhone: "+1 (555) 567-8901",
-      ownerPhone: "+1 (555) 123-4567"
-    },
-    {
-      tenant: "David Wilson",
-      property: "Riverside Towers",
-      unit: "Unit 501",
-      amount: "$1,500",
-      dueDate: "Mar 1, 2026",
-      status: "paid",
-      tenantPhone: "+1 (555) 678-9012",
-      ownerPhone: "+1 (555) 123-4567"
-    },
-    {
-      tenant: "Lisa Anderson",
-      property: "Metro Plaza",
-      unit: "Unit 203",
-      amount: "$1,400",
-      dueDate: "Mar 1, 2026",
-      status: "pending",
-      tenantPhone: "+1 (555) 789-0123",
-      ownerPhone: "+1 (555) 123-4567"
-    }
-  ]);
+  const { currentOwner, tenants, properties, refreshTenants, refreshProperties } = useOwner();
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [selectedTenantForLink, setSelectedTenantForLink] = useState<string | null>(null);
 
-  const handleTenantStatusChange = (index: number, newStatus: PaymentStatus) => {
-    const updatedTenants = [...tenants];
-    updatedTenants[index].status = newStatus;
-    setTenants(updatedTenants);
+  const getTenantRows = () => {
+    const rows: any[] = [];
+    
+    tenants.forEach((tenant) => {
+      // Get ACTIVE assignments
+      const activeAssignments = tenant.assignedProperties.filter(a => a.status === 'active');
+      
+      // If tenant has active assignments, show one row per assignment
+      if (activeAssignments.length > 0) {
+        activeAssignments.forEach((assignment) => {
+          const property = properties.find(p => p.id === assignment.propertyId);
+          const unit = property?.units.find(u => u.id === assignment.unitId);
+
+          if (!property || !unit) return;
+
+          rows.push({
+            id: tenant.id,
+            tenant: `${tenant.firstName} ${tenant.lastName}`,
+            email: tenant.email,
+            phone: tenant.phone,
+            property: property.name,
+            propertyId: property.id,
+            unit: `Unidad ${unit.unitNumber}`,
+            unitId: unit.id,
+            amount: `$${assignment.rentAmount.toLocaleString()}`,
+            status: assignment.paymentStatus,
+            ownerPhone: currentOwner.name,
+            hasAssignment: true,
+          });
+        });
+      } else {
+        // Tenant without active assignments
+        rows.push({
+          id: tenant.id,
+          tenant: `${tenant.firstName} ${tenant.lastName}`,
+          email: tenant.email,
+          phone: tenant.phone,
+          property: 'Sin Asignar',
+          propertyId: '',
+          unit: '-',
+          unitId: '',
+          amount: '-',
+          status: 'pending' as PaymentStatus,
+          ownerPhone: currentOwner.name,
+          hasAssignment: false,
+        });
+      }
+    });
+
+    return rows;
+  };
+
+  const tenantRows = getTenantRows();
+
+  const totalCollected = tenants.reduce((sum, t) => {
+    // Sum ALL active assignments for each tenant
+    const activeTotal = t.assignedProperties
+      .filter(a => a.status === 'active')
+      .reduce((total, assignment) => total + assignment.rentAmount, 0);
+    return sum + activeTotal;
+  }, 0);
+
+  const handleDeleteTenant = (tenantId: string, propertyId: string, unitId: string) => {
+    if (confirm('¿Estás seguro de que deseas eliminar este vínculo?')) {
+      try {
+        // Only unassign from this specific unit
+        propertyService.unassignTenantFromUnit(propertyId, unitId);
+        
+        // Unassign in tenant's assignedProperties
+        tenantService.unassignFromUnit(tenantId, propertyId, unitId);
+        
+        // Refresh both lists
+        refreshTenants();
+        refreshProperties();
+      } catch (error) {
+        console.error('Error deleting link:', error);
+        alert('Error al eliminar vínculo');
+      }
+    }
+  };
+
+  const handleDeleteTenantCompletely = (tenantId: string) => {
+    if (confirm('¿Estás seguro de que deseas eliminar este tenant completamente? Esta acción no se puede deshacer.')) {
+      try {
+        // Get tenant data before deleting
+        const tenant = tenantService.getTenant(tenantId);
+        
+        // Unassign from all properties
+        if (tenant && tenant.assignedProperties) {
+          tenant.assignedProperties.forEach(assignment => {
+            if (assignment.status === 'active') {
+              propertyService.unassignTenantFromUnit(assignment.propertyId, assignment.unitId);
+            }
+          });
+        }
+        
+        // Delete the tenant completely
+        tenantService.deleteTenant(tenantId);
+        
+        // Refresh both lists
+        refreshTenants();
+        refreshProperties();
+      } catch (error) {
+        console.error('Error deleting tenant:', error);
+        alert('Error al eliminar tenant');
+      }
+    }
+  };
+
+  const handlePaymentStatusChange = (tenantId: string, propertyId: string, unitId: string, paymentStatus: PaymentStatus) => {
+    try {
+      tenantService.updatePaymentStatus(tenantId, propertyId, unitId, paymentStatus);
+      refreshTenants();
+    } catch (error) {
+      console.error('Error updating payment status:', error);
+      alert('Error al actualizar estado de pago');
+    }
   };
 
   return (
@@ -202,54 +323,79 @@ export function Tenants() {
               Tenants
             </p>
             <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] text-[15px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
-              Manage tenant payments for {currentOwner.name}
+              Manage {tenants.length} tenants for {currentOwner.name}
             </p>
           </div>
-          <button className="bg-[#928dd3] content-stretch flex items-center justify-center px-[16px] py-[8px] relative rounded-[8px] shrink-0 hover:bg-[#7f7ab8] transition-colors">
+          <button 
+            onClick={() => setShowCreateDialog(true)}
+            className="bg-[#928dd3] content-stretch flex items-center justify-center px-[16px] py-[8px] relative rounded-[8px] shrink-0 hover:bg-[#7f7ab8] transition-colors"
+          >
             <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] relative shrink-0 text-[15px] text-black whitespace-nowrap" style={{ fontVariationSettings: "'wdth' 100" }}>
-              Record Payment
+              Add Tenant
             </p>
           </button>
         </div>
       </div>
 
       <div className="content-stretch flex gap-[24px] items-start px-[48px] pb-[24px] relative w-full">
-        <SummaryCard title="Total Collected" value="$120,000" subtitle="This month" />
-        <SummaryCard title="Outstanding" value="$15,000" subtitle="3 pending payments" />
-        <SummaryCard title="Overdue" value="$1,150" subtitle="1 payment" />
+        <SummaryCard title="Total Tenants" value={tenants.length.toString()} subtitle="Active tenants" />
+        <SummaryCard title="Expected Revenue" value={`$${totalCollected.toLocaleString()}`} subtitle="Monthly" />
+        <SummaryCard title="Occupied Units" value={properties.reduce((sum, p) => sum + p.occupiedUnits, 0).toString()} subtitle={`of ${properties.reduce((sum, p) => sum + p.totalUnits, 0)}`} />
       </div>
 
       <div className="bg-black mx-[48px] mb-[48px] rounded-[16px] relative">
         <div aria-hidden="true" className="absolute border border-solid border-white inset-0 pointer-events-none rounded-[16px]" />
-        <div className="overflow-clip rounded-[inherit] size-full">
+        <div className="overflow-visible rounded-[inherit] size-full">
           <div className="content-stretch flex items-center justify-between py-[16px] px-[24px] relative shrink-0 w-full border-b border-[rgba(255,255,255,0.16)]">
-            <p className="flex-[2_0_0] font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
+            <p className="flex-[2.5_0_0] font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
               Tenant
+            </p>
+            <p className="flex-[2_0_0] font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
+              Property / Unit
             </p>
             <p className="flex-[1_0_0] font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
               Amount
             </p>
             <p className="flex-[1_0_0] font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
-              Due Date
-            </p>
-            <p className="flex-[1_0_0] font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
               Status
             </p>
-            <div className="w-[40px] flex items-center justify-center">
-              <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
-                Contact
-              </p>
-            </div>
           </div>
-          {tenants.map((tenant, index) => (
-            <TenantRow 
-              key={index} 
-              {...tenant} 
-              onStatusChange={(newStatus) => handleTenantStatusChange(index, newStatus)}
-            />
-          ))}
+          {tenantRows.length === 0 ? (
+            <div className="py-8 px-4 text-center text-[rgba(255,255,255,0.6)]">
+              No tenants yet. Create one to get started!
+            </div>
+          ) : (
+            tenantRows.map((row, index) => (
+              <TenantRow 
+                key={index}
+                {...row}
+                onDelete={() => handleDeleteTenant(row.id, row.propertyId, row.unitId)}
+                onLinkUnit={() => setSelectedTenantForLink(row.id)}
+                onDeleteTenant={() => handleDeleteTenantCompletely(row.id)}
+                onStatusChange={(newStatus) => handlePaymentStatusChange(row.id, row.propertyId, row.unitId, newStatus)}
+              />
+            ))
+          )}
         </div>
       </div>
+
+      <CreateTenantDialog 
+        isOpen={showCreateDialog}
+        onClose={() => setShowCreateDialog(false)}
+        onSuccess={() => setShowCreateDialog(false)}
+      />
+
+      <LinkAdditionalUnitDialog
+        isOpen={!!selectedTenantForLink}
+        tenantId={selectedTenantForLink || ''}
+        properties={properties}
+        onClose={() => setSelectedTenantForLink(null)}
+        onSuccess={() => {
+          setSelectedTenantForLink(null);
+          refreshTenants();
+          refreshProperties();
+        }}
+      />
     </div>
   );
 }

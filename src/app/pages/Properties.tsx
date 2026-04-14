@@ -1,7 +1,12 @@
 import { useState } from 'react';
 import { useOwner } from '../context/OwnerContext';
+import { propertyService } from '../../services/propertyService';
+import { CreatePropertyDialog } from '../components/dialogs/CreatePropertyDialog';
+import { EditPropertyDialog } from '../components/dialogs/EditPropertyDialog';
+import { PropertyDetailsDialog } from '../components/dialogs/PropertyDetailsDialog';
 import svgPaths from "../../imports/svg-zayt9vop9f";
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
+import type { Property } from '../types/index';
 
 function DotsHorizontal() {
   return (
@@ -24,17 +29,23 @@ function Plus() {
 }
 
 interface PropertyCardProps {
-  name: string;
-  address: string;
-  units: number;
-  occupancy: string;
-  revenue: string;
-  imageUrl: string;
+  property: Property;
+  onDelete?: (id: string) => void;
+  onEdit?: (property: Property) => void;
+  onViewDetails?: (property: Property) => void;
 }
 
-function PropertyCard({ name, address, units, occupancy, revenue, imageUrl }: PropertyCardProps) {
+function PropertyCard({ property, onDelete, onEdit, onViewDetails }: PropertyCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+
+  const occupancyPercentage = property.totalUnits > 0 
+    ? Math.round((property.occupiedUnits / property.totalUnits) * 100) 
+    : 0;
+
+  const totalMonthlyRevenue = property.units
+    .filter(u => u.status === 'occupied')
+    .reduce((sum, u) => sum + u.rentAmount, 0);
 
   return (
     <div 
@@ -44,8 +55,8 @@ function PropertyCard({ name, address, units, occupancy, revenue, imageUrl }: Pr
     >
       <div className="relative w-full h-[200px] overflow-hidden">
         <ImageWithFallback 
-          src={imageUrl}
-          alt={name}
+          src={property.imageUrl}
+          alt={property.name}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
@@ -55,10 +66,10 @@ function PropertyCard({ name, address, units, occupancy, revenue, imageUrl }: Pr
         <div className="flex items-start justify-between mb-[12px]">
           <div className="flex-1">
             <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] text-[17px] text-white mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
-              {name}
+              {property.name}
             </p>
             <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
-              {address}
+              {property.address}
             </p>
           </div>
           <div className="relative">
@@ -79,35 +90,35 @@ function PropertyCard({ name, address, units, occupancy, revenue, imageUrl }: Pr
                   <button
                     onClick={() => {
                       setShowMenu(false);
-                      // Handle add expense
+                      onEdit?.(property);
                     }}
-                    className="w-full text-left px-[16px] py-[12px] hover:bg-[rgba(255,255,255,0.05)] transition-colors flex items-center gap-[12px]"
+                    className="w-full text-left px-[16px] py-[12px] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
                   >
-                    <Plus />
                     <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
-                      Add Expense
+                      Editar Propiedad
                     </p>
                   </button>
                   <button
                     onClick={() => {
                       setShowMenu(false);
-                      // Handle edit
+                      onViewDetails?.(property);
                     }}
                     className="w-full text-left px-[16px] py-[12px] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
                   >
                     <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
-                      Edit Property
+                      Ver Detalles
                     </p>
                   </button>
+                  <div className="border-t border-[rgba(255,255,255,0.16)]" />
                   <button
                     onClick={() => {
                       setShowMenu(false);
-                      // Handle view details
+                      onDelete?.(property.id);
                     }}
-                    className="w-full text-left px-[16px] py-[12px] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
+                    className="w-full text-left px-[16px] py-[12px] hover:bg-[rgba(255,0,0,0.1)] transition-colors"
                   >
-                    <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
-                      View Details
+                    <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-[#ff6b6b]" style={{ fontVariationSettings: "'wdth' 100" }}>
+                      Eliminar Propiedad
                     </p>
                   </button>
                 </div>
@@ -121,7 +132,7 @@ function PropertyCard({ name, address, units, occupancy, revenue, imageUrl }: Pr
             Monthly Revenue
           </p>
           <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] text-[24px] text-[#928dd3] tracking-[-0.24px]">
-            {revenue}
+            ${totalMonthlyRevenue.toLocaleString()}
           </p>
         </div>
 
@@ -134,7 +145,7 @@ function PropertyCard({ name, address, units, occupancy, revenue, imageUrl }: Pr
                   Units
                 </p>
                 <p className="font-['Chivo:Black',sans-serif] font-black leading-[24px] text-[20px] text-white tracking-[-0.2px]">
-                  {units}
+                  {property.totalUnits}
                 </p>
               </div>
               <div>
@@ -142,7 +153,7 @@ function PropertyCard({ name, address, units, occupancy, revenue, imageUrl }: Pr
                   Occupancy
                 </p>
                 <p className="font-['Chivo:Black',sans-serif] font-black leading-[24px] text-[20px] text-white tracking-[-0.2px]">
-                  {occupancy}
+                  {occupancyPercentage}%
                 </p>
               </div>
             </div>
@@ -156,58 +167,25 @@ function PropertyCard({ name, address, units, occupancy, revenue, imageUrl }: Pr
 }
 
 export function Properties() {
-  const { currentOwner } = useOwner();
-  
-  const properties = [
-    {
-      name: "Sunset Apartments",
-      address: "123 Main St, City",
-      units: 24,
-      occupancy: "92%",
-      revenue: "$28,000",
-      imageUrl: "https://images.unsplash.com/photo-1559329146-807aff9ff1fb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBhcGFydG1lbnQlMjBidWlsZGluZyUyMGV4dGVyaW9yfGVufDF8fHx8MTc3MzkzMjE3MXww&ixlib=rb-4.1.0&q=80&w=1080"
-    },
-    {
-      name: "Harbor View Complex",
-      address: "456 Ocean Ave, City",
-      units: 36,
-      occupancy: "88%",
-      revenue: "$42,000",
-      imageUrl: "https://images.unsplash.com/photo-1771998785227-268f33b50c65?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjByZXNpZGVudGlhbCUyMGNvbXBsZXh8ZW58MXx8fHwxNzczOTU1OTQzfDA&ixlib=rb-4.1.0&q=80&w=1080"
-    },
-    {
-      name: "Downtown Lofts",
-      address: "789 Central Blvd, City",
-      units: 18,
-      occupancy: "95%",
-      revenue: "$35,000",
-      imageUrl: "https://images.unsplash.com/photo-1504660069764-2b37e279874a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkb3dudG93biUyMGxvZnQlMjBidWlsZGluZ3xlbnwxfHx8fDE3NzM5NTU5NDR8MA&ixlib=rb-4.1.0&q=80&w=1080"
-    },
-    {
-      name: "Parkside Residences",
-      address: "321 Park Dr, City",
-      units: 30,
-      occupancy: "90%",
-      revenue: "$38,000",
-      imageUrl: "https://images.unsplash.com/photo-1687051471969-d2ded7eec8a0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyZXNpZGVudGlhbCUyMHRvd2VyJTIwc2t5bGluZXxlbnwxfHx8fDE3NzM5NTU5NDR8MA&ixlib=rb-4.1.0&q=80&w=1080"
-    },
-    {
-      name: "Riverside Towers",
-      address: "654 River Rd, City",
-      units: 48,
-      occupancy: "85%",
-      revenue: "$52,000",
-      imageUrl: "https://images.unsplash.com/photo-1740484408109-bf402fa3a1ff?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhcGFydG1lbnQlMjBjb21wbGV4JTIwd2F0ZXJmcm9udHxlbnwxfHx8fDE3NzM5NTU5NDR8MA&ixlib=rb-4.1.0&q=80&w=1080"
-    },
-    {
-      name: "Metro Plaza",
-      address: "987 Metro St, City",
-      units: 42,
-      occupancy: "93%",
-      revenue: "$48,000",
-      imageUrl: "https://images.unsplash.com/photo-1736007917095-88dd6bc641e5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx1cmJhbiUyMGFwYXJ0bWVudCUyMGJ1aWxkaW5nfGVufDF8fHx8MTc3Mzk0Njg0Nnww&ixlib=rb-4.1.0&q=80&w=1080"
+  const { currentOwner, properties, refreshProperties } = useOwner();
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [editingProperty, setEditingProperty] = useState<Property | null>(null);
+  const [viewingProperty, setViewingProperty] = useState<Property | null>(null);
+
+  const handleDeleteProperty = (propertyId: string) => {
+    if (confirm('¿Estás seguro de que deseas eliminar esta propiedad?')) {
+      propertyService.deleteProperty(propertyId);
+      refreshProperties();
     }
-  ];
+  };
+
+  const handleEditProperty = (property: Property) => {
+    setEditingProperty(property);
+  };
+
+  const handleViewDetails = (property: Property) => {
+    setViewingProperty(property);
+  };
 
   return (
     <div className="bg-black min-h-full w-full">
@@ -218,10 +196,13 @@ export function Properties() {
               Properties
             </p>
             <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] text-[15px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
-              Managing {currentOwner.properties} properties for {currentOwner.name}
+              Managing {properties.length} properties for {currentOwner.name}
             </p>
           </div>
-          <button className="bg-[#928dd3] content-stretch flex items-center justify-center px-[16px] py-[8px] relative rounded-[8px] shrink-0 hover:bg-[#7f7ab8] transition-colors">
+          <button 
+            onClick={() => setShowCreateDialog(true)}
+            className="bg-[#928dd3] content-stretch flex items-center justify-center px-[16px] py-[8px] relative rounded-[8px] shrink-0 hover:bg-[#7f7ab8] transition-colors"
+          >
             <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] relative shrink-0 text-[15px] text-black whitespace-nowrap" style={{ fontVariationSettings: "'wdth' 100" }}>
               Add Property
             </p>
@@ -230,10 +211,50 @@ export function Properties() {
       </div>
 
       <div className="grid grid-cols-3 gap-[24px] px-[48px] pb-[48px]">
-        {properties.map((property, index) => (
-          <PropertyCard key={index} {...property} />
-        ))}
+        {properties.length === 0 ? (
+          <div className="col-span-3 text-center py-12">
+            <p className="text-[rgba(255,255,255,0.6)] mb-4">No hay propiedades creadas aún</p>
+            <button 
+              onClick={() => setShowCreateDialog(true)}
+              className="text-[#928dd3] hover:text-[#a89be6] transition-colors"
+            >
+              Crear la primera propiedad →
+            </button>
+          </div>
+        ) : (
+          properties.map((property) => (
+            <PropertyCard 
+              key={property.id} 
+              property={property}
+              onDelete={handleDeleteProperty}
+              onEdit={handleEditProperty}
+              onViewDetails={handleViewDetails}
+            />
+          ))
+        )}
       </div>
+
+      <CreatePropertyDialog 
+        isOpen={showCreateDialog}
+        onClose={() => setShowCreateDialog(false)}
+        onSuccess={() => setShowCreateDialog(false)}
+      />
+
+      <EditPropertyDialog
+        isOpen={!!editingProperty}
+        property={editingProperty}
+        onClose={() => setEditingProperty(null)}
+        onSuccess={() => {
+          setEditingProperty(null);
+          refreshProperties();
+        }}
+      />
+
+      <PropertyDetailsDialog
+        isOpen={!!viewingProperty}
+        property={viewingProperty}
+        onClose={() => setViewingProperty(null)}
+      />
     </div>
   );
 }
