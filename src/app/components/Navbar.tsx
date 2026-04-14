@@ -183,6 +183,7 @@ function Profile() {
     <button
       className="overflow-clip relative rounded-[999px] shrink-0 size-[40px] hover:opacity-80 transition-opacity"
       data-name="profile"
+      type="button"
     >
       <ImageUserAvatar />
     </button>
