@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { Property } from '../../types/index';
 import { propertyService } from '../../../services/propertyService';
 
@@ -16,16 +16,13 @@ export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: Edi
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
-  // Actualizar formulario cuando la propiedad cambia
-  useEffect(() => {
-    if (property) {
-      setFormData({
-        name: property.name,
-        description: property.description || '',
-      });
-      setValidationErrors({});
-    }
-  }, [property?.id, isOpen]);
+  const resetFormFromProperty = () => {
+    setFormData({
+      name: property?.name || '',
+      description: property?.description || '',
+    });
+    setValidationErrors({});
+  };
 
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
@@ -60,11 +57,7 @@ export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: Edi
   };
 
   const handleClose = () => {
-    setFormData({
-      name: property?.name || '',
-      description: property?.description || '',
-    });
-    setValidationErrors({});
+    resetFormFromProperty();
     onClose();
   };
 

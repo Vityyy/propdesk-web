@@ -2,6 +2,7 @@ import type { PaymentStatus } from '../types/index';
 
 interface StatusBadgeProps {
   status: PaymentStatus;
+  onStatusChange?: (status: PaymentStatus) => void;
 }
 
 export type { PaymentStatus };
