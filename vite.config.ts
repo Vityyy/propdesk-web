@@ -5,10 +5,17 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
-  const apiBaseUrl = env.VITE_API_URL || '/api'
-  const proxyTarget = env.VITE_DEV_PROXY_TARGET || 'http://localhost:8080'
+  const apiBaseUrl = env.VITE_API_URL
 
-  const shouldUseProxy = apiBaseUrl.startsWith('/')
+  if (!apiBaseUrl) {
+    throw new Error('Missing required env var: VITE_API_URL')
+  }
+
+  const shouldUseProxy = mode === 'development' && apiBaseUrl.startsWith('/')
+
+  if (shouldUseProxy && mode === 'development' && !env.VITE_DEV_PROXY_TARGET) {
+    throw new Error('Missing required env var for dev proxy: VITE_DEV_PROXY_TARGET')
+  }
 
   return {
     plugins: [tailwindcss(), react()],
@@ -16,7 +23,7 @@ export default defineConfig(({ mode }) => {
       ? {
           proxy: {
             [apiBaseUrl]: {
-              target: proxyTarget,
+              target: env.VITE_DEV_PROXY_TARGET,
               changeOrigin: true,
               secure: false,
               rewrite: (path) =>

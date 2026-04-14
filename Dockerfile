@@ -14,8 +14,10 @@ FROM nginx:alpine
 
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Nginx config para SPA con fallback a index.html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Nginx template para SPA + proxy /api (envsubst en startup)
+COPY nginx.conf /etc/nginx/templates/default.conf.template
+COPY docker-entrypoint.d/10-require-backend-url.sh /docker-entrypoint.d/10-require-backend-url.sh
+RUN chmod +x /docker-entrypoint.d/10-require-backend-url.sh
 
 EXPOSE 80
 
