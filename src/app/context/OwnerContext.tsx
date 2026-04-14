@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode, useEffect } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 import type { Property, Tenant } from '../types/index';
 import { propertyService } from '../../services/propertyService';
 import { tenantService } from '../../services/tenantService';
@@ -30,25 +30,27 @@ const defaultOwners: Owner[] = [
 const OwnerContext = createContext<OwnerContextType | undefined>(undefined);
 
 export function OwnerProvider({ children }: { children: ReactNode }) {
-  const [currentOwner, setCurrentOwner] = useState<Owner>(defaultOwners[0]);
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [tenants, setTenants] = useState<Tenant[]>([]);
+  const [currentOwner, setCurrentOwnerState] = useState<Owner>(defaultOwners[0]);
+  const [properties, setProperties] = useState<Property[]>(() =>
+    propertyService.getPropertiesByOwner(defaultOwners[0].id),
+  );
+  const [tenants, setTenants] = useState<Tenant[]>(() =>
+    tenantService.getTenantsByOwner(defaultOwners[0].id),
+  );
+
+  const setCurrentOwner = (owner: Owner) => {
+    setCurrentOwnerState(owner);
+    setProperties(propertyService.getPropertiesByOwner(owner.id));
+    setTenants(tenantService.getTenantsByOwner(owner.id));
+  };
 
   const refreshProperties = () => {
-    const props = propertyService.getPropertiesByOwner(currentOwner.id);
-    setProperties(props);
+    setProperties(propertyService.getPropertiesByOwner(currentOwner.id));
   };
 
   const refreshTenants = () => {
-    const tenantsList = tenantService.getTenantsByOwner(currentOwner.id);
-    setTenants(tenantsList);
+    setTenants(tenantService.getTenantsByOwner(currentOwner.id));
   };
-
-  // Load data when owner changes
-  useEffect(() => {
-    refreshProperties();
-    refreshTenants();
-  }, [currentOwner.id]);
 
   return (
     <OwnerContext.Provider value={{ 
