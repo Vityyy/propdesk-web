@@ -1,73 +1,65 @@
-# React + TypeScript + Vite
+# GDSI Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + TypeScript + Vite frontend for RMS.
 
-Currently, two official plugins are available:
+## Requirements
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Node.js 20+
+- npm 10+
+- Docker (optional)
 
-## React Compiler
+## Environment Variables
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Create a local `.env` file:
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```dotenv
+VITE_API_URL=/api
+VITE_DEV_PROXY_TARGET=http://localhost:8080
+VITE_APP_NAME=ARMS
+VITE_ENVIRONMENT=development
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### How API routing works
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- The app reads `VITE_API_URL` from `src/config/api.ts`.
+- In local development, Vite proxies `VITE_API_URL` to `VITE_DEV_PROXY_TARGET`.
+- In Docker/Render, Nginx proxies `/api` to `BACKEND_URL`.
+- There are no runtime fallbacks for these variables.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Local Development
+
+```powershell
+npm install
+npm run dev
 ```
+
+
+## Build
+
+```powershell
+npm run build
+npm run preview
+```
+
+## Run With Docker (Frontend on 3000)
+
+Build image:
+
+```powershell
+docker build -t gdsi-frontend:latest .
+```
+
+Run container:
+
+```powershell
+docker rm -f gdsi-frontend 2>$null
+docker run -d --name gdsi-frontend -p 3000:80 -e BACKEND_URL=http://host.docker.internal:8080 gdsi-frontend:latest
+```
+
+Frontend dev URL:
+- `http://localhost:3000`
+
+Render URL:
+- `https://gdsi-frontend.onrender.com`
+- Static frontend is served by Nginx.
+- Requests to `/api/*` are proxied to `BACKEND_URL`.
