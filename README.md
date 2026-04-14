@@ -6,25 +6,22 @@ React + TypeScript + Vite frontend for RMS.
 
 - Node.js 20+
 - npm 10+
-- Docker (optional)
 
 ## Environment Variables
 
 Create a local `.env` file:
 
 ```dotenv
-VITE_API_URL=/api
-VITE_DEV_PROXY_TARGET=http://localhost:8080
+VITE_API_URL=http://localhost:8080
 VITE_APP_NAME=ARMS
 VITE_ENVIRONMENT=development
 ```
 
-### How API routing works
+### API routing model
 
 - The app reads `VITE_API_URL` from `src/config/api.ts`.
-- In local development, Vite proxies `VITE_API_URL` to `VITE_DEV_PROXY_TARGET`.
-- In Docker/Render, Nginx proxies `/api` to `BACKEND_URL`.
-- There are no runtime fallbacks for these variables.
+- `VITE_API_URL` must be an absolute backend URL (for example `https://your-backend.onrender.com`).
+- There are no runtime proxy fallbacks.
 
 ## Local Development
 
@@ -33,6 +30,9 @@ npm install
 npm run dev
 ```
 
+Frontend URL:
+
+- `http://localhost:5173`
 
 ## Build
 
@@ -41,25 +41,24 @@ npm run build
 npm run preview
 ```
 
-## Run With Docker (Frontend on 3000)
+## Deploy on Render (Static Site)
 
-Build image:
+1. Create a **Static Site** from this repository.
+2. Set build command:
+   - `npm install; npm run build`
+3. Set publish directory:
+   - `dist`
+4. Add environment variables:
 
-```powershell
-docker build -t gdsi-frontend:latest .
+```env
+VITE_API_URL=https://your-backend.onrender.com
+VITE_APP_NAME=ARMS
+VITE_ENVIRONMENT=production
 ```
 
-Run container:
+5. Deploy.
 
-```powershell
-docker rm -f gdsi-frontend 2>$null
-docker run -d --name gdsi-frontend -p 3000:80 -e BACKEND_URL=http://host.docker.internal:8080 gdsi-frontend:latest
-```
+## Notes
 
-Frontend dev URL:
-- `http://localhost:3000`
-
-Render URL:
-- `https://gdsi-frontend.onrender.com`
-- Static frontend is served by Nginx.
-- Requests to `/api/*` are proxied to `BACKEND_URL`.
+- Do not use `./` as Publish Directory for Render Static Site. Use `dist`.
+- If you use custom domains, make sure backend CORS allows the frontend origin.
