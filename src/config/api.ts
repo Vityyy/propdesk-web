@@ -1,6 +1,10 @@
-const DEFAULT_API_URL = "/api";
+const rawApiUrl = import.meta.env.VITE_API_URL;
 
-export const API_BASE_URL = (import.meta.env.VITE_API_URL || DEFAULT_API_URL).replace(/\/$/, "");
+if (!rawApiUrl) {
+  throw new Error("Missing required env var: VITE_API_URL");
+}
+
+export const API_BASE_URL = rawApiUrl.replace(/\/$/, "");
 
 export const API_ENDPOINTS = {
   AUTH: {
