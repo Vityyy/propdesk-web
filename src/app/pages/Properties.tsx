@@ -20,14 +20,6 @@ function DotsHorizontal() {
   );
 }
 
-function Plus() {
-  return (
-    <svg className="size-[20px]" fill="none" viewBox="0 0 24 24">
-      <path d="M12 5V19M5 12H19" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-    </svg>
-  );
-}
-
 interface PropertyCardProps {
   property: Property;
   onDelete?: (id: string) => void;
@@ -241,6 +233,7 @@ export function Properties() {
       />
 
       <EditPropertyDialog
+        key={editingProperty?.id ?? 'no-property'}
         isOpen={!!editingProperty}
         property={editingProperty}
         onClose={() => setEditingProperty(null)}
