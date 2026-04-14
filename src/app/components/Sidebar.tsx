@@ -1,18 +1,7 @@
-import { Link, useLocation } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import svgPaths from "../../imports/svg-zayt9vop9f";
 import { OwnerSelector } from './OwnerSelector';
-
-function Placeholder() {
-  return (
-    <div className="relative shrink-0 size-[24px]" data-name="placeholder">
-      <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 24">
-        <g id="placeholder">
-          <path d={svgPaths.pace200} id="Icon" stroke="var(--stroke-0, #928DD3)" strokeDasharray="4 4" strokeLinecap="round" strokeLinejoin="round" />
-        </g>
-      </svg>
-    </div>
-  );
-}
+import { useAuth } from '../context/AuthContext';
 
 function Building() {
   return (
@@ -20,18 +9,6 @@ function Building() {
       <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 24">
         <g id="building">
           <path d={svgPaths.p3d3d1a18} id="Icon" stroke="var(--stroke-0, white)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
-        </g>
-      </svg>
-    </div>
-  );
-}
-
-function Shipping() {
-  return (
-    <div className="relative shrink-0 size-[24px]" data-name="shipping">
-      <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 24">
-        <g id="shipping">
-          <path d={svgPaths.p23f9b930} id="Icon" stroke="var(--stroke-0, white)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
         </g>
       </svg>
     </div>
@@ -140,12 +117,31 @@ function MenuItem({ icon, label, to, isActive, isCollapsed }: MenuItemProps) {
   );
 }
 
+function LogoutIcon() {
+  return (
+    <div className="relative shrink-0 size-[24px]" data-name="logout">
+      <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 24">
+        <path d="M15 17L20 12L15 7" stroke="#FF6B6B" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
+        <path d="M20 12H9" stroke="#FF6B6B" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
+        <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="#FF6B6B" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
+      </svg>
+    </div>
+  );
+}
+
 export function Sidebar({ isCollapsed, onToggle }: { isCollapsed: boolean; onToggle: () => void }) {
   const location = useLocation();
-  
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login', { replace: true });
+  };
+
   return (
     <div className={`content-stretch flex flex-col isolate items-start overflow-clip relative shrink-0 transition-all duration-300 z-[2] ${isCollapsed ? 'w-[80px]' : 'w-[400px]'}`} data-name="Sidebar">
-      <div className="bg-black content-stretch flex flex-col items-start overflow-clip py-[24px] px-[24px] relative shrink-0 w-full z-[1]" data-name="Side Panel Menu">
+      <div className="bg-black content-stretch flex h-full flex-col items-start overflow-clip py-[24px] px-[24px] relative shrink-0 w-full z-[1]" data-name="Side Panel Menu">
         <div className="flex items-center justify-between w-full mb-[16px]">
           {!isCollapsed && <OwnerSelector />}
           <button
@@ -200,6 +196,21 @@ export function Sidebar({ isCollapsed, onToggle }: { isCollapsed: boolean; onTog
           isActive={location.pathname.startsWith('/settings')}
           isCollapsed={isCollapsed}
         />
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="mt-auto bg-black hover:bg-[rgba(255,107,107,0.08)] relative rounded-[8px] shrink-0 w-full transition-colors"
+          title={isCollapsed ? 'Logout' : undefined}
+        >
+          <div className={`content-stretch flex gap-[16px] items-center px-[16px] py-[8px] relative w-full ${isCollapsed ? 'justify-center' : ''}`}>
+            <LogoutIcon />
+            {!isCollapsed && (
+              <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] relative shrink-0 text-[15px] whitespace-nowrap text-[#FF6B6B]" style={{ fontVariationSettings: "'wdth' 100" }}>
+                Logout
+              </p>
+            )}
+          </div>
+        </button>
       </div>
     </div>
   );
