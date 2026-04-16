@@ -2,6 +2,7 @@ import { FormEvent, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router";
+import { ApiError } from "../../utils/httpUtils";
 
 export function Login() {
   const navigate = useNavigate();
@@ -29,8 +30,16 @@ export function Login() {
 
       await login({ name: name.trim(), password: password.trim() });
       navigate("/", { replace: true });
-    } catch {
-      setError("Ha ocurrido un error. Intenta nuevamente.");
+    } catch (error) {
+      if (error instanceof ApiError) {
+        if (error.status === 401) {
+          setError("Usuario o contraseña incorrectos.");
+        } else {
+          setError(`Error ${error.status}: ${error.message || "No se pudo iniciar sesion."}`);
+        }
+      } else {
+        setError("Ha ocurrido un error. Intenta nuevamente.");
+      }
     } finally {
       setIsSubmitting(false);
     }

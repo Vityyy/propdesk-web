@@ -92,6 +92,8 @@ const authService = {
   },
 
   async refresh(): Promise<boolean> {
+    const tokenAtStart = inMemoryAccessToken;
+
     try {
       const response = await apiRequest<TokenResponse>(API_ENDPOINTS.AUTH.REFRESH, {
         method: "POST",
@@ -108,7 +110,11 @@ const authService = {
       this.setToken(token);
       return true;
     } catch {
-      this.clearToken();
+      // Avoid race condition: if login succeeded while refresh was in flight,
+      // don't wipe the freshly stored access token.
+      if (inMemoryAccessToken === tokenAtStart) {
+        this.clearToken();
+      }
       return false;
     }
   },
