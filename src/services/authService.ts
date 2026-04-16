@@ -17,15 +17,61 @@ export interface SignUpRequest {
   password: string;
 }
 
+export type AccountType = "admin" | "owner";
+
 export interface UserResponse {
   id: string;
   name: string;
 }
 
-let inMemoryAccessToken: string | null = null;
+const ACCESS_TOKEN_STORAGE_KEY = "gdsi_access_token";
+
+function readStoredToken(): string | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    return localStorage.getItem(ACCESS_TOKEN_STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function writeStoredToken(token: string): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, token);
+  } catch {
+    // ignore storage failures and keep in-memory token
+  }
+}
+
+function clearStoredToken(): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
+  } catch {
+    // ignore storage failures
+  }
+}
+
+let inMemoryAccessToken: string | null = readStoredToken();
 
 function extractAccessToken(response: TokenResponse): string | null {
   return response.access || response.token || response.accessToken || null;
+}
+
+function resolveRegisterEndpoint(accountType: AccountType): string {
+  return accountType === "admin"
+    ? API_ENDPOINTS.AUTH.REGISTER_ADMIN
+    : API_ENDPOINTS.AUTH.REGISTER_OWNER;
 }
 
 function decodeBase64Url(value: string): string {
@@ -37,6 +83,7 @@ function decodeBase64Url(value: string): string {
 const authService = {
   setToken(token: string): void {
     inMemoryAccessToken = token;
+    writeStoredToken(token);
   },
 
   getToken(): string | null {
@@ -45,6 +92,7 @@ const authService = {
 
   clearToken(): void {
     inMemoryAccessToken = null;
+    clearStoredToken();
   },
 
   isSessionValidB(): boolean {
@@ -70,6 +118,7 @@ const authService = {
       const nowInSeconds = Math.floor(Date.now() / 1000);
       return payload.exp > nowInSeconds;
     } catch {
+      this.clearToken();
       return false;
     }
   },
@@ -119,19 +168,12 @@ const authService = {
     }
   },
 
-  registerAdmin(data: SignUpRequest): Promise<UserResponse> {
-    return apiRequest<UserResponse>(API_ENDPOINTS.AUTH.REGISTER_ADMIN, {
+  register(data: SignUpRequest, accountType: AccountType): Promise<UserResponse> {
+    return apiRequest<UserResponse>(resolveRegisterEndpoint(accountType), {
       method: "POST",
       body: data,
       token: null,
-    });
-  },
-
-  registerOwner(data: SignUpRequest): Promise<UserResponse> {
-    return apiRequest<UserResponse>(API_ENDPOINTS.AUTH.REGISTER_OWNER, {
-      method: "POST",
-      body: data,
-      token: null,
+      credentials: "include",
     });
   },
 };
