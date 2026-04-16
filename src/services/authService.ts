@@ -7,7 +7,8 @@ export interface LoginRequest {
 }
 
 export interface TokenResponse {
-  token: string;
+  access?: string;
+  token?: string;
   accessToken?: string;
 }
 
@@ -24,7 +25,7 @@ export interface UserResponse {
 let inMemoryAccessToken: string | null = null;
 
 function extractAccessToken(response: TokenResponse): string | null {
-  return response.token || response.accessToken || null;
+  return response.access || response.token || response.accessToken || null;
 }
 
 function decodeBase64Url(value: string): string {
