@@ -1,6 +1,7 @@
 import { FormEvent, useMemo, useState } from "react";
 import { useNavigate, Link } from "react-router";
 import { useAuth } from "../context/AuthContext";
+import { ApiError } from "../../utils/httpUtils";
 
 type UserType = "admin" | "owner";
 
@@ -11,6 +12,8 @@ export function Register() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -41,8 +44,12 @@ export function Register() {
         userType
       );
       navigate("/", { replace: true });
-    } catch (err) {
-      setError("Ha ocurrido un error al registrarse. Intenta nuevamente.");
+    } catch (error) {
+      if (error instanceof ApiError) {
+        setError(`Error ${error.status}: ${error.message || "No se pudo completar el registro."}`);
+      } else {
+        setError("Ha ocurrido un error al registrarse. Intenta nuevamente.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -96,30 +103,48 @@ export function Register() {
               <span className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
                 Contraseña
               </span>
-              <input
-                id="register-password"
-                type="password"
-                autoComplete="new-password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                placeholder="Ingresa una contraseña"
-                className="h-[44px] rounded-[8px] border border-white bg-black px-[12px] text-white placeholder:text-[rgba(255,255,255,0.45)] outline-none focus:border-[#928dd3]"
-              />
+              <div className="relative">
+                <input
+                  id="register-password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  placeholder="Ingresa una contraseña"
+                  className="h-[44px] w-full rounded-[8px] border border-white bg-black px-[12px] pr-[90px] text-white placeholder:text-[rgba(255,255,255,0.45)] outline-none focus:border-[#928dd3]"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((current) => !current)}
+                  className="absolute right-[10px] top-1/2 -translate-y-1/2 text-[13px] text-[#928dd3] hover:underline"
+                >
+                  {showPassword ? "Ocultar" : "Mostrar"}
+                </button>
+              </div>
             </label>
 
             <label className="flex flex-col gap-[8px]" htmlFor="register-confirm-password">
               <span className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
                 Confirmar contraseña
               </span>
-              <input
-                id="register-confirm-password"
-                type="password"
-                autoComplete="new-password"
-                value={confirmPassword}
-                onChange={(event) => setConfirmPassword(event.target.value)}
-                placeholder="Confirma tu contraseña"
-                className="h-[44px] rounded-[8px] border border-white bg-black px-[12px] text-white placeholder:text-[rgba(255,255,255,0.45)] outline-none focus:border-[#928dd3]"
-              />
+              <div className="relative">
+                <input
+                  id="register-confirm-password"
+                  type={showConfirmPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  value={confirmPassword}
+                  onChange={(event) => setConfirmPassword(event.target.value)}
+                  placeholder="Confirma tu contraseña"
+                  className="h-[44px] w-full rounded-[8px] border border-white bg-black px-[12px] pr-[90px] text-white placeholder:text-[rgba(255,255,255,0.45)] outline-none focus:border-[#928dd3]"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((current) => !current)}
+                  className="absolute right-[10px] top-1/2 -translate-y-1/2 text-[13px] text-[#928dd3] hover:underline"
+                >
+                  {showConfirmPassword ? "Ocultar" : "Mostrar"}
+                </button>
+              </div>
             </label>
 
             {passwordError ? (
