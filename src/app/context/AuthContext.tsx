@@ -1,10 +1,11 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import authService, { type LoginRequest } from "../../services/authService";
+import authService, { type LoginRequest, type SignUpRequest } from "../../services/authService";
 
 type AuthContextType = {
   isAuthenticated: boolean;
   isBootstrapping: boolean;
   login: (data: LoginRequest) => Promise<void>;
+  signup: (data: SignUpRequest, type: "admin" | "owner") => Promise<void>;
   logout: () => void;
 };
 
@@ -40,6 +41,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAuthenticated,
       isBootstrapping,
       login: async (data: LoginRequest) => {
+        await authService.login(data);
+        setIsAuthenticated(authService.isSessionValidB());
+      },
+      signup: async (data: SignUpRequest, type: "admin" | "owner") => {
+        if (type === "admin") {
+          await authService.registerAdmin(data);
+        } else {
+          await authService.registerOwner(data);
+        }
+        // After successful registration, login automatically
         await authService.login(data);
         setIsAuthenticated(authService.isSessionValidB());
       },

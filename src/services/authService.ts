@@ -3,6 +3,7 @@ import { ApiError, apiRequest } from "../utils/httpUtils";
 
 export interface LoginRequest {
   name: string;
+  password: string;
 }
 
 export interface TokenResponse {
@@ -12,6 +13,7 @@ export interface TokenResponse {
 
 export interface SignUpRequest {
   name: string;
+  password: string;
 }
 
 export interface UserResponse {

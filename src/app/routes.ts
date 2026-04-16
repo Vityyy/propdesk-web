@@ -7,6 +7,7 @@ import { Expenses } from "./pages/Expenses";
 import { Reports } from "./pages/Reports";
 import { Settings } from "./pages/Settings";
 import { Login } from "./pages/Login";
+import { Register } from "./pages/Register";
 import authService from "../services/authService";
 
 export const router = createBrowserRouter([
@@ -20,6 +21,17 @@ export const router = createBrowserRouter([
       return null;
     },
     Component: Login,
+  },
+  {
+    path: "/register",
+    loader: () => {
+      if (authService.isSessionValidB()) {
+        return redirect("/");
+      }
+
+      return null;
+    },
+    Component: Register,
   },
   {
     path: "/",
