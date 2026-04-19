@@ -1,7 +1,9 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { Property, Tenant } from '../types/index';
 import { propertyService } from '../../services/propertyService';
 import { tenantService } from '../../services/tenantService';
+import authService from '../../services/authService';
+import { useAuth } from './AuthContext';
 
 interface Owner {
   id: string;
@@ -20,23 +22,38 @@ interface OwnerContextType {
   refreshTenants: () => void;
 }
 
-const defaultOwners: Owner[] = [
-  { id: '1', name: 'John Martinez', properties: 3, totalRevenue: '$105,000' },
-  { id: '2', name: 'Sarah Johnson', properties: 2, totalRevenue: '$70,000' },
-  { id: '3', name: 'Michael Chen', properties: 4, totalRevenue: '$143,000' },
-  { id: '4', name: 'Emily Rodriguez', properties: 1, totalRevenue: '$28,000' },
-];
+const fallbackOwner: Owner = {
+  id: 'owner-session',
+  name: 'Current Owner',
+  properties: 0,
+  totalRevenue: '$0',
+};
+
+// Derives the current owner identity from the authenticated session token.
+const buildSessionOwner = (): Owner => ({
+  ...fallbackOwner,
+  id: authService.getCurrentUserId() ?? fallbackOwner.id,
+});
 
 const OwnerContext = createContext<OwnerContextType | undefined>(undefined);
 
 export function OwnerProvider({ children }: { children: ReactNode }) {
-  const [currentOwner, setCurrentOwnerState] = useState<Owner>(defaultOwners[0]);
+  const { isAuthenticated } = useAuth();
+  const [currentOwner, setCurrentOwnerState] = useState<Owner>(() => buildSessionOwner());
   const [properties, setProperties] = useState<Property[]>(() =>
-    propertyService.getPropertiesByOwner(defaultOwners[0].id),
+    propertyService.getPropertiesByOwner(buildSessionOwner().id),
   );
   const [tenants, setTenants] = useState<Tenant[]>(() =>
-    tenantService.getTenantsByOwner(defaultOwners[0].id),
+    tenantService.getTenantsByOwner(buildSessionOwner().id),
   );
+
+  useEffect(() => {
+    const sessionOwner = buildSessionOwner();
+
+    setCurrentOwnerState(sessionOwner);
+    setProperties(propertyService.getPropertiesByOwner(sessionOwner.id));
+    setTenants(tenantService.getTenantsByOwner(sessionOwner.id));
+  }, [isAuthenticated]);
 
   const setCurrentOwner = (owner: Owner) => {
     setCurrentOwnerState(owner);
@@ -52,11 +69,13 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
     setTenants(tenantService.getTenantsByOwner(currentOwner.id));
   };
 
+  const owners = useMemo(() => [currentOwner], [currentOwner]);
+
   return (
     <OwnerContext.Provider value={{ 
       currentOwner, 
       setCurrentOwner, 
-      owners: defaultOwners,
+      owners,
       properties,
       tenants,
       refreshProperties,

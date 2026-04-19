@@ -47,6 +47,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, Component: Summary },
       { path: "properties", Component: Properties },
+      { path: "apartments", loader: () => redirect("/properties") },
       { path: "tenants", Component: Tenants },
       { path: "expenses", Component: Expenses },
       { path: "reports", Component: Reports },

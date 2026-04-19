@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import type { Unit } from '../../types/index';
 import { propertyService } from '../../../services/propertyService';
+import authService from '../../../services/authService';
+import userService from '../../../services/userService';
 import { useOwner } from '../../context/OwnerContext';
 
 interface CreatePropertyDialogProps {
@@ -10,7 +12,7 @@ interface CreatePropertyDialogProps {
 }
 
 export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePropertyDialogProps) {
-  const { currentOwner, refreshProperties } = useOwner();
+  const { refreshProperties } = useOwner();
   const [formData, setFormData] = useState({
     name: '',
     address: '',
@@ -77,7 +79,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
     setUnits(units.filter((_, i) => i < startIndex || i >= startIndex + count));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.name || !formData.address) {
@@ -91,21 +93,43 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
     }
 
     try {
-      // Convert units to full Unit objects with IDs
-      const unitsWithIds: Unit[] = units.map((u) => ({
-        ...u,
-        id: `unit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      }));
+      const authenticatedOwnerId = authService.getCurrentUserId();
+      if (!authenticatedOwnerId) {
+        throw new Error('No authenticated owner found');
+      }
 
-      propertyService.createProperty({
-        ownerId: currentOwner.id,
+      const createdProperty = await userService.createProperty({
+        ownerId: authenticatedOwnerId,
         name: formData.name,
         address: formData.address,
+      });
+
+      const createdApartments = await Promise.all(
+        units.map((unit) =>
+          userService.createApartment({
+            name: unit.unitNumber,
+            propertyId: createdProperty.id,
+          }),
+        ),
+      );
+
+      const unitsWithBackendIds: Unit[] = units.map((unit, index) => ({
+        ...unit,
+        id: createdApartments[index].id,
+      }));
+
+      propertyService.storeProperty({
+        id: createdProperty.id,
+        ownerId: authenticatedOwnerId,
+        name: createdProperty.name,
+        address: createdProperty.address,
         imageUrl: formData.imageUrl || 'https://via.placeholder.com/400x300?text=Property',
         description: formData.description,
-        units: unitsWithIds,
-        totalUnits: unitsWithIds.length,
-        occupiedUnits: 0,
+        units: unitsWithBackendIds,
+        totalUnits: unitsWithBackendIds.length,
+        occupiedUnits: unitsWithBackendIds.filter((unit) => unit.status === 'occupied').length,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       });
 
       refreshProperties();
