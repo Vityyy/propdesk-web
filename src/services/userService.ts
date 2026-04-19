@@ -18,6 +18,7 @@ export interface PropertyResponse {
 export interface ApartmentCreateRequest {
   name: string;
   propertyId: string;
+  amount_due: number;
 }
 
 export interface ApartmentResponse {
@@ -60,8 +61,8 @@ export const userService = {
     });
   },
 
-  createApartment(data: ApartmentCreateRequest): Promise<ApartmentResponse> {
-    return apiRequest<ApartmentResponse>(API_ENDPOINTS.APARTMENTS.CREATE, {
+  createApartments(data: ApartmentCreateRequest[]): Promise<ApartmentResponse[]> {
+    return apiRequest<ApartmentResponse[]>(API_ENDPOINTS.APARTMENTS.CREATE, {
       method: "POST",
       body: data,
       token: getRequiredToken(),

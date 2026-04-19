@@ -1,12 +1,21 @@
+import { useState } from 'react';
 import type { Property } from '../../types/index';
+import { AddApartmentDialog } from './AddApartmentDialog';
 
 interface PropertyDetailsDialogProps {
   isOpen: boolean;
   property: Property | null;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
-export function PropertyDetailsDialog({ isOpen, property, onClose }: PropertyDetailsDialogProps) {
+export function PropertyDetailsDialog({ isOpen, property, onClose, onSuccess }: PropertyDetailsDialogProps) {
+  const [showAddApartmentDialog, setShowAddApartmentDialog] = useState(false);
+
+  const handleAddApartmentSuccess = () => {
+    setShowAddApartmentDialog(false);
+    onSuccess?.();
+  };
   if (!isOpen || !property) return null;
 
   const occupiedUnits = property.units.filter(u => u.status === 'occupied');
@@ -120,9 +129,17 @@ export function PropertyDetailsDialog({ isOpen, property, onClose }: PropertyDet
           {/* Vacant Units */}
           {vacantUnits.length > 0 && (
             <div>
-              <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold text-[15px] text-white mb-3">
-                Unidades Vacantes ({vacantUnits.length})
-              </p>
+              <div className="flex items-center justify-between mb-3">
+                <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold text-[15px] text-white">
+                  Unidades Vacantes ({vacantUnits.length})
+                </p>
+                <button
+                  onClick={() => setShowAddApartmentDialog(true)}
+                  className="px-3 py-1 bg-[#928dd3] text-black font-semibold rounded-[6px] hover:bg-[#a89be6] transition-colors text-sm"
+                >
+                  + Agregar Unidades
+                </button>
+              </div>
               <div className="space-y-2">
                 {vacantUnits.map((unit) => (
                   <div key={unit.id} className="bg-[rgba(147,141,211,0.1)] border border-[rgba(147,141,211,0.3)] p-3 rounded-[8px]">
@@ -183,6 +200,15 @@ export function PropertyDetailsDialog({ isOpen, property, onClose }: PropertyDet
           </div>
         </div>
       </div>
+
+      {property && (
+        <AddApartmentDialog
+          isOpen={showAddApartmentDialog}
+          propertyId={property.id}
+          onClose={() => setShowAddApartmentDialog(false)}
+          onSuccess={handleAddApartmentSuccess}
+        />
+      )}
     </div>
   );
 }
