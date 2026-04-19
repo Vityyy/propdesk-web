@@ -8,11 +8,29 @@ export interface PropertyCreateRequest {
   ownerId: string;
 }
 
+export interface AdminSummary {
+  id: string;
+  name: string;
+}
+
 export interface PropertyResponse {
   id: string;
   name: string;
   address: string;
   ownerId: string;
+}
+
+export interface AssociateAdminRequest {
+  adminId: string;
+  adminCut?: number;
+}
+
+export interface OwnerAdminAssociationResponse {
+  ownerId: string;
+  ownerName: string;
+  adminId: string;
+  adminName: string;
+  adminCut: number | null;
 }
 
 export interface ApartmentCreateRequest {
@@ -52,6 +70,23 @@ const getRequiredToken = (): string => {
 };
 
 export const userService = {
+  // Loads available admins so owners can choose who to associate with.
+  listAdmins(): Promise<AdminSummary[]> {
+    return apiRequest<AdminSummary[]>(API_ENDPOINTS.ADMINS.LIST, {
+      method: "GET",
+      token: getRequiredToken(),
+    });
+  },
+
+  // Associates the authenticated owner with the selected admin account.
+  associateAdmin(data: AssociateAdminRequest): Promise<OwnerAdminAssociationResponse> {
+    return apiRequest<OwnerAdminAssociationResponse>(API_ENDPOINTS.OWNERS.ASSOCIATE_ADMIN, {
+      method: "POST",
+      body: data,
+      token: getRequiredToken(),
+    });
+  },
+
   createProperty(data: PropertyCreateRequest): Promise<PropertyResponse> {
     return apiRequest<PropertyResponse>(API_ENDPOINTS.PROPERTIES.CREATE, {
       method: "POST",
@@ -78,4 +113,3 @@ export const userService = {
 };
 
 export default userService;
-
