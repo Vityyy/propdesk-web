@@ -114,7 +114,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
 
       const unitsWithBackendIds: Unit[] = units.map((unit, index) => ({
         ...unit,
-        id: createdApartmentsResponse[index].id,
+        id: createdApartments[index].id,
       }));
 
       propertyService.storeProperty({

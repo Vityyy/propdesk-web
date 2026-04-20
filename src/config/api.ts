@@ -24,12 +24,6 @@ export const API_ENDPOINTS = {
   OWNERS: {
     ASSOCIATE_ADMIN: `${API_BASE_URL}/owners/me/admin`,
   },
-  ADMINS: {
-    LIST: `${API_BASE_URL}/admins`,
-  },
-  OWNERS: {
-    ASSOCIATE_ADMIN: `${API_BASE_URL}/owners/me/admin`,
-  },
   APARTMENTS: {
     CREATE: `${API_BASE_URL}/apartments`,
     LIST: `${API_BASE_URL}/apartments`,
