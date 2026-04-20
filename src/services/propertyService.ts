@@ -1,5 +1,6 @@
 import { type Property, type Unit } from '../app/types/index';
 import { tenantService } from './tenantService';
+import userService from './userService';
 
 const STORAGE_KEY = 'gdsi_properties';
 
@@ -98,20 +99,39 @@ export const propertyService = {
     return true;
   },
 
-  // Add unit to property
-  addUnit: (propertyId: string, unit: Omit<Unit, 'id'>): Unit | null => {
-    const property = propertyService.getProperty(propertyId);
-    if (!property) return null;
+  // Add multiple units to property via API (no cache update)
+  addUnits: async (propertyId: string, units: Omit<Unit, 'id'>[]): Promise<Unit[]> => {
+    try {
+      // Prepare data as ApartmentCreateRequest[] (only name and propertyId)
+      const apartmentsData: Array<{ name: string; propertyId: string; amount_due: number }> = units.map(unit => ({
+        name: unit.unitNumber,
+        propertyId,
+        amount_due: unit.rentAmount,
+        // not part of ApartmentCreateRequest
+        // type: unit.type,
+        // squareFeet: unit.squareFeet,
+      }));
 
-    const newUnit: Unit = {
-      ...unit,
-      id: `unit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    };
+      const response = await userService.createApartments(apartmentsData);
 
-    property.units.push(newUnit);
-    propertyService.updateProperty(propertyId, property);
-    
-    return newUnit;
+      // Return created units
+      if (response && Array.isArray(response) && response.length > 0) {
+        const newUnits: Unit[] = response.map(apt => ({
+          id: apt.id,
+          unitNumber: apt.name,
+          type: units.find(u => u.unitNumber === apt.name)?.type || '1 Dormitorio',
+          squareFeet: units.find(u => u.unitNumber === apt.name)?.squareFeet || 0,
+          rentAmount: units.find(u => u.unitNumber === apt.name)?.rentAmount || 0,
+          status: 'vacant' as const,
+        }));
+
+        return newUnits;
+      }
+      return [];
+    } catch (error: any) {
+      console.error('Error adding units:', error);
+      throw error;
+    }
   },
 
   // Update unit
