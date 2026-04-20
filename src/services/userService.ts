@@ -88,10 +88,31 @@ export const userService = {
     });
   },
 
+  listProperties(): Promise<PropertyResponse[]> {
+    return apiRequest<PropertyResponse[]>(API_ENDPOINTS.PROPERTIES.LIST, {
+      method: "GET",
+      token: getRequiredToken(),
+    });
+  },
+
   createProperty(data: PropertyCreateRequest): Promise<PropertyResponse> {
     return apiRequest<PropertyResponse>(API_ENDPOINTS.PROPERTIES.CREATE, {
       method: "POST",
       body: data,
+      token: getRequiredToken(),
+    });
+  },
+
+  deleteProperty(propertyId: string): Promise<void> {
+    return apiRequest<void>(`${API_ENDPOINTS.PROPERTIES.BASE}/${propertyId}`, {
+      method: "DELETE",
+      token: getRequiredToken(),
+    });
+  },
+
+  listApartments(): Promise<ApartmentResponse[]> {
+    return apiRequest<ApartmentResponse[]>(API_ENDPOINTS.APARTMENTS.LIST, {
+      method: "GET",
       token: getRequiredToken(),
     });
   },
