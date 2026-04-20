@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useOwner } from '../context/OwnerContext';
 import { propertyService } from '../../services/propertyService';
+import userService from '../../services/userService';
 import { CreatePropertyDialog } from '../components/dialogs/CreatePropertyDialog';
 import { EditPropertyDialog } from '../components/dialogs/EditPropertyDialog';
 import { PropertyDetailsDialog } from '../components/dialogs/PropertyDetailsDialog';
@@ -164,10 +165,15 @@ export function Properties() {
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
   const [viewingProperty, setViewingProperty] = useState<Property | null>(null);
 
-  const handleDeleteProperty = (propertyId: string) => {
+  const handleDeleteProperty = async (propertyId: string) => {
     if (confirm('¿Estás seguro de que deseas eliminar esta propiedad?')) {
-      propertyService.deleteProperty(propertyId);
-      refreshProperties();
+      try {
+        await userService.deleteProperty(propertyId);
+        refreshProperties();
+      } catch (e) {
+        console.error("Error al eliminar la propiedad", e);
+        alert('Hubo un error eliminando la propiedad.');
+      }
     }
   };
 

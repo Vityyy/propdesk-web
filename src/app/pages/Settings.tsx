@@ -1,4 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { ApiError } from '../../utils/httpUtils';
+import authService from '../../services/authService';
+import userService, { type AdminSummary } from '../../services/userService';
 import svgPaths from "../../imports/svg-zayt9vop9f";
 
 function CaretDown() {
@@ -96,6 +99,7 @@ function SettingsSection({ title, children }: { title: string; children: React.R
 }
 
 export function Settings() {
+  const isOwner = authService.getCurrentUserRole() === 'OWNER';
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(false);
   const [autoPayment, setAutoPayment] = useState(true);
@@ -106,6 +110,67 @@ export function Settings() {
   const [currency, setCurrency] = useState('USD');
   const [timezone, setTimezone] = useState('EST');
   const [language, setLanguage] = useState('English');
+  const [admins, setAdmins] = useState<AdminSummary[]>([]);
+  const [selectedAdminId, setSelectedAdminId] = useState('');
+  const [adminCut, setAdminCut] = useState('10');
+  const [associationMessage, setAssociationMessage] = useState<string | null>(null);
+  const [associationError, setAssociationError] = useState<string | null>(null);
+  const [isAssociatingAdmin, setIsAssociatingAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!isOwner) {
+      return;
+    }
+
+    let ignore = false;
+
+    // Loads the admin options used by the owner association flow.
+    const loadAdmins = async () => {
+      try {
+        const availableAdmins = await userService.listAdmins();
+        if (ignore) {
+          return;
+        }
+
+        setAdmins(availableAdmins);
+        setSelectedAdminId((currentAdminId) => currentAdminId || availableAdmins[0]?.id || '');
+      } catch (error) {
+        if (!ignore) {
+          setAssociationError(error instanceof ApiError ? error.message : 'No se pudieron cargar los administradores');
+        }
+      }
+    };
+
+    loadAdmins();
+
+    return () => {
+      ignore = true;
+    };
+  }, [isOwner]);
+
+  // Associates the current owner with the selected admin using the backend API.
+  const handleAssociateAdmin = async () => {
+    if (!selectedAdminId || isAssociatingAdmin) {
+      return;
+    }
+
+    try {
+      setAssociationError(null);
+      setAssociationMessage(null);
+      setIsAssociatingAdmin(true);
+
+      const response = await userService.associateAdmin({
+        adminId: selectedAdminId,
+        adminCut: adminCut.trim() ? Number(adminCut) : undefined,
+      });
+
+      setAssociationMessage(`Ahora ${response.adminName} administra tus propiedades con tu permiso.`);
+    } catch (error) {
+      setAssociationError(error instanceof ApiError ? error.message : 'No se pudo asociar el administrador');
+    } finally {
+      setIsAssociatingAdmin(false);
+    }
+  };
 
   return (
     <div className="bg-black min-h-full w-full">
@@ -194,6 +259,74 @@ export function Settings() {
             onChange={(v) => setTwoFactor(v as boolean)}
           />
         </SettingsSection>
+
+        {isOwner && (
+          <SettingsSection title="Administrator Association">
+            <div className="px-[24px] py-[20px] space-y-4">
+              <div>
+                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white mb-[4px]">
+                  Select Administrator
+                </p>
+                <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)] mb-[12px]">
+                  Choose the admin you want to authorize to manage your properties.
+                </p>
+                <select
+                  value={selectedAdminId}
+                  onChange={(event) => setSelectedAdminId(event.target.value)}
+                  className="bg-black border border-[rgba(255,255,255,0.16)] rounded-[8px] px-[12px] py-[10px] text-white w-full"
+                >
+                  <option value="" disabled>
+                    Select an admin
+                  </option>
+                  {admins.map((admin) => (
+                    <option key={admin.id} value={admin.id}>
+                      {admin.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white mb-[4px]">
+                  Admin Cut
+                </p>
+                <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)] mb-[12px]">
+                  Define the percentage this admin will charge for managing your portfolio.
+                </p>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  value={adminCut}
+                  onChange={(event) => setAdminCut(event.target.value)}
+                  className="bg-black border border-[rgba(255,255,255,0.16)] rounded-[8px] px-[12px] py-[10px] text-white w-full"
+                />
+              </div>
+
+              {associationMessage && (
+                <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[#0DC44A]">
+                  {associationMessage}
+                </p>
+              )}
+
+              {associationError && (
+                <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[#FF6B6B]">
+                  {associationError}
+                </p>
+              )}
+
+              <button
+                onClick={handleAssociateAdmin}
+                disabled={!selectedAdminId || isAssociatingAdmin}
+                className="bg-[#928dd3] content-stretch flex items-center justify-center px-[16px] py-[10px] relative rounded-[8px] shrink-0 hover:bg-[#7f7ab8] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-black whitespace-nowrap">
+                  {isAssociatingAdmin ? 'Associating...' : 'Associate Administrator'}
+                </p>
+              </button>
+            </div>
+          </SettingsSection>
+        )}
 
         <SettingsSection title="Regional Settings">
           <SettingItem
