@@ -80,6 +80,25 @@ function decodeBase64Url(value: string): string {
   return atob(padded);
 }
 
+// Reads the current JWT payload to expose session data to the UI layer.
+function readTokenPayload(): { sub?: string; role?: string } | null {
+  const token = inMemoryAccessToken;
+  if (!token) {
+    return null;
+  }
+
+  const parts = token.split(".");
+  if (parts.length !== 3) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(decodeBase64Url(parts[1])) as { sub?: string; role?: string };
+  } catch {
+    return null;
+  }
+}
+
 const authService = {
   setToken(token: string): void {
     inMemoryAccessToken = token;
@@ -88,6 +107,14 @@ const authService = {
 
   getToken(): string | null {
     return inMemoryAccessToken;
+  },
+
+  getCurrentUserId(): string | null {
+    return readTokenPayload()?.sub ?? null;
+  },
+
+  getCurrentUserRole(): string | null {
+    return readTokenPayload()?.role ?? null;
   },
 
   clearToken(): void {
@@ -179,5 +206,3 @@ const authService = {
 };
 
 export default authService;
-
-

@@ -3,27 +3,33 @@ import { tenantService } from './tenantService';
 
 const STORAGE_KEY = 'gdsi_properties';
 
+// Centralizes property reads from localStorage for the current UI model.
+const readProperties = (): Property[] => {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  return stored ? JSON.parse(stored) : [];
+};
+
+// Persists the current property list used by the frontend screens.
+const writeProperties = (properties: Property[]): void => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(properties));
+};
+
 export const propertyService = {
   // Get all properties for an owner
   getPropertiesByOwner: (ownerId: string): Property[] => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return [];
-    const properties: Property[] = JSON.parse(stored);
+    const properties = readProperties();
     return properties.filter(p => p.ownerId === ownerId);
   },
 
   // Get single property
   getProperty: (propertyId: string): Property | null => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return null;
-    const properties: Property[] = JSON.parse(stored);
+    const properties = readProperties();
     return properties.find(p => p.id === propertyId) || null;
   },
 
   // Create new property
   createProperty: (property: Omit<Property, 'id' | 'createdAt' | 'updatedAt'>): Property => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    const properties: Property[] = stored ? JSON.parse(stored) : [];
+    const properties = readProperties();
     
     const newProperty: Property = {
       ...property,
@@ -36,16 +42,28 @@ export const propertyService = {
     };
 
     properties.push(newProperty);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(properties));
+    writeProperties(properties);
     return newProperty;
+  },
+
+  // Stores backend-created properties locally so existing views can render them.
+  storeProperty: (property: Property): Property => {
+    const properties = readProperties();
+    const index = properties.findIndex((storedProperty) => storedProperty.id === property.id);
+
+    if (index === -1) {
+      properties.push(property);
+    } else {
+      properties[index] = property;
+    }
+
+    writeProperties(properties);
+    return property;
   },
 
   // Update property
   updateProperty: (propertyId: string, updates: Partial<Property>): Property | null => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return null;
-
-    const properties: Property[] = JSON.parse(stored);
+    const properties = readProperties();
     const index = properties.findIndex(p => p.id === propertyId);
     
     if (index === -1) return null;
@@ -60,16 +78,13 @@ export const propertyService = {
       occupiedUnits: properties[index].units?.filter(u => u.status === 'occupied').length || 0,
     };
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(properties));
+    writeProperties(properties);
     return properties[index];
   },
 
   // Delete property
   deleteProperty: (propertyId: string): boolean => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return false;
-
-    const properties: Property[] = JSON.parse(stored);
+    const properties = readProperties();
     const propertyToDelete = properties.find(p => p.id === propertyId);
     
     if (!propertyToDelete) return false;
@@ -79,7 +94,7 @@ export const propertyService = {
 
     // Delete the property
     const filtered = properties.filter(p => p.id !== propertyId);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+    writeProperties(filtered);
     return true;
   },
 
@@ -132,10 +147,7 @@ export const propertyService = {
 
   // Assign tenant to unit
   assignTenantToUnit: (propertyId: string, unitId: string, tenantId: string): boolean => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return false;
-
-    const properties: Property[] = JSON.parse(stored);
+    const properties = readProperties();
     const propertyIndex = properties.findIndex(p => p.id === propertyId);
     if (propertyIndex === -1) return false;
 
@@ -156,16 +168,13 @@ export const propertyService = {
       updatedAt: new Date().toISOString(),
     };
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(properties));
+    writeProperties(properties);
     return true;
   },
 
   // Unassign tenant from unit
   unassignTenantFromUnit: (propertyId: string, unitId: string): boolean => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return false;
-
-    const properties: Property[] = JSON.parse(stored);
+    const properties = readProperties();
     const propertyIndex = properties.findIndex(p => p.id === propertyId);
     if (propertyIndex === -1) return false;
 
@@ -186,7 +195,7 @@ export const propertyService = {
       updatedAt: new Date().toISOString(),
     };
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(properties));
+    writeProperties(properties);
     return true;
   },
 };
