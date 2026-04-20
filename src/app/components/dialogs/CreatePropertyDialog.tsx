@@ -104,13 +104,12 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
         address: formData.address,
       });
 
-      const createdApartments = await Promise.all(
-        units.map((unit) =>
-          userService.createApartment({
-            name: unit.unitNumber,
-            propertyId: createdProperty.id,
-          }),
-        ),
+      const createdApartments = await userService.createApartments(
+        units.map((unit) => ({
+          name: unit.unitNumber,
+          propertyId: createdProperty.id,
+          amount_due: unit.rentAmount || 0,
+        })),
       );
 
       const unitsWithBackendIds: Unit[] = units.map((unit, index) => ({
