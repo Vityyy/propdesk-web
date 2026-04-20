@@ -36,6 +36,7 @@ export interface OwnerAdminAssociationResponse {
 export interface ApartmentCreateRequest {
   name: string;
   propertyId: string;
+  amount_due: number;
 }
 
 export interface ApartmentResponse {
@@ -87,6 +88,13 @@ export const userService = {
     });
   },
 
+  listProperties(): Promise<PropertyResponse[]> {
+    return apiRequest<PropertyResponse[]>(API_ENDPOINTS.PROPERTIES.LIST, {
+      method: "GET",
+      token: getRequiredToken(),
+    });
+  },
+
   createProperty(data: PropertyCreateRequest): Promise<PropertyResponse> {
     return apiRequest<PropertyResponse>(API_ENDPOINTS.PROPERTIES.CREATE, {
       method: "POST",
@@ -95,8 +103,22 @@ export const userService = {
     });
   },
 
-  createApartment(data: ApartmentCreateRequest): Promise<ApartmentResponse> {
-    return apiRequest<ApartmentResponse>(API_ENDPOINTS.APARTMENTS.CREATE, {
+  deleteProperty(propertyId: string): Promise<void> {
+    return apiRequest<void>(`${API_ENDPOINTS.PROPERTIES.BASE}/${propertyId}`, {
+      method: "DELETE",
+      token: getRequiredToken(),
+    });
+  },
+
+  listApartments(): Promise<ApartmentResponse[]> {
+    return apiRequest<ApartmentResponse[]>(API_ENDPOINTS.APARTMENTS.LIST, {
+      method: "GET",
+      token: getRequiredToken(),
+    });
+  },
+
+  createApartments(data: ApartmentCreateRequest[]): Promise<ApartmentResponse[]> {
+    return apiRequest<ApartmentResponse[]>(API_ENDPOINTS.APARTMENTS.CREATE, {
       method: "POST",
       body: data,
       token: getRequiredToken(),
