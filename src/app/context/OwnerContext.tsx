@@ -40,14 +40,37 @@ const OwnerContext = createContext<OwnerContextType | undefined>(undefined);
 export function OwnerProvider({ children }: { children: ReactNode }) {
   const { isAuthenticated } = useAuth();
   const [currentOwner, setCurrentOwnerState] = useState<Owner>(() => buildSessionOwner());
+  const [ownersAvailable, setOwnersAvailable] = useState<Owner[]>([]);
   const [properties, setProperties] = useState<Property[]>([]);
   const [tenants, setTenants] = useState<Tenant[]>(() =>
     tenantService.getTenantsByOwner(buildSessionOwner().id),
   );
 
+  const loadAdminOwners = async () => {
+    try {
+      const adminOwnersList = await userService.listMyOwners();
+      const owners: Owner[] = adminOwnersList.map(o => ({
+        id: o.id,
+        name: o.name,
+        properties: 0,
+        totalRevenue: '$0',
+      }));
+      setOwnersAvailable(owners);
+
+      // Restore selected owner from sessionStorage or pick first
+      const storedOwnerId = sessionStorage.getItem('selectedOwnerId');
+      const ownerToSelect = owners.find(o => o.id === storedOwnerId) || owners[0];
+      if (ownerToSelect) {
+        setCurrentOwnerState(ownerToSelect);
+      }
+    } catch (err) {
+      console.error('Failed to load admin owners', err);
+    }
+  };
+
   const fetchBackendData = async () => {
     try {
-      const fetchedProperties = await userService.listProperties();
+      const fetchedProperties = await userService.listProperties(currentOwner.id);
       const fetchedApartments = await userService.listApartments();
 
       const propertiesMapped: Property[] = fetchedProperties.map(p => {
@@ -80,21 +103,34 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
       setProperties(propertiesMapped);
     } catch(e) {
       console.error('Failed to load backend properties', e);
-      setProperties(propertyService.getPropertiesByOwner(buildSessionOwner().id));
+      setProperties(propertyService.getPropertiesByOwner(currentOwner.id));
     }
   };
 
   useEffect(() => {
-    const sessionOwner = buildSessionOwner();
-    setCurrentOwnerState(sessionOwner);
-    fetchBackendData();
-    setTenants(tenantService.getTenantsByOwner(sessionOwner.id));
+    if (!isAuthenticated) return;
+    
+    const isAdmin = authService.getCurrentUserRole() === 'ADMIN';
+    if (isAdmin) {
+      loadAdminOwners();
+    } else {
+      const sessionOwner = buildSessionOwner();
+      setCurrentOwnerState(sessionOwner);
+      setOwnersAvailable([]);
+    }
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    fetchBackendData();
+    setTenants(tenantService.getTenantsByOwner(currentOwner.id));
+  }, [currentOwner]);
 
   const setCurrentOwner = (owner: Owner) => {
     setCurrentOwnerState(owner);
-    fetchBackendData();
-    setTenants(tenantService.getTenantsByOwner(owner.id));
+    const isAdmin = authService.getCurrentUserRole() === 'ADMIN';
+    if (isAdmin) {
+      sessionStorage.setItem('selectedOwnerId', owner.id);
+    }
   };
 
   const refreshProperties = () => {
@@ -105,7 +141,10 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
     setTenants(tenantService.getTenantsByOwner(currentOwner.id));
   };
 
-  const owners = useMemo(() => [currentOwner], [currentOwner]);
+  const owners = useMemo(() => {
+    const isAdmin = authService.getCurrentUserRole() === 'ADMIN';
+    return isAdmin ? ownersAvailable : [currentOwner];
+  }, [currentOwner, ownersAvailable]);
 
   return (
     <OwnerContext.Provider value={{ 
