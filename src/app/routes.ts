@@ -8,6 +8,7 @@ import { Reports } from "./pages/Reports";
 import { Settings } from "./pages/Settings";
 import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
+import { SelectOwner } from "./pages/SelectOwner";
 import authService from "../services/authService";
 
 export const router = createBrowserRouter([
@@ -34,11 +35,35 @@ export const router = createBrowserRouter([
     Component: Register,
   },
   {
+    path: "/select-owner",
+    loader: () => {
+      if (!authService.isSessionValidB()) {
+        authService.clearToken();
+        return redirect("/login");
+      }
+
+      const isAdmin = authService.getCurrentUserRole() === 'ADMIN';
+      if (!isAdmin) {
+        return redirect("/");
+      }
+
+      return null;
+    },
+    Component: SelectOwner,
+  },
+  {
     path: "/",
     loader: () => {
       if (!authService.isSessionValidB()) {
         authService.clearToken();
         return redirect("/login");
+      }
+
+      // If admin, redirect to owner selection
+      const isAdmin = authService.getCurrentUserRole() === 'ADMIN';
+      const hasSelectedOwner = sessionStorage.getItem('selectedOwnerId');
+      if (isAdmin && !hasSelectedOwner) {
+        return redirect("/select-owner");
       }
 
       return null;
