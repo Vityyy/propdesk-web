@@ -20,6 +20,7 @@ export const API_ENDPOINTS = {
   },
   ADMINS: {
     LIST: `${API_BASE_URL}/admins`,
+    GET_MY_OWNERS: `${API_BASE_URL}/admins/me/owners`,
   },
   OWNERS: {
     ASSOCIATE_ADMIN: `${API_BASE_URL}/owners/me/admin`,
