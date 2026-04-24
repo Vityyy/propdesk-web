@@ -1,5 +1,5 @@
 import { RouterProvider } from 'react-router';
-import { router } from './routes.tsx';
+import { router } from './routes';
 import { OwnerProvider } from './context/OwnerContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 

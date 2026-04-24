@@ -1,3 +1,4 @@
+import React from "react";
 import { createBrowserRouter, redirect } from "react-router";
 import { Layout } from "./Layout";
 import { Login } from "./pages/Login";
@@ -16,13 +17,9 @@ const createProtectedRoute = (
   Component: React.ComponentType,
   fallbackPath?: string
 ) => {
-  return () => (
-    <RoleProtectedRoute 
-      allowedRoles={[...allowedRoles]} 
-      fallbackPath={fallbackPath}
-    >
-      <Component />
-    </RoleProtectedRoute>
+  return () => React.createElement(
+    RoleProtectedRoute,
+    { allowedRoles: [...allowedRoles], fallbackPath, children: React.createElement(Component) }
   );
 };
 
