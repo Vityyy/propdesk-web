@@ -8,6 +8,22 @@ export interface PropertyCreateRequest {
   ownerId: string;
 }
 
+export interface ApartmentRangeData {
+  startFloor: number;
+  endFloor: number;
+  startApartmentNumber: number;
+  endApartmentNumber: number;
+  squareMeters: number;
+  rentValue: number;
+}
+
+export interface NewPropertyCreateRequest {
+  propertyName: string;
+  propertyAddress: string;
+  propertyPicture: string;
+  ranges: ApartmentRangeData[];
+}
+
 export interface AdminSummary {
   id: string;
   name: string;
@@ -112,6 +128,14 @@ export const userService = {
   },
 
   createProperty(data: PropertyCreateRequest): Promise<PropertyResponse> {
+    return apiRequest<PropertyResponse>(API_ENDPOINTS.PROPERTIES.CREATE, {
+      method: "POST",
+      body: data,
+      token: getRequiredToken(),
+    });
+  },
+
+  createPropertyWithRanges(data: NewPropertyCreateRequest): Promise<PropertyResponse> {
     return apiRequest<PropertyResponse>(API_ENDPOINTS.PROPERTIES.CREATE, {
       method: "POST",
       body: data,
