@@ -1,6 +1,6 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import { useOwner } from '../context/OwnerContext';
-import { propertyService } from '../../services/propertyService';
 import userService from '../../services/userService';
 import { CreatePropertyDialog } from '../components/dialogs/CreatePropertyDialog';
 import { EditPropertyDialog } from '../components/dialogs/EditPropertyDialog';
@@ -26,9 +26,10 @@ interface PropertyCardProps {
   onDelete?: (id: string) => void;
   onEdit?: (property: Property) => void;
   onViewDetails?: (property: Property) => void;
+  onViewApartments?: (property: Property) => void;
 }
 
-function PropertyCard({ property, onDelete, onEdit, onViewDetails }: PropertyCardProps) {
+function PropertyCard({ property, onDelete, onEdit, onViewDetails, onViewApartments }: PropertyCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
@@ -102,6 +103,17 @@ function PropertyCard({ property, onDelete, onEdit, onViewDetails }: PropertyCar
                       Ver Detalles
                     </p>
                   </button>
+                  <button
+                    onClick={() => {
+                      setShowMenu(false);
+                      onViewApartments?.(property);
+                    }}
+                    className="w-full text-left px-[16px] py-[12px] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
+                  >
+                    <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
+                      Ver Apartamentos
+                    </p>
+                  </button>
                   <div className="border-t border-[rgba(255,255,255,0.16)]" />
                   <button
                     onClick={() => {
@@ -160,6 +172,7 @@ function PropertyCard({ property, onDelete, onEdit, onViewDetails }: PropertyCar
 }
 
 export function Properties() {
+  const navigate = useNavigate();
   const { currentOwner, properties, refreshProperties } = useOwner();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
@@ -227,6 +240,7 @@ export function Properties() {
               onDelete={handleDeleteProperty}
               onEdit={handleEditProperty}
               onViewDetails={handleViewDetails}
+              onViewApartments={(p) => navigate(`/properties/${p.id}/apartments`)}
             />
           ))
         )}
