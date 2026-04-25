@@ -45,6 +45,22 @@ export interface ApartmentResponse {
   propertyId: string;
 }
 
+export interface TenantGridResponse {
+  id: string;
+  name: string;
+}
+
+export interface ApartmentGridResponse {
+  id: string;
+  due_date: string;
+  payment_status: 'PAID' | string;
+  square_meters: number;
+  rent: number;
+  tenant: TenantGridResponse | null;
+}
+
+export type PropertyApartmentsGridResponse = Record<number, Record<number, ApartmentGridResponse>>;
+
 export interface ExpenseCreateRequest {
   category: string;
   description: string;
@@ -112,6 +128,13 @@ export const userService = {
 
   listApartments(): Promise<ApartmentResponse[]> {
     return apiRequest<ApartmentResponse[]>(API_ENDPOINTS.APARTMENTS.LIST, {
+      method: "GET",
+      token: getRequiredToken(),
+    });
+  },
+
+  getPropertyApartmentsGrid(propertyId: string): Promise<PropertyApartmentsGridResponse> {
+    return apiRequest<PropertyApartmentsGridResponse>(`${API_ENDPOINTS.PROPERTIES.BASE}/${propertyId}/apartments`, {
       method: "GET",
       token: getRequiredToken(),
     });
