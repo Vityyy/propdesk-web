@@ -1,14 +1,23 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import type { Unit } from '../../types/index';
 import { propertyService } from '../../../services/propertyService';
 import authService from '../../../services/authService';
-import userService from '../../../services/userService';
+import userService, { ApartmentRangeData } from '../../../services/userService';
 import { useOwner } from '../../context/OwnerContext';
+import { parseRange, generateApartmentRanges, findOverlapError } from '../../../utils/rangeParser';
 
 interface CreatePropertyDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
+}
+
+interface Rule {
+  id: string;
+  floorRanges: string;
+  apartmentNumberRanges: string;
+  squareMeters: string;
+  rentValue: string;
 }
 
 export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePropertyDialogProps) {
@@ -17,78 +26,94 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
     name: '',
     address: '',
     imageUrl: '',
-    description: '',
-  });
-  const [units, setUnits] = useState<Omit<Unit, 'id'>[]>([]);
-  const [unitConfig, setUnitConfig] = useState({
-    startNumber: '',
-    quantity: '',
-    type: '',
-    squareFeet: '',
-    rentAmount: '',
   });
 
-  const generateUnits = () => {
-    if (!unitConfig.startNumber || !unitConfig.quantity || !unitConfig.type) {
-      alert('Por favor completa todos los campos de configuración');
-      return;
+  const [rules, setRules] = useState<Rule[]>([
+    {
+      id: crypto.randomUUID(),
+      floorRanges: '',
+      apartmentNumberRanges: '',
+      squareMeters: '',
+      rentValue: '',
     }
+  ]);
 
-    const startNum = parseInt(unitConfig.startNumber);
-    const quantity = parseInt(unitConfig.quantity);
+  const [formError, setFormError] = useState<string | null>(null);
 
-    if (isNaN(startNum) || isNaN(quantity) || quantity <= 0) {
-      alert('Número inicial y cantidad deben ser números válidos');
-      return;
+  const parsedRanges = useMemo(() => {
+    try {
+      let allRanges: ApartmentRangeData[] = [];
+      setFormError(null);
+
+      // We only parse if there are some inputs
+      for (const rule of rules) {
+        if (!rule.floorRanges || !rule.apartmentNumberRanges || !rule.squareMeters || !rule.rentValue) {
+          continue; // Skip incomplete rules in preview
+        }
+        
+        const fIntervals = parseRange(rule.floorRanges);
+        const aIntervals = parseRange(rule.apartmentNumberRanges);
+        const sqMt = parseFloat(rule.squareMeters) || 0;
+        const rent = parseFloat(rule.rentValue) || 0;
+
+        const generated = generateApartmentRanges(fIntervals, aIntervals, sqMt, rent);
+        allRanges = [...allRanges, ...generated];
+      }
+
+      // Check overlaps globally
+      const overlapErr = findOverlapError(allRanges);
+      if (overlapErr) {
+        setFormError(overlapErr);
+      }
+
+      return allRanges;
+    } catch (err: any) {
+      setFormError(err.message || 'Error parsing ranges.');
+      return [];
     }
+  }, [rules]);
 
-    // Check for duplicates
-    const existingNumbers = new Set(units.map(u => u.unitNumber));
-    const newNumbers: string[] = [];
-    
-    for (let i = 0; i < quantity; i++) {
-      newNumbers.push(String(startNum + i));
-    }
-
-    const duplicates = newNumbers.filter(num => existingNumbers.has(num));
-    if (duplicates.length > 0) {
-      alert(`Las unidades ${duplicates.join(', ')} ya existen. Por favor elige números diferentes.`);
-      return;
-    }
-
-    const newUnits: Omit<Unit, 'id'>[] = [];
-    for (let i = 0; i < quantity; i++) {
-      newUnits.push({
-        unitNumber: String(startNum + i),
-        type: unitConfig.type,
-        squareFeet: parseInt(unitConfig.squareFeet) || 0,
-        rentAmount: parseFloat(unitConfig.rentAmount) || 0,
-        status: 'vacant',
-      });
-    }
-
-    setUnits([...units, ...newUnits]);
-    setUnitConfig({ startNumber: '', quantity: '', type: '', squareFeet: '', rentAmount: '' });
+  const handleAddRule = () => {
+    setRules([
+      ...rules,
+      {
+        id: crypto.randomUUID(),
+        floorRanges: '',
+        apartmentNumberRanges: '',
+        squareMeters: '',
+        rentValue: '',
+      }
+    ]);
   };
 
-  const handleRemoveUnit = (index: number) => {
-    setUnits(units.filter((_, i) => i !== index));
+  const handleRemoveRule = (id: string) => {
+    setRules(rules.filter(r => r.id !== id));
   };
 
-  const handleRemoveRange = (startIndex: number, count: number) => {
-    setUnits(units.filter((_, i) => i < startIndex || i >= startIndex + count));
+  const updateRule = (id: string, field: keyof Rule, value: string) => {
+    setRules(rules.map(r => r.id === id ? { ...r, [field]: value } : r));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.address) {
-      alert('Por favor ingresa nombre y dirección');
+    if (!formData.name.trim() || !formData.address.trim()) {
+      alert('El nombre y dirección de la propiedad no pueden estar vacíos.');
       return;
     }
 
-    if (units.length === 0) {
-      alert('Por favor agrega al menos una unidad');
+    if (rules.some(r => !r.floorRanges || !r.apartmentNumberRanges || !r.squareMeters || !r.rentValue)) {
+      alert('Por favor, completa todos los campos de todas las reglas antes de enviar.');
+      return;
+    }
+
+    if (formError) {
+      alert('Corrige los errores en las reglas antes de crear la propiedad.');
+      return;
+    }
+
+    if (parsedRanges.length === 0) {
+      alert('Debe generarse al menos un departamento.');
       return;
     }
 
@@ -98,35 +123,38 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
         throw new Error('No authenticated owner found');
       }
 
-      const createdProperty = await userService.createProperty({
+      // Updated backend call using the requested schema format
+      const createdProperty = await userService.createPropertyWithRanges({
+        propertyName: formData.name,
+        propertyAddress: formData.address,
+        propertyPicture: formData.imageUrl,
+        ranges: parsedRanges,
+      });
+
+      // Backward compatible mapping for localStorage (since local storage expects units)
+      const mappedUnits: Unit[] = parsedRanges.map((r, i) => {
+        // Floor 1, Apt 4 => Unit '104'. Just pad apartments with 2 zeros.
+        const unitNumber = `${r.startFloor}${String(r.startApartmentNumber).padStart(2, '0')}`;
+        return {
+          id: `local-unit-${i}-${crypto.randomUUID()}`,
+          unitNumber,
+          type: 'Apartment',
+          squareFeet: r.squareMeters,
+          rentAmount: r.rentValue,
+          status: 'vacant',
+        };
+      });
+
+      propertyService.storeProperty({
+        id: createdProperty.id || crypto.randomUUID(),
         ownerId: authenticatedOwnerId,
         name: formData.name,
         address: formData.address,
-      });
-
-      const createdApartments = await userService.createApartments(
-        units.map((unit) => ({
-          name: unit.unitNumber,
-          propertyId: createdProperty.id,
-          amount_due: unit.rentAmount || 0,
-        })),
-      );
-
-      const unitsWithBackendIds: Unit[] = units.map((unit, index) => ({
-        ...unit,
-        id: createdApartments[index].id,
-      }));
-
-      propertyService.storeProperty({
-        id: createdProperty.id,
-        ownerId: authenticatedOwnerId,
-        name: createdProperty.name,
-        address: createdProperty.address,
         imageUrl: formData.imageUrl || 'https://via.placeholder.com/400x300?text=Property',
-        description: formData.description,
-        units: unitsWithBackendIds,
-        totalUnits: unitsWithBackendIds.length,
-        occupiedUnits: unitsWithBackendIds.filter((unit) => unit.status === 'occupied').length,
+        description: '',
+        units: mappedUnits,
+        totalUnits: mappedUnits.length,
+        occupiedUnits: 0,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       });
@@ -141,261 +169,205 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
   };
 
   const handleClose = () => {
-    setFormData({ name: '', address: '', imageUrl: '', description: '' });
-    setUnits([]);
-    setUnitConfig({ startNumber: '', quantity: '', type: '', squareFeet: '', rentAmount: '' });
+    setFormData({ name: '', address: '', imageUrl: '' });
+    setRules([{
+      id: crypto.randomUUID(),
+      floorRanges: '',
+      apartmentNumberRanges: '',
+      squareMeters: '',
+      rentValue: '',
+    }]);
+    setFormError(null);
     onClose();
   };
-
-  // Group units by configuration for preview
-  const groupedUnits = (() => {
-    const groups: { units: Omit<Unit, 'id'>[]; index: number }[] = [];
-    let currentGroup: { units: Omit<Unit, 'id'>[]; index: number } | null = null;
-
-    units.forEach((unit, idx) => {
-      if (!currentGroup) {
-        currentGroup = { units: [unit], index: idx };
-      } else {
-        const lastUnit = currentGroup.units[currentGroup.units.length - 1];
-        const currentNum = parseInt(unit.unitNumber);
-        const lastNum = parseInt(lastUnit.unitNumber);
-
-        if (lastNum + 1 === currentNum && lastUnit.type === unit.type && lastUnit.rentAmount === unit.rentAmount) {
-          currentGroup.units.push(unit);
-        } else {
-          groups.push(currentGroup);
-          currentGroup = { units: [unit], index: idx };
-        }
-      }
-    });
-
-    if (currentGroup) {
-      groups.push(currentGroup);
-    }
-
-    return groups;
-  })();
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-black border border-[rgba(255,255,255,0.16)] rounded-[16px] max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-[rgba(255,255,255,0.16)] flex items-center justify-between sticky top-0 bg-black">
-          <h2 className="font-['Archivo:ExtraBold',sans-serif] font-extrabold text-[20px] text-white">
-            Nueva Propiedad
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-[#0f0f0f] border border-[rgba(255,255,255,0.16)] rounded-[16px] max-w-4xl w-full my-8">
+        <div className="p-6 border-b border-[rgba(255,255,255,0.16)] flex items-center justify-between sticky top-0 bg-[#0f0f0f] z-10 rounded-t-[16px]">
+          <h2 className="font-['Archivo:ExtraBold',sans-serif] font-extrabold text-[22px] text-white">
+            Crear Nueva Propiedad
           </h2>
           <button
             onClick={handleClose}
-            className="text-[rgba(255,255,255,0.6)] hover:text-white transition-colors"
+            className="text-[rgba(255,255,255,0.6)] hover:text-white transition-colors p-2"
           >
             ✕
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Property Info */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-8">
+          {/* General Property Information */}
           <div className="space-y-4">
-            <h3 className="font-['Archivo:SemiBold',sans-serif] font-semibold text-white">
-              Información de la Propiedad
+            <h3 className="font-['Archivo:SemiBold',sans-serif] font-semibold text-white/90 text-lg border-l-4 border-[#928dd3] pl-3">
+              Información General
             </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
+                  Nombre de la Propiedad <span className="text-[#ff6b6b]">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full px-4 py-3 bg-[rgba(255,255,255,0.03)] focus:bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.16)] focus:border-[#928dd3] outline-none rounded-[8px] text-white placeholder-[rgba(255,255,255,0.3)] transition-all"
+                  placeholder="ej: Sunset Apartments"
+                />
+              </div>
 
-            <div>
-              <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
-                Nombre de la Propiedad
-              </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-2 bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.16)] rounded-[8px] text-white placeholder-[rgba(255,255,255,0.4)]"
-                placeholder="ej: Sunset Apartments"
-              />
+              <div>
+                <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
+                  Dirección <span className="text-[#ff6b6b]">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.address}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  className="w-full px-4 py-3 bg-[rgba(255,255,255,0.03)] focus:bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.16)] focus:border-[#928dd3] outline-none rounded-[8px] text-white placeholder-[rgba(255,255,255,0.3)] transition-all"
+                  placeholder="ej: 123 Main St, City, State"
+                />
+              </div>
             </div>
 
             <div>
               <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
-                Dirección
-              </label>
-              <input
-                type="text"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                className="w-full px-4 py-2 bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.16)] rounded-[8px] text-white placeholder-[rgba(255,255,255,0.4)]"
-                placeholder="ej: 123 Main St, City, State"
-              />
-            </div>
-
-            <div>
-              <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
-                URL de Imagen
+                URL de la Imagen de Portada (Opcional)
               </label>
               <input
                 type="url"
                 value={formData.imageUrl}
                 onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                className="w-full px-4 py-2 bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.16)] rounded-[8px] text-white placeholder-[rgba(255,255,255,0.4)]"
+                className="w-full px-4 py-3 bg-[rgba(255,255,255,0.03)] focus:bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.16)] focus:border-[#928dd3] outline-none rounded-[8px] text-white placeholder-[rgba(255,255,255,0.3)] transition-all"
                 placeholder="https://..."
               />
             </div>
-
-            <div>
-              <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
-                Descripción (Opcional)
-              </label>
-              <textarea
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full px-4 py-2 bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.16)] rounded-[8px] text-white placeholder-[rgba(255,255,255,0.4)] resize-none"
-                placeholder="Descripción de la propiedad..."
-                rows={3}
-              />
-            </div>
           </div>
 
-          {/* Units Configuration */}
+          {/* Rules Configuration */}
           <div className="space-y-4">
-            <h3 className="font-['Archivo:SemiBold',sans-serif] font-semibold text-white">
-              Configurar Unidades
-            </h3>
-
-            <div className="bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] rounded-[8px] p-4 space-y-4">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
-                    Número de Unidad Inicial *
-                  </label>
-                  <input
-                    type="number"
-                    value={unitConfig.startNumber}
-                    onChange={(e) => setUnitConfig({ ...unitConfig, startNumber: e.target.value })}
-                    className="w-full px-4 py-2 bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.16)] rounded-[8px] text-white placeholder-[rgba(255,255,255,0.4)] text-sm"
-                    placeholder="ej: 101"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
-                    Cantidad de Unidades *
-                  </label>
-                  <input
-                    type="number"
-                    value={unitConfig.quantity}
-                    onChange={(e) => setUnitConfig({ ...unitConfig, quantity: e.target.value })}
-                    className="w-full px-4 py-2 bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.16)] rounded-[8px] text-white placeholder-[rgba(255,255,255,0.4)] text-sm"
-                    placeholder="ej: 10"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
-                  Tipo de Unidad *
-                </label>
-                <input
-                  type="text"
-                  value={unitConfig.type}
-                  onChange={(e) => setUnitConfig({ ...unitConfig, type: e.target.value })}
-                  className="w-full px-4 py-2 bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.16)] rounded-[8px] text-white placeholder-[rgba(255,255,255,0.4)] text-sm"
-                  placeholder="ej: 2 Dormitorios"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
-                    Tamaño (m²)
-                  </label>
-                  <input
-                    type="number"
-                    value={unitConfig.squareFeet}
-                    onChange={(e) => setUnitConfig({ ...unitConfig, squareFeet: e.target.value })}
-                    className="w-full px-4 py-2 bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.16)] rounded-[8px] text-white placeholder-[rgba(255,255,255,0.4)] text-sm"
-                    placeholder="0"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
-                    Renta Mensual ($)
-                  </label>
-                  <input
-                    type="number"
-                    value={unitConfig.rentAmount}
-                    onChange={(e) => setUnitConfig({ ...unitConfig, rentAmount: e.target.value })}
-                    className="w-full px-4 py-2 bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.16)] rounded-[8px] text-white placeholder-[rgba(255,255,255,0.4)] text-sm"
-                    placeholder="0"
-                  />
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={generateUnits}
-                className="w-full px-4 py-2 bg-[#928dd3] text-black font-semibold rounded-[8px] hover:bg-[#a89be6] transition-colors text-sm"
-              >
-                + Agregar {unitConfig.quantity ? `${unitConfig.quantity} Unidades` : 'Unidades'}
-              </button>
+            <div className="flex justify-between items-center border-l-4 border-[#928dd3] pl-3">
+              <h3 className="font-['Archivo:SemiBold',sans-serif] font-semibold text-white/90 text-lg">
+                Reglas de Departamentos
+              </h3>
+              <p className="text-sm text-[rgba(255,255,255,0.5)]">
+                Ejemplo de rango: 1-5, 9, 11
+              </p>
             </div>
+
+            <div className="space-y-4">
+              {rules.map((rule, idx) => (
+                <div key={rule.id} className="relative bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.1)] rounded-[12px] p-5 pt-6 transition-all hover:border-[rgba(255,255,255,0.2)]">
+                  {rules.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveRule(rule.id)}
+                      className="absolute top-3 right-3 text-[rgba(255,255,255,0.4)] hover:text-[#ff6b6b] transition-colors"
+                      title="Eliminar regla"
+                    >
+                      ✕
+                    </button>
+                  )}
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="md:col-span-2">
+                      <label className="block text-[rgba(255,255,255,0.7)] text-xs uppercase tracking-wider mb-2 font-semibold">
+                        Pisos (Rango) <span className="text-[#928dd3] ml-1">#</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={rule.floorRanges}
+                        onChange={(e) => updateRule(rule.id, 'floorRanges', e.target.value)}
+                        className="w-full px-3 py-2 bg-[rgba(0,0,0,0.3)] border border-[rgba(255,255,255,0.12)] focus:border-[#928dd3] outline-none rounded-[6px] text-white text-sm"
+                        placeholder="Ej: 1-5, 9, 11"
+                      />
+                    </div>
+                    
+                    <div className="md:col-span-2">
+                      <label className="block text-[rgba(255,255,255,0.7)] text-xs uppercase tracking-wider mb-2 font-semibold">
+                        Departamentos (Rango) <span className="text-[#928dd3] ml-1">#</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={rule.apartmentNumberRanges}
+                        onChange={(e) => updateRule(rule.id, 'apartmentNumberRanges', e.target.value)}
+                        className="w-full px-3 py-2 bg-[rgba(0,0,0,0.3)] border border-[rgba(255,255,255,0.12)] focus:border-[#928dd3] outline-none rounded-[6px] text-white text-sm"
+                        placeholder="Ej: 1-4, 8, 10"
+                      />
+                    </div>
+                    
+                    <div className="md:col-span-2">
+                      <label className="block text-[rgba(255,255,255,0.7)] text-xs uppercase tracking-wider mb-2 font-semibold">
+                        Metros Cuadrados (m²)
+                      </label>
+                      <input
+                        type="number"
+                        value={rule.squareMeters}
+                        onChange={(e) => updateRule(rule.id, 'squareMeters', e.target.value)}
+                        min="1"
+                        className="w-full px-3 py-2 bg-[rgba(0,0,0,0.3)] border border-[rgba(255,255,255,0.12)] focus:border-[#928dd3] outline-none rounded-[6px] text-white text-sm"
+                        placeholder="Ej: 45"
+                      />
+                    </div>
+                    
+                    <div className="md:col-span-2">
+                      <label className="block text-[rgba(255,255,255,0.7)] text-xs uppercase tracking-wider mb-2 font-semibold">
+                        Valor Alquiler ($)
+                      </label>
+                      <input
+                        type="number"
+                        value={rule.rentValue}
+                        onChange={(e) => updateRule(rule.id, 'rentValue', e.target.value)}
+                        min="0"
+                        className="w-full px-3 py-2 bg-[rgba(0,0,0,0.3)] border border-[rgba(255,255,255,0.12)] focus:border-[#928dd3] outline-none rounded-[6px] text-white text-sm"
+                        placeholder="Ej: 1500"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={handleAddRule}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-dashed border-[rgba(255,255,255,0.3)] text-[rgba(255,255,255,0.7)] font-medium rounded-[12px] hover:border-[#928dd3] hover:text-[#928dd3] hover:bg-[rgba(146,141,211,0.05)] transition-all"
+            >
+              <span>+</span> Añadir Regla
+            </button>
           </div>
 
-          {/* Units Preview */}
-          {units.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="font-['Archivo:SemiBold',sans-serif] font-semibold text-white">
-                Unidades Configuradas ({units.length})
-              </h3>
+          {/* Validation & Preview Panel */}
+          {formError && (
+            <div className="bg-[#ff6b6b]/10 border border-[#ff6b6b]/30 rounded-[12px] p-4 text-[#ff6b6b] text-sm animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite]">
+              <strong>Atención: </strong>
+              {formError}
+            </div>
+          )}
 
-              <div className="space-y-2">
-                {groupedUnits.map((group, groupIdx) => {
-                  const isMultiple = group.units.length > 1;
-                  const firstUnit = group.units[0];
-                  const lastUnit = group.units[group.units.length - 1];
-
-                  return (
-                    <div
-                      key={groupIdx}
-                      className="flex items-center justify-between p-3 bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.16)] rounded-[8px]"
-                    >
-                      <div className="flex-1 text-sm">
-                        <p className="text-white font-semibold">
-                          {isMultiple
-                            ? `Unidades ${firstUnit.unitNumber} - ${lastUnit.unitNumber} (${group.units.length})`
-                            : `Unidad ${firstUnit.unitNumber}`}
-                        </p>
-                        <p className="text-[rgba(255,255,255,0.6)]">
-                          {firstUnit.type} • {firstUnit.squareFeet}m² • ${firstUnit.rentAmount.toLocaleString()}/mes
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          isMultiple
-                            ? handleRemoveRange(group.index, group.units.length)
-                            : handleRemoveUnit(group.index)
-                        }
-                        className="text-[#ff6b6b] hover:text-[#ff5252] transition-colors ml-4"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
+          {!formError && parsedRanges.length > 0 && (
+            <div className="bg-[rgba(146,141,211,0.1)] border border-[#928dd3]/30 rounded-[12px] p-4 text-[#a89be6] text-sm">
+              <strong>Éxito: </strong>
+              Se generarán un total de <strong>{parsedRanges.length}</strong> bloques de departamentos válidos.
             </div>
           )}
 
           {/* Actions */}
-          <div className="flex gap-3 pt-4 border-t border-[rgba(255,255,255,0.16)]">
+          <div className="flex gap-4 pt-6 border-t border-[rgba(255,255,255,0.16)]">
             <button
               type="button"
               onClick={handleClose}
-              className="flex-1 px-4 py-2 border border-[rgba(255,255,255,0.16)] text-white rounded-[8px] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
+              className="flex-1 px-6 py-3 border border-[rgba(255,255,255,0.16)] text-white font-medium rounded-[12px] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              disabled={units.length === 0}
-              className="flex-1 px-4 py-2 bg-[#928dd3] text-black font-semibold rounded-[8px] hover:bg-[#a89be6] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!!formError || parsedRanges.length === 0}
+              className="flex-1 px-6 py-3 bg-[#928dd3] text-black font-bold rounded-[12px] hover:bg-[#a89be6] transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-[0_0_15px_rgba(146,141,211,0.4)]"
             >
               Crear Propiedad
             </button>
