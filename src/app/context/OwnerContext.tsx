@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, useCallback, type ReactNode } from 'react';
 import type { Property, Tenant, Unit } from '../types/index';
 import { propertyService } from '../../services/propertyService';
 import { tenantService } from '../../services/tenantService';
@@ -68,7 +68,7 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const fetchBackendData = async () => {
+  const fetchBackendData = useCallback(async () => {
     try {
       const fetchedProperties = await userService.listProperties(currentOwner.id);
       const fetchedApartments = await userService.listApartments();
@@ -105,7 +105,7 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
       console.error('Failed to load backend properties', e);
       setProperties(propertyService.getPropertiesByOwner(currentOwner.id));
     }
-  };
+  }, [currentOwner.id]);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -123,7 +123,7 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     fetchBackendData();
     setTenants(tenantService.getTenantsByOwner(currentOwner.id));
-  }, [currentOwner]);
+  }, [currentOwner.id, fetchBackendData]);
 
   const setCurrentOwner = (owner: Owner) => {
     setCurrentOwnerState(owner);

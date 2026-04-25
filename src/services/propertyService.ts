@@ -128,7 +128,7 @@ export const propertyService = {
         return newUnits;
       }
       return [];
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error adding units:', error);
       throw error;
     }

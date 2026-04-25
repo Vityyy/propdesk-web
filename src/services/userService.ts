@@ -97,7 +97,7 @@ export const userService = {
   },
 
   listProperties(ownerId?: string): Promise<PropertyResponse[]> {
-    let url = API_ENDPOINTS.PROPERTIES.LIST;
+    let url: string = API_ENDPOINTS.PROPERTIES.LIST;
     if (ownerId) {
       url = `${url}?ownerId=${ownerId}`;
     }

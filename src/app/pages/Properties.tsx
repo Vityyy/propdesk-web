@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useOwner } from '../context/OwnerContext';
-import { propertyService } from '../../services/propertyService';
 import userService from '../../services/userService';
 import { CreatePropertyDialog } from '../components/dialogs/CreatePropertyDialog';
 import { EditPropertyDialog } from '../components/dialogs/EditPropertyDialog';
