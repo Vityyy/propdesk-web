@@ -2,6 +2,7 @@ import { createBrowserRouter, redirect } from "react-router";
 import { Layout } from "./Layout";
 import { Summary } from "./pages/Summary";
 import { Properties } from "./pages/Properties";
+import { Apartments } from "./pages/Apartments";
 import { Tenants } from "./pages/Tenants";
 import { Expenses } from "./pages/Expenses";
 import { Reports } from "./pages/Reports";
@@ -47,7 +48,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, Component: Summary },
       { path: "properties", Component: Properties },
-      { path: "apartments", loader: () => redirect("/properties") },
+      { path: "properties/:propertyId/apartments", Component: Apartments },
       { path: "tenants", Component: Tenants },
       { path: "expenses", Component: Expenses },
       { path: "reports", Component: Reports },

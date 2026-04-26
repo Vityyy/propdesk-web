@@ -1,6 +1,6 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import { useOwner } from '../context/OwnerContext';
-import { propertyService } from '../../services/propertyService';
 import userService from '../../services/userService';
 import { CreatePropertyDialog } from '../components/dialogs/CreatePropertyDialog';
 import { EditPropertyDialog } from '../components/dialogs/EditPropertyDialog';
@@ -26,9 +26,10 @@ interface PropertyCardProps {
   onDelete?: (id: string) => void;
   onEdit?: (property: Property) => void;
   onViewDetails?: (property: Property) => void;
+  onViewApartments?: (property: Property) => void;
 }
 
-function PropertyCard({ property, onDelete, onEdit, onViewDetails }: PropertyCardProps) {
+function PropertyCard({ property, onDelete, onEdit, onViewDetails, onViewApartments }: PropertyCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
@@ -42,9 +43,10 @@ function PropertyCard({ property, onDelete, onEdit, onViewDetails }: PropertyCar
 
   return (
     <div 
-      className="bg-black relative rounded-[16px] overflow-hidden group"
+      className="bg-black relative rounded-[16px] overflow-hidden group cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={() => onViewApartments?.(property)}
     >
       <div className="relative w-full h-[200px] overflow-hidden">
         <ImageWithFallback 
@@ -67,7 +69,10 @@ function PropertyCard({ property, onDelete, onEdit, onViewDetails }: PropertyCar
           </div>
           <div className="relative">
             <button 
-              onClick={() => setShowMenu(!showMenu)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowMenu(!showMenu);
+              }}
               className="hover:opacity-70 transition-opacity p-[4px]"
             >
               <DotsHorizontal />
@@ -77,11 +82,15 @@ function PropertyCard({ property, onDelete, onEdit, onViewDetails }: PropertyCar
               <>
                 <div 
                   className="fixed inset-0 z-[10]" 
-                  onClick={() => setShowMenu(false)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowMenu(false);
+                  }}
                 />
                 <div className="absolute top-[calc(100%+8px)] right-0 bg-black border border-[rgba(255,255,255,0.16)] rounded-[8px] min-w-[200px] z-[11] overflow-hidden">
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setShowMenu(false);
                       onEdit?.(property);
                     }}
@@ -92,7 +101,8 @@ function PropertyCard({ property, onDelete, onEdit, onViewDetails }: PropertyCar
                     </p>
                   </button>
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setShowMenu(false);
                       onViewDetails?.(property);
                     }}
@@ -102,9 +112,22 @@ function PropertyCard({ property, onDelete, onEdit, onViewDetails }: PropertyCar
                       Ver Detalles
                     </p>
                   </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowMenu(false);
+                      onViewApartments?.(property);
+                    }}
+                    className="w-full text-left px-[16px] py-[12px] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
+                  >
+                    <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
+                      Ver Apartamentos
+                    </p>
+                  </button>
                   <div className="border-t border-[rgba(255,255,255,0.16)]" />
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setShowMenu(false);
                       onDelete?.(property.id);
                     }}
@@ -160,6 +183,7 @@ function PropertyCard({ property, onDelete, onEdit, onViewDetails }: PropertyCar
 }
 
 export function Properties() {
+  const navigate = useNavigate();
   const { currentOwner, properties, refreshProperties } = useOwner();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
@@ -227,6 +251,7 @@ export function Properties() {
               onDelete={handleDeleteProperty}
               onEdit={handleEditProperty}
               onViewDetails={handleViewDetails}
+              onViewApartments={(p) => navigate(`/properties/${p.id}/apartments`)}
             />
           ))
         )}
