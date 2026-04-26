@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { useOwner } from '../context/OwnerContext';
 import userService, { PropertyApartmentsGridResponse, ApartmentGridResponse } from '../../services/userService';
+import { EditApartmentsDialog } from '../components/dialogs/EditApartmentsDialog';
 
 function UserIcon() {
   return (
@@ -28,9 +29,32 @@ export function Apartments() {
   const [gridData, setGridData] = useState<PropertyApartmentsGridResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const [selectedApartments, setSelectedApartments] = useState<Set<string>>(new Set());
+  const [lastSelectedId, setLastSelectedId] = useState<string | null>(null);
+  const [editingApartments, setEditingApartments] = useState<ApartmentGridResponse[]>([]);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
   const property = properties.find(p => p.id === propertyId);
 
-  useEffect(() => {
+  // Convert the Record<number, Record<number, ApartmentGridResponse>> to sorted arrays for rendering
+  const sortedFloors = gridData 
+    ? Object.keys(gridData).map(Number).sort((a, b) => a - b)
+    : [];
+
+  const flattenedApartments = useMemo(() => {
+    if (!gridData) return [];
+    const flat: ApartmentGridResponse[] = [];
+    sortedFloors.forEach(floor => {
+      const aptsMap = gridData[floor];
+      const sortedAptNums = Object.keys(aptsMap).map(Number).sort((a, b) => a - b);
+      sortedAptNums.forEach(num => {
+        flat.push(aptsMap[num]);
+      });
+    });
+    return flat;
+  }, [gridData, sortedFloors]);
+
+  const fetchApartments = () => {
     if (!propertyId) return;
     setLoading(true);
     userService.getPropertyApartmentsGrid(propertyId)
@@ -42,11 +66,53 @@ export function Apartments() {
         console.error('Error fetching apartments', err);
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    fetchApartments();
   }, [propertyId]);
 
-  const handleEditClick = (apartment: ApartmentGridResponse) => {
-    // Other branch is working on the popup
-    console.log('Edit apartment clicked:', apartment);
+  const handleCardClick = (apt: ApartmentGridResponse, e: React.MouseEvent) => {
+    const newSelected = new Set(selectedApartments);
+
+    if (e.shiftKey && lastSelectedId) {
+      // Find indices
+      const startIdx = flattenedApartments.findIndex(a => a.id === lastSelectedId);
+      const endIdx = flattenedApartments.findIndex(a => a.id === apt.id);
+      
+      if (startIdx !== -1 && endIdx !== -1) {
+        const min = Math.min(startIdx, endIdx);
+        const max = Math.max(startIdx, endIdx);
+        for (let i = min; i <= max; i++) {
+          newSelected.add(flattenedApartments[i].id);
+        }
+      }
+    } else if (e.ctrlKey || e.metaKey) {
+      if (newSelected.has(apt.id)) {
+        newSelected.delete(apt.id);
+      } else {
+        newSelected.add(apt.id);
+      }
+      setLastSelectedId(apt.id);
+    } else {
+      newSelected.clear();
+      newSelected.add(apt.id);
+      setLastSelectedId(apt.id);
+    }
+
+    setSelectedApartments(newSelected);
+  };
+
+  const handleEditClick = (e: React.MouseEvent, apt: ApartmentGridResponse) => {
+    e.stopPropagation();
+    setEditingApartments([apt]);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleBulkEditClick = () => {
+    const selectedApts = flattenedApartments.filter(a => selectedApartments.has(a.id));
+    setEditingApartments(selectedApts);
+    setIsEditDialogOpen(true);
   };
 
   if (loading) {
@@ -56,11 +122,6 @@ export function Apartments() {
       </div>
     );
   }
-
-  // Convert the Record<number, Record<number, ApartmentGridResponse>> to sorted arrays for rendering
-  const sortedFloors = gridData 
-    ? Object.keys(gridData).map(Number).sort((a, b) => a - b)
-    : [];
 
   return (
     <div className="bg-black min-h-full w-full">
@@ -83,10 +144,37 @@ export function Apartments() {
               </p>
             </div>
           </div>
+          
+          <div className="bg-[#928dd3]/10 border border-[#928dd3]/30 rounded-lg p-3 w-fit text-[#928dd3] text-sm flex gap-4 mt-2">
+            <p><strong className="font-bold">Click:</strong> Select one</p>
+            <p><strong className="font-bold">Ctrl + Click:</strong> Select multiple</p>
+            <p><strong className="font-bold">Shift + Click:</strong> Select range</p>
+          </div>
         </div>
       </div>
 
-      <div className="px-[48px] pb-[48px] flex flex-col gap-12">
+      <div className="px-[48px] pb-[48px] flex flex-col gap-12 relative">
+        {selectedApartments.size > 0 && (
+          <div className="sticky top-[24px] z-40 bg-[#111] border border-[#928dd3] rounded-xl p-4 shadow-2xl flex items-center justify-between animate-in fade-in slide-in-from-top-4">
+            <span className="text-white font-semibold">
+              {selectedApartments.size} apartment{selectedApartments.size !== 1 ? 's' : ''} selected
+            </span>
+            <div className="flex gap-3">
+              <button 
+                onClick={() => setSelectedApartments(new Set())}
+                className="px-4 py-2 border border-[rgba(255,255,255,0.2)] text-white hover:bg-[rgba(255,255,255,0.1)] rounded-lg transition-colors text-sm font-semibold"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleBulkEditClick}
+                className="px-4 py-2 bg-[#928dd3] text-black hover:bg-[#a89be6] rounded-lg transition-colors text-sm font-bold"
+              >
+                Edit Selection
+              </button>
+            </div>
+          </div>
+        )}
         {sortedFloors.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-[rgba(255,255,255,0.6)]">No floors or apartments registered for this property.</p>
@@ -113,10 +201,13 @@ export function Apartments() {
                       bgClass = isPaid ? 'bg-green-600/80' : 'bg-red-600/80';
                     }
 
+                    const isSelected = selectedApartments.has(apt.id);
+
                     return (
                       <div 
                         key={apt.id} 
-                        className="flex flex-col rounded-xl overflow-hidden border border-[rgba(255,255,255,0.1)] transition-transform hover:scale-[1.02] bg-[#111]"
+                        onClick={(e) => handleCardClick(apt, e)}
+                        className={`flex flex-col rounded-xl overflow-hidden border transition-all hover:scale-[1.02] bg-[#111] cursor-pointer select-none ${isSelected ? 'border-[#928dd3] ring-2 ring-[#928dd3]/50 transform scale-[1.02]' : 'border-[rgba(255,255,255,0.1)]'}`}
                       >
                         {/* Upper half: Background color & Icon */}
                         <div className={`relative h-[120px] flex items-center justify-center ${bgClass}`}>
@@ -131,8 +222,8 @@ export function Apartments() {
                           
                           {/* Edit button */}
                           <button 
-                            onClick={() => handleEditClick(apt)}
-                            className="absolute top-3 right-3 bg-black/40 hover:bg-black/70 backdrop-blur-sm p-1.5 rounded transition-colors text-white"
+                            onClick={(e) => handleEditClick(e, apt)}
+                            className="absolute top-3 right-3 bg-black/40 hover:bg-black/70 backdrop-blur-sm p-1.5 rounded transition-colors text-white z-10"
                             title="Edit apartment data"
                           >
                             <EditIcon />
@@ -172,6 +263,16 @@ export function Apartments() {
           })
         )}
       </div>
+
+      <EditApartmentsDialog 
+        isOpen={isEditDialogOpen}
+        apartments={editingApartments}
+        onClose={() => setIsEditDialogOpen(false)}
+        onSuccess={() => {
+          setSelectedApartments(new Set());
+          fetchApartments();
+        }}
+      />
     </div>
   );
 }

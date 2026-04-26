@@ -180,6 +180,22 @@ export const userService = {
       token: getRequiredToken(),
     });
   },
+
+  updateApartment(apartmentId: string, data: { rent?: number; squareMeters?: number }): Promise<ApartmentResponse> {
+    return apiRequest<ApartmentResponse>(`${API_ENDPOINTS.APARTMENTS.BASE}/${apartmentId}`, {
+      method: "PUT",
+      body: data,
+      token: getRequiredToken(),
+    });
+  },
+
+  bulkUpdateApartments(data: { apartmentIds: string[]; rent?: number; squareMeters?: number }): Promise<void> {
+    return apiRequest<void>(`${API_ENDPOINTS.APARTMENTS.BASE}/bulk`, {
+      method: "PUT",
+      body: data,
+      token: getRequiredToken(),
+    });
+  },
 };
 
 export default userService;
