@@ -52,7 +52,7 @@ export function Apartments() {
   if (loading) {
     return (
       <div className="bg-black min-h-full w-full flex items-center justify-center">
-        <p className="text-white">Cargando apartamentos...</p>
+        <p className="text-white">Loading apartments...</p>
       </div>
     );
   }
@@ -70,16 +70,16 @@ export function Apartments() {
             onClick={() => navigate('/properties')}
             className="text-[rgba(255,255,255,0.6)] hover:text-white transition-colors self-start mb-4"
           >
-            ← Volver a Propiedades
+            ← Back to Properties
           </button>
           
           <div className="flex items-center justify-between w-full">
             <div>
               <p className="font-['Chivo:Black',sans-serif] font-black leading-[40px] text-[34px] text-white tracking-[-0.34px]">
-                Apartamentos
+                Apartments
               </p>
               <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] text-[15px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
-                {property ? `Administrando ${property.name}` : 'Cargando datos de la propiedad...'}
+                {property ? `Managing ${property.name}` : 'Loading property data...'}
               </p>
             </div>
           </div>
@@ -89,7 +89,7 @@ export function Apartments() {
       <div className="px-[48px] pb-[48px] flex flex-col gap-12">
         {sortedFloors.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-[rgba(255,255,255,0.6)]">No hay pisos ni apartamentos registrados para esta propiedad.</p>
+            <p className="text-[rgba(255,255,255,0.6)]">No floors or apartments registered for this property.</p>
           </div>
         ) : (
           sortedFloors.map(floorNum => {
@@ -99,22 +99,28 @@ export function Apartments() {
             return (
               <div key={floorNum} className="flex flex-col gap-6">
                 <h3 className="font-['Chivo:Black',sans-serif] font-black text-2xl text-white">
-                  Piso {floorNum}
+                  Floor {floorNum}
                 </h3>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-7 gap-6 auto-rows-fr">
                   {sortedApartmentNumbers.map(aptNum => {
                     const apt = floorApartmentsMap[aptNum];
+                    const isVacant = !apt.tenant;
                     const isPaid = apt.paymentStatus === 'PAID';
                     
+                    let bgClass = 'bg-gray-600/80';
+                    if (!isVacant) {
+                      bgClass = isPaid ? 'bg-green-600/80' : 'bg-red-600/80';
+                    }
+
                     return (
                       <div 
                         key={apt.id} 
                         className="flex flex-col rounded-xl overflow-hidden border border-[rgba(255,255,255,0.1)] transition-transform hover:scale-[1.02] bg-[#111]"
                       >
                         {/* Upper half: Background color & Icon */}
-                        <div className={`relative h-[120px] flex items-center justify-center ${isPaid ? 'bg-green-600/80' : 'bg-red-600/80'}`}>
-                          <div className="text-white opacity-90 drop-shadow-md">
+                        <div className={`relative h-[120px] flex items-center justify-center ${bgClass}`}>
+                          <div className={`text-white opacity-90 drop-shadow-md ${isVacant ? 'opacity-50' : ''}`}>
                             <UserIcon />
                           </div>
                           
@@ -127,7 +133,7 @@ export function Apartments() {
                           <button 
                             onClick={() => handleEditClick(apt)}
                             className="absolute top-3 right-3 bg-black/40 hover:bg-black/70 backdrop-blur-sm p-1.5 rounded transition-colors text-white"
-                            title="Editar datos del apartamento"
+                            title="Edit apartment data"
                           >
                             <EditIcon />
                           </button>
@@ -137,8 +143,8 @@ export function Apartments() {
                         <div className="p-4 flex flex-col gap-3 flex-1 bg-[#1a1a1a]">
                           <div className="flex justify-between items-center border-b border-[rgba(255,255,255,0.05)] pb-2">
                             <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Tenant</span>
-                            <span className="text-sm text-white font-medium truncate max-w-[100px]" title={apt.tenant?.name || 'Vacante'}>
-                              {apt.tenant ? apt.tenant.name : <span className="text-[rgba(255,255,255,0.3)] italic">Vacante</span>}
+                            <span className="text-sm text-white font-medium truncate max-w-[100px]" title={apt.tenant?.name || 'Vacant'}>
+                              {apt.tenant ? apt.tenant.name : <span className="text-[rgba(255,255,255,0.3)] italic">Vacant</span>}
                             </span>
                           </div>
                           
@@ -148,12 +154,12 @@ export function Apartments() {
                           </div>
                           
                           <div className="flex justify-between items-center">
-                            <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Área</span>
+                            <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Area</span>
                             <span className="text-sm text-white">{apt.squareMeters} m²</span>
                           </div>
                           
                           <div className="flex justify-between items-center mt-auto pt-2">
-                            <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Vence</span>
+                            <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Due</span>
                             <span className="text-sm text-white">{apt.dueDate || '-'}</span>
                           </div>
                         </div>
