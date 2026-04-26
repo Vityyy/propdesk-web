@@ -43,9 +43,10 @@ function PropertyCard({ property, onDelete, onEdit, onViewDetails, onViewApartme
 
   return (
     <div 
-      className="bg-black relative rounded-[16px] overflow-hidden group"
+      className="bg-black relative rounded-[16px] overflow-hidden group cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={() => onViewApartments?.(property)}
     >
       <div className="relative w-full h-[200px] overflow-hidden">
         <ImageWithFallback 
@@ -68,7 +69,10 @@ function PropertyCard({ property, onDelete, onEdit, onViewDetails, onViewApartme
           </div>
           <div className="relative">
             <button 
-              onClick={() => setShowMenu(!showMenu)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowMenu(!showMenu);
+              }}
               className="hover:opacity-70 transition-opacity p-[4px]"
             >
               <DotsHorizontal />
@@ -78,11 +82,15 @@ function PropertyCard({ property, onDelete, onEdit, onViewDetails, onViewApartme
               <>
                 <div 
                   className="fixed inset-0 z-[10]" 
-                  onClick={() => setShowMenu(false)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowMenu(false);
+                  }}
                 />
                 <div className="absolute top-[calc(100%+8px)] right-0 bg-black border border-[rgba(255,255,255,0.16)] rounded-[8px] min-w-[200px] z-[11] overflow-hidden">
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setShowMenu(false);
                       onEdit?.(property);
                     }}
@@ -93,7 +101,8 @@ function PropertyCard({ property, onDelete, onEdit, onViewDetails, onViewApartme
                     </p>
                   </button>
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setShowMenu(false);
                       onViewDetails?.(property);
                     }}
@@ -104,7 +113,8 @@ function PropertyCard({ property, onDelete, onEdit, onViewDetails, onViewApartme
                     </p>
                   </button>
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setShowMenu(false);
                       onViewApartments?.(property);
                     }}
@@ -116,7 +126,8 @@ function PropertyCard({ property, onDelete, onEdit, onViewDetails, onViewApartme
                   </button>
                   <div className="border-t border-[rgba(255,255,255,0.16)]" />
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setShowMenu(false);
                       onDelete?.(property.id);
                     }}
