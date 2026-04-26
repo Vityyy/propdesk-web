@@ -38,12 +38,9 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
     }
   ]);
 
-  const [formError, setFormError] = useState<string | null>(null);
-
-  const parsedRanges = useMemo(() => {
+  const { parsedRanges, formError } = useMemo(() => {
     try {
       let allRanges: ApartmentRangeData[] = [];
-      setFormError(null);
 
       // We only parse if there are some inputs
       for (const rule of rules) {
@@ -63,13 +60,12 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
       // Check overlaps globally
       const overlapErr = findOverlapError(allRanges);
       if (overlapErr) {
-        setFormError(overlapErr);
+        return { parsedRanges: allRanges, formError: overlapErr };
       }
 
-      return allRanges;
+      return { parsedRanges: allRanges, formError: null };
     } catch (err: any) {
-      setFormError(err.message || 'Error parsing ranges.');
-      return [];
+      return { parsedRanges: [], formError: err.message || 'Error parsing ranges.' };
     }
   }, [rules]);
 
@@ -141,7 +137,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
           type: 'Apartment',
           squareFeet: r.squareMeters,
           rentAmount: r.rentValue,
-          status: 'vacant',
+          status: 'vacant' as const,
         };
       });
 
@@ -177,7 +173,6 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
       squareMeters: '',
       rentValue: '',
     }]);
-    setFormError(null);
     onClose();
   };
 
