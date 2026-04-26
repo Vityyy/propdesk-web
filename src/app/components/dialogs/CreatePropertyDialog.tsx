@@ -47,7 +47,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
         if (!rule.floorRanges || !rule.apartmentNumberRanges || !rule.squareMeters || !rule.rentValue) {
           continue; // Skip incomplete rules in preview
         }
-        
+
         const fIntervals = parseRange(rule.floorRanges);
         const aIntervals = parseRange(rule.apartmentNumberRanges);
         const sqMt = parseFloat(rule.squareMeters) || 0;
@@ -119,12 +119,12 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
         throw new Error('No authenticated owner found');
       }
 
-      // Updated backend call using the requested schema format
       const createdProperty = await userService.createPropertyWithRanges({
         propertyName: formData.name,
         propertyAddress: formData.address,
-        propertyPicture: formData.imageUrl,
-        ranges: parsedRanges,
+        pictureUrl: formData.imageUrl,
+        ownerId: authenticatedOwnerId,
+        apartmentRanges: parsedRanges,
       });
 
       // Backward compatible mapping for localStorage (since local storage expects units)
@@ -199,7 +199,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
             <h3 className="font-['Archivo:SemiBold',sans-serif] font-semibold text-white/90 text-lg border-l-4 border-[#928dd3] pl-3">
               Información General
             </h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
@@ -266,7 +266,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                       ✕
                     </button>
                   )}
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div className="md:col-span-2">
                       <label className="block text-[rgba(255,255,255,0.7)] text-xs uppercase tracking-wider mb-2 font-semibold">
@@ -280,7 +280,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                         placeholder="Ej: 1-5, 9, 11"
                       />
                     </div>
-                    
+
                     <div className="md:col-span-2">
                       <label className="block text-[rgba(255,255,255,0.7)] text-xs uppercase tracking-wider mb-2 font-semibold">
                         Departamentos (Rango) <span className="text-[#928dd3] ml-1">#</span>
@@ -293,7 +293,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                         placeholder="Ej: 1-4, 8, 10"
                       />
                     </div>
-                    
+
                     <div className="md:col-span-2">
                       <label className="block text-[rgba(255,255,255,0.7)] text-xs uppercase tracking-wider mb-2 font-semibold">
                         Metros Cuadrados (m²)
@@ -307,7 +307,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                         placeholder="Ej: 45"
                       />
                     </div>
-                    
+
                     <div className="md:col-span-2">
                       <label className="block text-[rgba(255,255,255,0.7)] text-xs uppercase tracking-wider mb-2 font-semibold">
                         Valor Alquiler ($)

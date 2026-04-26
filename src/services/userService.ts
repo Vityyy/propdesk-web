@@ -20,8 +20,9 @@ export interface ApartmentRangeData {
 export interface NewPropertyCreateRequest {
   propertyName: string;
   propertyAddress: string;
-  propertyPicture: string;
-  ranges: ApartmentRangeData[];
+  pictureUrl: string;
+  ownerId: string;
+  apartmentRanges: ApartmentRangeData[];
 }
 
 export interface AdminSummary {
