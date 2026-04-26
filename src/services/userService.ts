@@ -68,9 +68,9 @@ export interface TenantGridResponse {
 
 export interface ApartmentGridResponse {
   id: string;
-  due_date: string;
-  payment_status: 'PAID' | string;
-  square_meters: number;
+  dueDate: string;
+  paymentStatus: 'PAID' | string;
+  squareMeters: number;
   rent: number;
   tenant: TenantGridResponse | null;
 }

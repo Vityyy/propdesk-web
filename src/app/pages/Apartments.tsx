@@ -105,7 +105,7 @@ export function Apartments() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-7 gap-6 auto-rows-fr">
                   {sortedApartmentNumbers.map(aptNum => {
                     const apt = floorApartmentsMap[aptNum];
-                    const isPaid = apt.payment_status === 'PAID';
+                    const isPaid = apt.paymentStatus === 'PAID';
                     
                     return (
                       <div 
@@ -149,12 +149,12 @@ export function Apartments() {
                           
                           <div className="flex justify-between items-center">
                             <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Área</span>
-                            <span className="text-sm text-white">{apt.square_meters} m²</span>
+                            <span className="text-sm text-white">{apt.squareMeters} m²</span>
                           </div>
                           
                           <div className="flex justify-between items-center mt-auto pt-2">
                             <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Vence</span>
-                            <span className="text-sm text-white">{apt.due_date || '-'}</span>
+                            <span className="text-sm text-white">{apt.dueDate || '-'}</span>
                           </div>
                         </div>
                       </div>
