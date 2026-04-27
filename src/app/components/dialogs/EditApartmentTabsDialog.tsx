@@ -4,6 +4,7 @@ import userService, {
   ApartmentExpenseResponse,
   TenantGridResponse,
 } from '../../../services/userService';
+import { parseRange } from '../../../utils/rangeParser';
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
 
@@ -177,16 +178,59 @@ function TenantSection({
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [floorRanges, setFloorRanges] = useState('');
+  const [apartmentRanges, setApartmentRanges] = useState('');
+  const [specialModsError, setSpecialModsError] = useState<string | null>(null);
+  const [specialModsSummary, setSpecialModsSummary] = useState<string | null>(null);
+
+  const parseSpecialModifications = () => {
+    if (!floorRanges.trim() && !apartmentRanges.trim()) {
+      setSpecialModsError(null);
+      setSpecialModsSummary(null);
+      return true;
+    }
+
+    if (!floorRanges.trim() || !apartmentRanges.trim()) {
+      setSpecialModsError('To use special modifications, complete both floor and apartment ranges.');
+      setSpecialModsSummary(null);
+      return false;
+    }
+
+    try {
+      const parsedFloors = parseRange(floorRanges);
+      const parsedApartments = parseRange(apartmentRanges);
+
+      const floorsCount = parsedFloors.reduce((sum, interval) => sum + (interval.end - interval.start + 1), 0);
+      const apartmentsCount = parsedApartments.reduce((sum, interval) => sum + (interval.end - interval.start + 1), 0);
+      const targetUnits = floorsCount * apartmentsCount;
+
+      setSpecialModsError(null);
+      setSpecialModsSummary(`Parsed successfully. Reference block covers ${targetUnits} units.`);
+      return true;
+    } catch (parseError: any) {
+      setSpecialModsError(parseError?.message || 'Invalid ranges format');
+      setSpecialModsSummary(null);
+      return false;
+    }
+  };
 
   const handleSave = async () => {
     setError(null);
+    if (!parseSpecialModifications()) {
+      return;
+    }
     if (!name.trim()) { setError('Name is required'); return; }
     setSaving(true);
     try {
+      const payload = {
+        name: name.trim(),
+        phone: phone.trim() || undefined,
+        email: email.trim() || undefined,
+      };
       if (hasTenant) {
-        await userService.updateTenant(apartment.id, { name, phone, email });
+        await userService.updateTenant(apartment.id, payload);
       } else {
-        await userService.assignTenant(apartment.id, { name, phone, email });
+        await userService.assignTenant(apartment.id, payload);
       }
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
@@ -249,7 +293,7 @@ function TenantSection({
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-white/50 mb-2">Email</label>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-white/50 mb-2">Email (optional)</label>
               <input
                 type="email" value={email} onChange={e => setEmail(e.target.value)}
                 className="w-full px-4 py-3 bg-black border border-white/10 focus:border-[#4ade80] rounded-xl text-white placeholder-white/30 transition-colors focus:outline-none"
@@ -266,26 +310,37 @@ function TenantSection({
               <div className="flex-1 h-px bg-white/10" />
             </div>
             <p className="text-xs text-white/40 mb-3">
-              If this tenant rents a block of units (e.g. a company), specify the range below — for display reference only.
+              If this tenant rents a block of units (e.g. a company), define floors and apartments using parsed ranges.
             </p>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-white/40 mb-1">Floor from</label>
-                <input type="number" className="w-full px-3 py-2 bg-black border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-white/30" placeholder="1" />
+                <label className="block text-xs text-white/40 mb-1">Floors (Range)</label>
+                <input
+                  type="text"
+                  value={floorRanges}
+                  onChange={(e) => setFloorRanges(e.target.value)}
+                  className="w-full px-3 py-2 bg-black border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-white/30"
+                  placeholder="1-5, 9"
+                />
               </div>
               <div>
-                <label className="block text-xs text-white/40 mb-1">Floor to</label>
-                <input type="number" className="w-full px-3 py-2 bg-black border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-white/30" placeholder="3" />
-              </div>
-              <div>
-                <label className="block text-xs text-white/40 mb-1">Apt from</label>
-                <input type="number" className="w-full px-3 py-2 bg-black border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-white/30" placeholder="101" />
-              </div>
-              <div>
-                <label className="block text-xs text-white/40 mb-1">Apt to</label>
-                <input type="number" className="w-full px-3 py-2 bg-black border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-white/30" placeholder="310" />
+                <label className="block text-xs text-white/40 mb-1">Apartments (Range)</label>
+                <input
+                  type="text"
+                  value={apartmentRanges}
+                  onChange={(e) => setApartmentRanges(e.target.value)}
+                  className="w-full px-3 py-2 bg-black border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-white/30"
+                  placeholder="1-4, 8, 10"
+                />
               </div>
             </div>
+            <p className="text-[11px] text-white/35 mt-2">Format example: `1-5, 9`</p>
+            {specialModsError && (
+              <p className="text-xs text-red-400 mt-2">{specialModsError}</p>
+            )}
+            {specialModsSummary && !specialModsError && (
+              <p className="text-xs text-[#4ade80] mt-2">{specialModsSummary}</p>
+            )}
           </div>
 
           <button
