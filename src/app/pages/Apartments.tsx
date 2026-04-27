@@ -64,6 +64,7 @@ export function Apartments() {
   const [lastSelectedId, setLastSelectedId] = useState<string | null>(null);
   const [editingApartments, setEditingApartments] = useState<ApartmentGridResponse[]>([]);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editDialogInitialSection, setEditDialogInitialSection] = useState<'data' | 'tenant' | 'expenses' | null>(null);
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [addDialogFloor, setAddDialogFloor] = useState(0);
@@ -153,6 +154,14 @@ export function Apartments() {
   const handleEditClick = (e: React.MouseEvent, apt: ApartmentGridResponse) => {
     e.stopPropagation();
     setEditingApartments([apt]);
+    setEditDialogInitialSection('data');
+    setIsEditDialogOpen(true);
+  };
+
+  const handleOpenExpenseDetails = (e: React.MouseEvent, apt: ApartmentGridResponse) => {
+    e.stopPropagation();
+    setEditingApartments([apt]);
+    setEditDialogInitialSection('expenses');
     setIsEditDialogOpen(true);
   };
 
@@ -234,7 +243,8 @@ export function Apartments() {
     }
 
     const nextStatus = apt.paymentStatus === 'PAID' ? 'PENDING' : 'PAID';
-    const nextDueDate = nextStatus === 'PAID' && apt.dueDate ? advanceDueDateOneMonth(apt.dueDate) : apt.dueDate;
+    const shouldAdvanceDueDate = nextStatus === 'PAID' && !!apt.dueDate && apt.dueDate <= todayIso;
+    const nextDueDate = shouldAdvanceDueDate && apt.dueDate ? advanceDueDateOneMonth(apt.dueDate) : apt.dueDate;
     const payload: { paymentStatus: 'PAID' | 'PENDING'; dueDate?: string } = { paymentStatus: nextStatus };
 
     if (nextStatus === 'PAID' && nextDueDate) {
@@ -393,6 +403,8 @@ export function Apartments() {
                     const isPaid = apt.paymentStatus === 'PAID';
                     const isOverdue = !!apt.dueDate && apt.dueDate < todayIso;
                     const hasExpenses = apt.expenses && apt.expenses.length > 0;
+                    const expensesTotal = (apt.expenses || []).reduce((sum, expense) => sum + (expense.amount || 0), 0);
+                    const rentGain = (apt.rent || 0) - expensesTotal;
                     const isStatusUpdating = statusUpdatingApartmentIds.has(apt.id);
 
                     // Card background color
@@ -401,16 +413,10 @@ export function Apartments() {
                       bgClass = (!isPaid || isOverdue) ? 'bg-red-600/80' : 'bg-green-600/80';
                     }
 
-                    // Rent value color
+                    // Rent gain color
                     let rentColor = '#928dd3'; // default purple (vacant)
                     if (!isVacant) {
-                      if (hasExpenses) {
-                        rentColor = '#f59e0b'; // orange when there are expenses
-                      } else if (isPaid) {
-                        rentColor = '#4ade80'; // green when paid, no expenses
-                      } else {
-                        rentColor = '#f87171'; // red when unpaid
-                      }
+                      rentColor = rentGain >= 0 ? '#4ade80' : '#f87171';
                     }
 
                     const isSelected = selectedApartments.has(apt.id);
@@ -486,22 +492,29 @@ export function Apartments() {
                           </div>
                           
                           <div className="flex justify-between items-center">
-                            <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Rent</span>
+                            <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Rent Gain</span>
                             <div className="flex items-center gap-1.5">
-                              <span className="text-sm font-bold" style={{ color: rentColor }}>${apt.rent}</span>
+                              <span className="text-sm font-bold" style={{ color: rentColor }}>${rentGain}</span>
                               {hasExpenses && (
                                 <span
                                   className="relative group"
-                                  title={`${apt.expenses.length} expense${apt.expenses.length > 1 ? 's' : ''}. See details`}
+                                  title={`${apt.expenses.length} expense${apt.expenses.length > 1 ? 's' : ''}. Changes due to expenses. See details`}
                                 >
-                                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="cursor-help">
-                                    <circle cx="12" cy="12" r="10" />
-                                    <line x1="12" y1="8" x2="12" y2="12" />
-                                    <line x1="12" y1="16" x2="12.01" y2="16" />
-                                  </svg>
+                                  <button
+                                    type="button"
+                                    onClick={(e) => handleOpenExpenseDetails(e, apt)}
+                                    className="p-0 m-0 bg-transparent border-0"
+                                    title="Changes due to expenses. Click to see details"
+                                  >
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="cursor-pointer">
+                                      <circle cx="12" cy="12" r="10" />
+                                      <line x1="12" y1="8" x2="12" y2="12" />
+                                      <line x1="12" y1="16" x2="12.01" y2="16" />
+                                    </svg>
+                                  </button>
                                   {/* Tooltip */}
                                   <span className="absolute bottom-full right-0 mb-1.5 hidden group-hover:block bg-[#1a1a1a] border border-[#f59e0b]/30 text-[#f59e0b] text-xs px-2 py-1 rounded-lg whitespace-nowrap shadow-xl z-50 pointer-events-none">
-                                    Expenses. See details
+                                    Changes due to expenses. See details
                                   </span>
                                 </span>
                               )}
@@ -542,7 +555,11 @@ export function Apartments() {
         isOpen={isEditDialogOpen}
         propertyId={propertyId || ''}
         apartments={editingApartments}
-        onClose={() => setIsEditDialogOpen(false)}
+        initialSection={editDialogInitialSection}
+        onClose={() => {
+          setIsEditDialogOpen(false);
+          setEditDialogInitialSection(null);
+        }}
         onSuccess={(result) => {
           setSelectedApartments(new Set());
           if (result?.apartmentId && result.changes) {
