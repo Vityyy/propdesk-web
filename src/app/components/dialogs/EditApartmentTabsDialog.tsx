@@ -97,13 +97,14 @@ function ApartmentDataSection({
 }) {
   const [rent, setRent] = useState(apartment.rent?.toString() ?? '');
   const [sqm, setSqm] = useState(apartment.squareMeters?.toString() ?? '');
+  const [dueDate, setDueDate] = useState(apartment.dueDate ?? '');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
   const handleSave = async () => {
     setError(null);
-    const updates: { rent?: number; squareMeters?: number } = {};
+    const updates: { rent?: number; squareMeters?: number; dueDate?: string } = {};
     if (rent.trim()) {
       const v = parseFloat(rent);
       if (isNaN(v) || v <= 0) { setError('Rent must be a positive number'); return; }
@@ -113,6 +114,9 @@ function ApartmentDataSection({
       const v = parseFloat(sqm);
       if (isNaN(v) || v <= 0) { setError('Area must be a positive number'); return; }
       updates.squareMeters = v;
+    }
+    if (dueDate.trim()) {
+      updates.dueDate = dueDate;
     }
     setSaving(true);
     try {
@@ -150,6 +154,17 @@ function ApartmentDataSection({
           placeholder="e.g. 45.5"
         />
       </div>
+      <div>
+        <label className="block text-xs font-semibold uppercase tracking-wider text-white/50 mb-2">
+          Due Date <span className="text-white/35 normal-case">(rent due day)</span>
+        </label>
+        <input
+          type="date"
+          value={dueDate}
+          onChange={e => setDueDate(e.target.value)}
+          className="w-full px-4 py-3 bg-black border border-white/10 focus:border-[#928dd3] rounded-xl text-white placeholder-white/30 transition-colors focus:outline-none"
+        />
+      </div>
       <button
         type="button" onClick={handleSave} disabled={saving}
         className={`w-full py-2.5 rounded-xl font-bold text-sm transition-all ${saved ? 'bg-green-500 text-white' : 'bg-[#928dd3] hover:bg-[#a89be6] text-black'} disabled:opacity-50`}
@@ -173,6 +188,7 @@ function TenantSection({
   const [name, setName] = useState(apartment.tenant?.name ?? '');
   const [phone, setPhone] = useState(apartment.tenant?.phone ?? '');
   const [email, setEmail] = useState(apartment.tenant?.email ?? '');
+  const [dueDate, setDueDate] = useState(apartment.dueDate ?? '');
   const [saving, setSaving] = useState(false);
   const [vacating, setVacating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -220,6 +236,10 @@ function TenantSection({
       return;
     }
     if (!name.trim()) { setError('Name is required'); return; }
+    if (!hasTenant && !dueDate.trim()) {
+      setError('Due date is required when assigning a tenant');
+      return;
+    }
     setSaving(true);
     try {
       const payload = {
@@ -231,6 +251,9 @@ function TenantSection({
         await userService.updateTenant(apartment.id, payload);
       } else {
         await userService.assignTenant(apartment.id, payload);
+      }
+      if (dueDate.trim()) {
+        await userService.updateApartment(apartment.id, { dueDate });
       }
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
@@ -300,6 +323,17 @@ function TenantSection({
                 placeholder="email@example.com"
               />
             </div>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-white/50 mb-2">
+              Due Date <span className="text-white/35 normal-case">(date tenant enters / monthly anchor)</span>
+            </label>
+            <input
+              type="date"
+              value={dueDate}
+              onChange={e => setDueDate(e.target.value)}
+              className="w-full px-4 py-3 bg-black border border-white/10 focus:border-[#4ade80] rounded-xl text-white placeholder-white/30 transition-colors focus:outline-none"
+            />
           </div>
 
           {/* Special modifications ─────────────────────────────────────── */}
@@ -492,11 +526,11 @@ export function EditApartmentTabsDialog({
   onClose,
   onSuccess,
 }: EditApartmentTabsDialogProps) {
-  const [openSection, setOpenSection] = useState<'data' | 'tenant' | 'expenses' | null>('data');
+  const [openSection, setOpenSection] = useState<'data' | 'tenant' | 'expenses' | null>(null);
 
-  // Reset when dialog opens
+  // Collapse all sections when the dialog opens (do not auto-expand the first accordion)
   useEffect(() => {
-    if (isOpen) setOpenSection('data');
+    if (isOpen) setOpenSection(null);
   }, [isOpen]);
 
   if (!isOpen) return null;
