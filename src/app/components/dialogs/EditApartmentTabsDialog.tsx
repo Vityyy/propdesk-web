@@ -32,9 +32,10 @@ function TrashIcon({ size = 14 }: { size?: number }) {
 
 interface EditApartmentTabsDialogProps {
   isOpen: boolean;
+  propertyId: string;
   apartment: ApartmentGridResponse;
   onClose: () => void;
-  onSuccess?: () => void;
+  onSuccess?: (result?: { apartmentId: string; changes: Partial<ApartmentGridResponse> }) => void;
 }
 
 // ─── Accordion wrapper ───────────────────────────────────────────────────────
@@ -93,7 +94,7 @@ function ApartmentDataSection({
   onSuccess,
 }: {
   apartment: ApartmentGridResponse;
-  onSuccess: () => void;
+  onSuccess: (changes: Partial<ApartmentGridResponse>) => void;
 }) {
   const [rent, setRent] = useState(apartment.rent?.toString() ?? '');
   const [sqm, setSqm] = useState(apartment.squareMeters?.toString() ?? '');
@@ -123,7 +124,11 @@ function ApartmentDataSection({
       await userService.updateApartment(apartment.id, updates);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
-      onSuccess();
+      onSuccess({
+        rent: updates.rent ?? apartment.rent,
+        squareMeters: updates.squareMeters ?? apartment.squareMeters,
+        dueDate: updates.dueDate ?? apartment.dueDate,
+      });
     } catch (e: any) {
       setError(e.message || 'Error saving');
     } finally {
@@ -178,11 +183,13 @@ function ApartmentDataSection({
 // ─── Sub-form: Tenant ────────────────────────────────────────────────────────
 
 function TenantSection({
+  propertyId,
   apartment,
   onSuccess,
 }: {
+  propertyId: string;
   apartment: ApartmentGridResponse;
-  onSuccess: () => void;
+  onSuccess?: (result?: { apartmentId: string; changes: Partial<ApartmentGridResponse> }) => void;
 }) {
   const hasTenant = !!apartment.tenant;
   const [name, setName] = useState(apartment.tenant?.name ?? '');
@@ -230,6 +237,12 @@ function TenantSection({
     }
   };
 
+  const expandIntervals = (intervals: Array<{ start: number; end: number }>): number[] => {
+    return intervals.flatMap(interval =>
+      Array.from({ length: interval.end - interval.start + 1 }, (_, idx) => interval.start + idx)
+    );
+  };
+
   const handleSave = async () => {
     setError(null);
     if (!parseSpecialModifications()) {
@@ -247,17 +260,80 @@ function TenantSection({
         phone: phone.trim() || undefined,
         email: email.trim() || undefined,
       };
+      const hasRangeSelection = !!floorRanges.trim() && !!apartmentRanges.trim();
+
+      if (!hasTenant && hasRangeSelection) {
+        if (!propertyId) {
+          throw new Error('Property context is missing for special modifications');
+        }
+
+        const parsedFloors = parseRange(floorRanges);
+        const parsedApartments = parseRange(apartmentRanges);
+        const floorNumbers = expandIntervals(parsedFloors);
+        const apartmentNumbers = expandIntervals(parsedApartments);
+
+        const propertyGrid = await userService.getPropertyApartmentsGrid(propertyId, { forceRefresh: true });
+        const targetApartments: Array<{ floor: number; number: number; apartment: ApartmentGridResponse }> = [];
+
+        floorNumbers.forEach((floorNumber) => {
+          const floorMap = propertyGrid[floorNumber];
+          if (!floorMap) return;
+          apartmentNumbers.forEach((apartmentNumber) => {
+            const target = floorMap[apartmentNumber];
+            if (target) {
+              targetApartments.push({ floor: floorNumber, number: apartmentNumber, apartment: target });
+            }
+          });
+        });
+
+        if (targetApartments.length === 0) {
+          setError('No apartments found for the selected floor/apartment ranges');
+          return;
+        }
+
+        const occupiedTargets = targetApartments.filter(target => !!target.apartment.tenant);
+        if (occupiedTargets.length > 0) {
+          const occupiedLabel = occupiedTargets
+            .slice(0, 8)
+            .map(target => `F${target.floor}-APT${target.number}`)
+            .join(', ');
+          const suffix = occupiedTargets.length > 8 ? ', ...' : '';
+          setError(`Cannot apply special modifications. Occupied apartments in selected range: ${occupiedLabel}${suffix}`);
+          return;
+        }
+
+        for (const target of targetApartments) {
+          await userService.assignTenant(target.apartment.id, payload);
+          if (dueDate.trim()) {
+            await userService.updateApartment(target.apartment.id, { dueDate });
+          }
+        }
+
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2000);
+        // Multiple apartments changed; trigger parent fallback full refresh.
+        onSuccess?.();
+        return;
+      }
+
+      let savedTenant: TenantGridResponse;
       if (hasTenant) {
-        await userService.updateTenant(apartment.id, payload);
+        savedTenant = await userService.updateTenant(apartment.id, payload);
       } else {
-        await userService.assignTenant(apartment.id, payload);
+        savedTenant = await userService.assignTenant(apartment.id, payload);
       }
       if (dueDate.trim()) {
         await userService.updateApartment(apartment.id, { dueDate });
       }
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
-      onSuccess();
+      onSuccess?.({
+        apartmentId: apartment.id,
+        changes: {
+          tenant: savedTenant,
+          dueDate: dueDate.trim() ? dueDate : apartment.dueDate,
+        },
+      });
     } catch (e: any) {
       setError(e.message || 'Error saving tenant');
     } finally {
@@ -270,7 +346,7 @@ function TenantSection({
     setVacating(true);
     try {
       await userService.vacateApartment(apartment.id);
-      onSuccess();
+      onSuccess?.({ apartmentId: apartment.id, changes: { tenant: null } });
     } catch (e: any) {
       setError(e.message || 'Error vacating apartment');
     } finally {
@@ -407,7 +483,7 @@ function ExpensesSection({
   onSuccess,
 }: {
   apartment: ApartmentGridResponse;
-  onSuccess: () => void;
+  onSuccess: (changes: Partial<ApartmentGridResponse>) => void;
 }) {
   const [expenses, setExpenses] = useState<ApartmentExpenseResponse[]>(apartment.expenses ?? []);
   const [amount, setAmount] = useState('');
@@ -424,10 +500,11 @@ function ExpensesSection({
     setAdding(true);
     try {
       const created = await userService.addExpense(apartment.id, { amount: amt, description: description.trim() });
-      setExpenses(prev => [...prev, created]);
+      const nextExpenses = [...expenses, created];
+      setExpenses(nextExpenses);
       setAmount('');
       setDescription('');
-      onSuccess();
+      onSuccess({ expenses: nextExpenses });
     } catch (e: any) {
       setError(e.message || 'Error adding expense');
     } finally {
@@ -439,8 +516,9 @@ function ExpensesSection({
     setDeletingId(expenseId);
     try {
       await userService.deleteExpense(apartment.id, expenseId);
-      setExpenses(prev => prev.filter(e => e.id !== expenseId));
-      onSuccess();
+      const nextExpenses = expenses.filter(e => e.id !== expenseId);
+      setExpenses(nextExpenses);
+      onSuccess({ expenses: nextExpenses });
     } catch (e: any) {
       setError(e.message || 'Error deleting expense');
     } finally {
@@ -522,6 +600,7 @@ function ExpensesSection({
 
 export function EditApartmentTabsDialog({
   isOpen,
+  propertyId,
   apartment,
   onClose,
   onSuccess,
@@ -566,7 +645,7 @@ export function EditApartmentTabsDialog({
             onToggle={() => toggle('data')}
             accentColor="#928dd3"
           >
-            <ApartmentDataSection apartment={apartment} onSuccess={() => onSuccess?.()} />
+            <ApartmentDataSection apartment={apartment} onSuccess={(changes) => onSuccess?.({ apartmentId: apartment.id, changes })} />
           </Accordion>
 
           <Accordion
@@ -575,7 +654,7 @@ export function EditApartmentTabsDialog({
             onToggle={() => toggle('tenant')}
             accentColor="#4ade80"
           >
-            <TenantSection apartment={apartment} onSuccess={() => onSuccess?.()} />
+            <TenantSection propertyId={propertyId} apartment={apartment} onSuccess={onSuccess} />
           </Accordion>
 
           <Accordion
@@ -584,7 +663,7 @@ export function EditApartmentTabsDialog({
             onToggle={() => toggle('expenses')}
             accentColor="#f59e0b"
           >
-            <ExpensesSection apartment={apartment} onSuccess={() => onSuccess?.()} />
+            <ExpensesSection apartment={apartment} onSuccess={(changes) => onSuccess?.({ apartmentId: apartment.id, changes })} />
           </Accordion>
         </div>
 

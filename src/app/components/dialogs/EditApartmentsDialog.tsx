@@ -4,12 +4,13 @@ import userService, { ApartmentGridResponse } from '../../../services/userServic
 
 interface EditApartmentsDialogProps {
   isOpen: boolean;
+  propertyId: string;
   apartments: ApartmentGridResponse[];
   onClose: () => void;
-  onSuccess?: () => void;
+  onSuccess?: (result?: { apartmentId: string; changes: Partial<ApartmentGridResponse> }) => void;
 }
 
-export function EditApartmentsDialog({ isOpen, apartments, onClose, onSuccess }: EditApartmentsDialogProps) {
+export function EditApartmentsDialog({ isOpen, propertyId, apartments, onClose, onSuccess }: EditApartmentsDialogProps) {
   const isBulk = apartments.length > 1;
 
   // Single apartment: use the new tabs dialog
@@ -17,6 +18,7 @@ export function EditApartmentsDialog({ isOpen, apartments, onClose, onSuccess }:
     return (
       <EditApartmentTabsDialog
         isOpen={isOpen}
+        propertyId={propertyId}
         apartment={apartments[0]}
         onClose={onClose}
         onSuccess={onSuccess}
