@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router';
 import { useOwner } from '../context/OwnerContext';
 import userService, { PropertyApartmentsGridResponse, ApartmentGridResponse } from '../../services/userService';
 import { EditApartmentsDialog } from '../components/dialogs/EditApartmentsDialog';
+import { ConfirmDeleteDialog } from '../components/dialogs/ConfirmDeleteDialog';
+import { AddSingleApartmentDialog } from '../components/dialogs/AddSingleApartmentDialog';
 
 function UserIcon() {
   return (
@@ -22,6 +24,26 @@ function EditIcon() {
   );
 }
 
+function TrashIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 6h18"></path>
+      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+      <line x1="10" y1="11" x2="10" y2="17"></line>
+      <line x1="14" y1="11" x2="14" y2="17"></line>
+    </svg>
+  );
+}
+
+function PlusIcon() {
+  return (
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19"></line>
+      <line x1="5" y1="12" x2="19" y2="12"></line>
+    </svg>
+  );
+}
+
 export function Apartments() {
   const { propertyId } = useParams<{ propertyId: string }>();
   const navigate = useNavigate();
@@ -33,6 +55,13 @@ export function Apartments() {
   const [lastSelectedId, setLastSelectedId] = useState<string | null>(null);
   const [editingApartments, setEditingApartments] = useState<ApartmentGridResponse[]>([]);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [addDialogFloor, setAddDialogFloor] = useState(0);
+  const [addDialogNextNumber, setAddDialogNextNumber] = useState(0);
+
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [apartmentToDelete, setApartmentToDelete] = useState<ApartmentGridResponse | null>(null);
 
   const property = properties.find(p => p.id === propertyId);
 
@@ -113,6 +142,31 @@ export function Apartments() {
     const selectedApts = flattenedApartments.filter(a => selectedApartments.has(a.id));
     setEditingApartments(selectedApts);
     setIsEditDialogOpen(true);
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent, apt: ApartmentGridResponse) => {
+    e.stopPropagation();
+    setApartmentToDelete(apt);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleAddClick = (floor: number, nextNum: number) => {
+    setAddDialogFloor(floor);
+    setAddDialogNextNumber(nextNum);
+    setIsAddDialogOpen(true);
+  };
+
+  const performDelete = async () => {
+    if (!apartmentToDelete) return;
+    try {
+      await userService.deleteApartment(apartmentToDelete.id);
+      setSelectedApartments(new Set());
+      fetchApartments();
+    } catch (err: any) {
+      console.error('Error deleting apartment', err);
+      alert(err.message || 'Failed to delete apartment');
+      throw err; // Re-throw to keep dialog open if error, or let dialog handle it? The dialog catches and handles state, but expects a Promise.
+    }
   };
 
   if (loading) {
@@ -220,14 +274,25 @@ export function Apartments() {
                             APT {aptNum}
                           </div>
                           
-                          {/* Edit button */}
-                          <button 
-                            onClick={(e) => handleEditClick(e, apt)}
-                            className="absolute top-3 right-3 bg-black/40 hover:bg-black/70 backdrop-blur-sm p-1.5 rounded transition-colors text-white z-10"
-                            title="Edit apartment data"
-                          >
-                            <EditIcon />
-                          </button>
+                          {/* Actions */}
+                          <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
+                            {/* Edit button */}
+                            <button 
+                              onClick={(e) => handleEditClick(e, apt)}
+                              className="bg-black/40 hover:bg-black/70 backdrop-blur-sm p-1.5 rounded transition-colors text-white"
+                              title="Edit apartment data"
+                            >
+                              <EditIcon />
+                            </button>
+                            {/* Delete button */}
+                            <button 
+                              onClick={(e) => handleDeleteClick(e, apt)}
+                              className="bg-black/40 hover:bg-[#ff6b6b]/80 backdrop-blur-sm p-1.5 rounded transition-colors text-[#ff6b6b] hover:text-white"
+                              title="Delete apartment"
+                            >
+                              <TrashIcon />
+                            </button>
+                          </div>
                         </div>
                         
                         {/* Lower half: Details */}
@@ -257,6 +322,16 @@ export function Apartments() {
                       </div>
                     );
                   })}
+
+                  {/* Add New Apartment Card */}
+                  <div 
+                    onClick={() => handleAddClick(floorNum, sortedApartmentNumbers.length > 0 ? sortedApartmentNumbers[sortedApartmentNumbers.length - 1] + 1 : floorNum * 100 + 1)}
+                    className="flex flex-col rounded-xl overflow-hidden border border-[#4ade80]/30 transition-all hover:scale-[1.02] bg-[#4ade80]/5 hover:bg-[#4ade80]/10 cursor-pointer min-h-[250px] items-center justify-center text-[#4ade80]"
+                    title={`Add apartment to floor ${floorNum}`}
+                  >
+                    <PlusIcon />
+                    <span className="mt-4 font-bold text-sm tracking-wide">Add APT</span>
+                  </div>
                 </div>
               </div>
             );
@@ -272,6 +347,25 @@ export function Apartments() {
           setSelectedApartments(new Set());
           fetchApartments();
         }}
+      />
+
+      <AddSingleApartmentDialog
+        isOpen={isAddDialogOpen}
+        propertyId={propertyId || ''}
+        floor={addDialogFloor}
+        nextNumber={addDialogNextNumber}
+        onClose={() => setIsAddDialogOpen(false)}
+        onSuccess={fetchApartments}
+      />
+
+      <ConfirmDeleteDialog
+        isOpen={isDeleteDialogOpen}
+        title="Delete Apartment"
+        description={`Are you sure you want to delete APT ${apartmentToDelete?.number}? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onClose={() => setIsDeleteDialogOpen(false)}
+        onConfirm={performDelete}
       />
     </div>
   );
