@@ -3,19 +3,24 @@ import type { Property } from '../../types/index';
 interface PropertyDetailsDialogProps {
   isOpen: boolean;
   property: Property | null;
+  metrics?: {
+    totalUnits: number;
+    occupiedUnits: number;
+    monthlyRevenue: number;
+  };
   onClose: () => void;
 }
 
-export function PropertyDetailsDialog({ isOpen, property, onClose }: PropertyDetailsDialogProps) {
+export function PropertyDetailsDialog({ isOpen, property, metrics, onClose }: PropertyDetailsDialogProps) {
   if (!isOpen || !property) return null;
 
-  const occupiedUnits = property.units.filter(u => u.status === 'occupied');
+  const totalUnits = metrics?.totalUnits ?? property.totalUnits;
+  const occupiedUnits = metrics?.occupiedUnits ?? property.occupiedUnits;
+  const totalMonthlyRevenue = metrics?.monthlyRevenue ?? 0;
 
-  const occupancyPercentage = property.totalUnits > 0 
-    ? Math.round((property.occupiedUnits / property.totalUnits) * 100) 
+  const occupancyPercentage = totalUnits > 0
+    ? Math.round((occupiedUnits / totalUnits) * 100)
     : 0;
-
-  const totalMonthlyRevenue = occupiedUnits.reduce((sum, u) => sum + u.rentAmount, 0);
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -50,7 +55,7 @@ export function PropertyDetailsDialog({ isOpen, property, onClose }: PropertyDet
                 Total Units
               </p>
               <p className="font-['Chivo:Black',sans-serif] font-black text-[24px] text-white">
-                {property.totalUnits}
+                {totalUnits}
               </p>
             </div>
 
@@ -62,7 +67,7 @@ export function PropertyDetailsDialog({ isOpen, property, onClose }: PropertyDet
                 {occupancyPercentage}%
               </p>
               <p className="font-['Archivo:Medium',sans-serif] font-medium text-[12px] text-[rgba(255,255,255,0.5)]">
-                {property.occupiedUnits} of {property.totalUnits}
+                {occupiedUnits} of {totalUnits}
               </p>
             </div>
 
