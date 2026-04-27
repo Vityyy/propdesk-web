@@ -249,10 +249,24 @@ export function Apartments() {
                     const apt = floorApartmentsMap[aptNum];
                     const isVacant = !apt.tenant;
                     const isPaid = apt.paymentStatus === 'PAID';
-                    
+                    const hasExpenses = apt.expenses && apt.expenses.length > 0;
+
+                    // Card background color
                     let bgClass = 'bg-gray-600/80';
                     if (!isVacant) {
                       bgClass = isPaid ? 'bg-green-600/80' : 'bg-red-600/80';
+                    }
+
+                    // Rent value color
+                    let rentColor = '#928dd3'; // default purple (vacant)
+                    if (!isVacant) {
+                      if (hasExpenses) {
+                        rentColor = '#f59e0b'; // orange when there are expenses
+                      } else if (isPaid) {
+                        rentColor = '#4ade80'; // green when paid, no expenses
+                      } else {
+                        rentColor = '#f87171'; // red when unpaid
+                      }
                     }
 
                     const isSelected = selectedApartments.has(apt.id);
@@ -269,7 +283,7 @@ export function Apartments() {
                             <UserIcon />
                           </div>
                           
-                          {/* Payment status badge */}
+                          {/* Apt number badge */}
                           <div className="absolute top-3 left-3 bg-black/40 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold text-white tracking-wide">
                             APT {aptNum}
                           </div>
@@ -306,7 +320,25 @@ export function Apartments() {
                           
                           <div className="flex justify-between items-center">
                             <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Rent</span>
-                            <span className="text-sm text-[#928dd3] font-bold">${apt.rent}</span>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-sm font-bold" style={{ color: rentColor }}>${apt.rent}</span>
+                              {hasExpenses && (
+                                <span
+                                  className="relative group"
+                                  title={`${apt.expenses.length} expense${apt.expenses.length > 1 ? 's' : ''}. See details`}
+                                >
+                                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="cursor-help">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <line x1="12" y1="8" x2="12" y2="12" />
+                                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                                  </svg>
+                                  {/* Tooltip */}
+                                  <span className="absolute bottom-full right-0 mb-1.5 hidden group-hover:block bg-[#1a1a1a] border border-[#f59e0b]/30 text-[#f59e0b] text-xs px-2 py-1 rounded-lg whitespace-nowrap shadow-xl z-50 pointer-events-none">
+                                    Expenses. See details
+                                  </span>
+                                </span>
+                              )}
+                            </div>
                           </div>
                           
                           <div className="flex justify-between items-center">
