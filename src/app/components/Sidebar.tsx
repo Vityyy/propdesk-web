@@ -2,6 +2,8 @@ import { Link, useLocation, useNavigate } from 'react-router';
 import svgPaths from "../../imports/svg-zayt9vop9f";
 import { OwnerSelector } from './OwnerSelector';
 import { useAuth } from '../context/AuthContext';
+import authService from '../../services/authService';
+import { getAccessibleRoutes, type UserRole } from '../RolePermissions';
 
 function Building() {
   return (
@@ -133,20 +135,32 @@ export function Sidebar({ isCollapsed, onToggle }: { isCollapsed: boolean; onTog
   const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const userRole = authService.getCurrentUserRole() as UserRole | null;
+  const accessibleRoutes = userRole ? getAccessibleRoutes(userRole) : [];
 
   const handleLogout = () => {
     logout();
     navigate('/login', { replace: true });
   };
 
+  // Mapeo de rutas a etiquetas e iconos
+  const routeConfig: { [key: string]: { label: string; icon: React.ReactNode; pathPrefix?: string } } = {
+    'summary': { label: 'Summary', icon: <ChartLine /> },
+    'properties': { label: 'Properties', icon: <Building />, pathPrefix: '/properties' },
+    'tenants': { label: 'Tenants', icon: <Users />, pathPrefix: '/tenants' },
+    'expenses': { label: 'Expenses', icon: <Tools />, pathPrefix: '/expenses' },
+    'reports': { label: 'Reports', icon: <Clipboard />, pathPrefix: '/reports' },
+    'settings': { label: 'Settings', icon: <SettingsIcon />, pathPrefix: '/settings' },
+  };
+
   return (
     <div className={`content-stretch flex flex-col isolate items-start overflow-clip relative shrink-0 transition-all duration-300 z-[2] ${isCollapsed ? 'w-[80px]' : 'w-[400px]'}`} data-name="Sidebar">
       <div className="bg-black content-stretch flex h-full flex-col items-start overflow-clip py-[24px] px-[24px] relative shrink-0 w-full z-[1]" data-name="Side Panel Menu">
-        <div className="flex items-center justify-between w-full mb-[16px]">
-          {!isCollapsed && <OwnerSelector />}
+        <div className="flex items-center w-full mb-[16px]">
+          {!isCollapsed && userRole === 'ADMIN' && <OwnerSelector />}
           <button
             onClick={onToggle}
-            className="hover:bg-[rgba(255,255,255,0.05)] transition-colors p-[8px] rounded-[8px]"
+            className="ml-auto hover:bg-[rgba(255,255,255,0.05)] transition-colors p-[8px] rounded-[8px]"
             title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             <svg className="size-[24px]" fill="none" viewBox="0 0 24 24">
@@ -154,48 +168,25 @@ export function Sidebar({ isCollapsed, onToggle }: { isCollapsed: boolean; onTog
             </svg>
           </button>
         </div>
-        <MenuItem 
-          icon={<ChartLine />}
-          label="Summary"
-          to="/"
-          isActive={location.pathname === '/'}
-          isCollapsed={isCollapsed}
-        />
-        <MenuItem 
-          icon={<Building />}
-          label="Properties"
-          to="/properties"
-          isActive={location.pathname.startsWith('/properties')}
-          isCollapsed={isCollapsed}
-        />
-        <MenuItem 
-          icon={<Users />}
-          label="Tenants"
-          to="/tenants"
-          isActive={location.pathname.startsWith('/tenants')}
-          isCollapsed={isCollapsed}
-        />
-        <MenuItem 
-          icon={<Tools />}
-          label="Expenses"
-          to="/expenses"
-          isActive={location.pathname.startsWith('/expenses')}
-          isCollapsed={isCollapsed}
-        />
-        <MenuItem 
-          icon={<Clipboard />}
-          label="Reports"
-          to="/reports"
-          isActive={location.pathname.startsWith('/reports')}
-          isCollapsed={isCollapsed}
-        />
-        <MenuItem 
-          icon={<SettingsIcon />}
-          label="Settings"
-          to="/settings"
-          isActive={location.pathname.startsWith('/settings')}
-          isCollapsed={isCollapsed}
-        />
+        {accessibleRoutes.map((route) => {
+          const config = routeConfig[route];
+          if (!config) return null;
+
+          const isActive = route === 'summary' 
+            ? location.pathname === '/summary' || location.pathname === '/'
+            : location.pathname.startsWith(config.pathPrefix || `/${route}`);
+
+          return (
+            <MenuItem
+              key={route}
+              icon={config.icon}
+              label={config.label}
+              to={`/${route}`}
+              isActive={isActive}
+              isCollapsed={isCollapsed}
+            />
+          );
+        })}
         <button
           type="button"
           onClick={handleLogout}
