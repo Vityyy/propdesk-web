@@ -26,7 +26,7 @@ export function Register() {
     return true;
   }, [name, password, confirmPassword, isSubmitting]);
 
-  const passwordError = password !== confirmPassword && confirmPassword.length > 0 ? "Las contraseñas no coinciden" : null;
+  const passwordError = password !== confirmPassword && confirmPassword.length > 0 ? "Passwords do not match" : null;
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -46,9 +46,9 @@ export function Register() {
       navigate("/", { replace: true });
     } catch (error) {
       if (error instanceof ApiError) {
-        setError(`Error ${error.status}: ${error.message || "No se pudo completar el registro."}`);
+        setError(`Error ${error.status}: ${error.message || "Registration could not be completed."}`);
       } else {
-        setError("Ha ocurrido un error al registrarse. Intenta nuevamente.");
+        setError("Something went wrong while registering. Please try again.");
       }
     } finally {
       setIsSubmitting(false);
@@ -61,17 +61,17 @@ export function Register() {
         <div className="content-stretch flex flex-col gap-[20px] p-[28px]">
           <div className="flex flex-col gap-[6px]">
             <p className="font-['Chivo:Black',sans-serif] font-black leading-[40px] text-[34px] tracking-[-0.34px] text-white">
-              Registrarse
+              Sign up
             </p>
             <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] text-[15px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
-              Crea una cuenta para acceder al panel.
+              Create an account to access the dashboard.
             </p>
           </div>
 
           <form className="flex flex-col gap-[14px]" onSubmit={onSubmit}>
             <label className="flex flex-col gap-[8px]" htmlFor="register-type">
               <span className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
-                Tipo de cuenta
+                Account type
               </span>
               <select
                 id="register-type"
@@ -79,14 +79,14 @@ export function Register() {
                 onChange={(event) => setUserType(event.target.value as UserType)}
                 className="h-[44px] rounded-[8px] border border-white bg-black px-[12px] text-white outline-none focus:border-[#928dd3]"
               >
-                <option value="owner">Propietario</option>
-                <option value="admin">Administrador</option>
+                <option value="owner">Owner</option>
+                <option value="admin">Admin</option>
               </select>
             </label>
 
             <label className="flex flex-col gap-[8px]" htmlFor="register-name">
               <span className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
-                Nombre
+                Username
               </span>
               <input
                 id="register-name"
@@ -94,14 +94,14 @@ export function Register() {
                 autoComplete="username"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                placeholder="Ingresa tu nombre completo"
+                placeholder="Choose a username"
                 className="h-[44px] rounded-[8px] border border-white bg-black px-[12px] text-white placeholder:text-[rgba(255,255,255,0.45)] outline-none focus:border-[#928dd3]"
               />
             </label>
 
             <label className="flex flex-col gap-[8px]" htmlFor="register-password">
               <span className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
-                Contraseña
+                Password
               </span>
               <div className="relative">
                 <input
@@ -110,7 +110,7 @@ export function Register() {
                   autoComplete="new-password"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
-                  placeholder="Ingresa una contraseña"
+                  placeholder="Choose a password"
                   className="h-[44px] w-full rounded-[8px] border border-white bg-black px-[12px] pr-[90px] text-white placeholder:text-[rgba(255,255,255,0.45)] outline-none focus:border-[#928dd3]"
                 />
                 <button
@@ -118,14 +118,14 @@ export function Register() {
                   onClick={() => setShowPassword((current) => !current)}
                   className="absolute right-[10px] top-1/2 -translate-y-1/2 text-[13px] text-[#928dd3] hover:underline"
                 >
-                  {showPassword ? "Ocultar" : "Mostrar"}
+                  {showPassword ? "Hide" : "Show"}
                 </button>
               </div>
             </label>
 
             <label className="flex flex-col gap-[8px]" htmlFor="register-confirm-password">
               <span className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
-                Confirmar contraseña
+                Confirm password
               </span>
               <div className="relative">
                 <input
@@ -134,7 +134,7 @@ export function Register() {
                   autoComplete="new-password"
                   value={confirmPassword}
                   onChange={(event) => setConfirmPassword(event.target.value)}
-                  placeholder="Confirma tu contraseña"
+                  placeholder="Re-enter your password"
                   className="h-[44px] w-full rounded-[8px] border border-white bg-black px-[12px] pr-[90px] text-white placeholder:text-[rgba(255,255,255,0.45)] outline-none focus:border-[#928dd3]"
                 />
                 <button
@@ -142,7 +142,7 @@ export function Register() {
                   onClick={() => setShowConfirmPassword((current) => !current)}
                   className="absolute right-[10px] top-1/2 -translate-y-1/2 text-[13px] text-[#928dd3] hover:underline"
                 >
-                  {showConfirmPassword ? "Ocultar" : "Mostrar"}
+                  {showConfirmPassword ? "Hide" : "Show"}
                 </button>
               </div>
             </label>
@@ -165,13 +165,13 @@ export function Register() {
               className="mt-[4px] h-[44px] rounded-[8px] bg-[#928dd3] font-['Archivo:SemiBold',sans-serif] font-semibold text-[15px] leading-[20px] text-black transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
               style={{ fontVariationSettings: "'wdth' 100" }}
             >
-              {isSubmitting ? "Registrando..." : "Registrarse"}
+              {isSubmitting ? "Creating account…" : "Create account"}
             </button>
 
             <p className="text-center text-[13px] text-[rgba(255,255,255,0.6)]">
-              ¿Ya tienes cuenta?{" "}
+              Already have an account?{" "}
               <Link to="/login" className="text-[#928dd3] hover:underline">
-                Inicia sesión aquí
+                Sign in here
               </Link>
             </p>
           </form>
