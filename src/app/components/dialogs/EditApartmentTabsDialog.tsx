@@ -5,6 +5,7 @@ import userService, {
   TenantGridResponse,
 } from '../../../services/userService';
 import { parseRange } from '../../../utils/rangeParser';
+import { ConfirmDeleteDialog } from './ConfirmDeleteDialog';
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
 
@@ -191,13 +192,15 @@ function TenantSection({
   apartment: ApartmentGridResponse;
   onSuccess?: (result?: { apartmentId: string; changes: Partial<ApartmentGridResponse> }) => void;
 }) {
-  const hasTenant = !!apartment.tenant;
+  const [currentTenant, setCurrentTenant] = useState<TenantGridResponse | null>(apartment.tenant ?? null);
+  const hasTenant = !!currentTenant;
   const [name, setName] = useState(apartment.tenant?.name ?? '');
   const [phone, setPhone] = useState(apartment.tenant?.phone ?? '');
   const [email, setEmail] = useState(apartment.tenant?.email ?? '');
   const [dueDate, setDueDate] = useState(apartment.dueDate ?? '');
   const [saving, setSaving] = useState(false);
   const [vacating, setVacating] = useState(false);
+  const [isVacateDialogOpen, setIsVacateDialogOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -242,6 +245,16 @@ function TenantSection({
       Array.from({ length: interval.end - interval.start + 1 }, (_, idx) => interval.start + idx)
     );
   };
+
+  useEffect(() => {
+    setCurrentTenant(apartment.tenant ?? null);
+    setName(apartment.tenant?.name ?? '');
+    setPhone(apartment.tenant?.phone ?? '');
+    setEmail(apartment.tenant?.email ?? '');
+    setDueDate(apartment.dueDate ?? '');
+    setShowAddForm(false);
+    setError(null);
+  }, [apartment.id, apartment.tenant, apartment.dueDate]);
 
   const handleSave = async () => {
     setError(null);
@@ -304,8 +317,11 @@ function TenantSection({
 
         for (const target of targetApartments) {
           await userService.assignTenant(target.apartment.id, payload);
-          if (dueDate.trim()) {
-            await userService.updateApartment(target.apartment.id, { dueDate });
+          if (dueDate.trim() || !target.apartment.paymentStatus || target.apartment.paymentStatus !== 'PAID') {
+            await userService.updateApartment(target.apartment.id, {
+              dueDate: dueDate.trim() || undefined,
+              paymentStatus: 'PAID',
+            });
           }
         }
 
@@ -322,9 +338,14 @@ function TenantSection({
       } else {
         savedTenant = await userService.assignTenant(apartment.id, payload);
       }
-      if (dueDate.trim()) {
-        await userService.updateApartment(apartment.id, { dueDate });
+      if (dueDate.trim() || !apartment.paymentStatus || apartment.paymentStatus !== 'PAID') {
+        await userService.updateApartment(apartment.id, {
+          dueDate: dueDate.trim() || undefined,
+          paymentStatus: 'PAID',
+        });
       }
+      setCurrentTenant(savedTenant);
+      setShowAddForm(false);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
       onSuccess?.({
@@ -332,6 +353,7 @@ function TenantSection({
         changes: {
           tenant: savedTenant,
           dueDate: dueDate.trim() ? dueDate : apartment.dueDate,
+          paymentStatus: 'PAID',
         },
       });
     } catch (e: any) {
@@ -342,11 +364,16 @@ function TenantSection({
   };
 
   const handleVacate = async () => {
-    if (!confirm('Remove tenant from this apartment? If they have no other apartments, they will be permanently deleted.')) return;
     setVacating(true);
     try {
       await userService.vacateApartment(apartment.id);
-      onSuccess?.({ apartmentId: apartment.id, changes: { tenant: null } });
+      setCurrentTenant(null);
+      setName('');
+      setPhone('');
+      setEmail('');
+      setDueDate('');
+      setShowAddForm(false);
+      onSuccess?.({ apartmentId: apartment.id, changes: { tenant: null, dueDate: undefined } });
     } catch (e: any) {
       setError(e.message || 'Error vacating apartment');
     } finally {
@@ -465,13 +492,23 @@ function TenantSection({
       {hasTenant && (
         <div className="pt-2 border-t border-white/5 mt-2">
           <button
-            type="button" onClick={handleVacate} disabled={vacating}
+            type="button" onClick={() => setIsVacateDialogOpen(true)} disabled={vacating}
             className="w-full py-2.5 rounded-xl font-bold text-sm bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 transition-colors disabled:opacity-50"
           >
             {vacating ? 'Processing…' : '🚪 Vacate Apartment'}
           </button>
         </div>
       )}
+
+      <ConfirmDeleteDialog
+        isOpen={isVacateDialogOpen}
+        title="Vacate apartment"
+        description="Remove this tenant from the apartment? If the tenant has no other apartments, they will be deleted from the sys."
+        confirmText="Vacate"
+        cancelText="Cancel"
+        onClose={() => setIsVacateDialogOpen(false)}
+        onConfirm={handleVacate}
+      />
     </div>
   );
 }
