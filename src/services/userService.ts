@@ -104,6 +104,7 @@ export interface ApartmentGridResponse {
 }
 
 export type PropertyApartmentsGridResponse = Record<number, Record<number, ApartmentGridResponse>>;
+export type OwnerApartmentsGridResponse = Record<string, PropertyApartmentsGridResponse>;
 
 export interface ExpenseCreateRequest {
   category: string;
@@ -125,10 +126,13 @@ export interface ExpenseResponse {
 const getRequiredToken = (): string => {
   const token = authService.getToken();
   if (!token) {
-    throw new ApiError("No hay token de autenticacion", 401);
+    throw new ApiError("No authentication token", 401);
   }
   return token;
 };
+
+const propertyApartmentsGridCache = new Map<string, PropertyApartmentsGridResponse>();
+const propertyApartmentsGridRequests = new Map<string, Promise<PropertyApartmentsGridResponse>>();
 
 export const userService = {
   // Loads available admins so owners can choose who to associate with.
@@ -193,11 +197,58 @@ export const userService = {
     });
   },
 
-  getPropertyApartmentsGrid(propertyId: string): Promise<PropertyApartmentsGridResponse> {
-    return apiRequest<PropertyApartmentsGridResponse>(`${API_ENDPOINTS.PROPERTIES.BASE}/${propertyId}/apartments`, {
+  getPropertyApartmentsGrid(
+    propertyId: string,
+    options?: { forceRefresh?: boolean }
+  ): Promise<PropertyApartmentsGridResponse> {
+    if (!options?.forceRefresh) {
+      const cached = propertyApartmentsGridCache.get(propertyId);
+      if (cached) {
+        return Promise.resolve(cached);
+      }
+
+      const inFlight = propertyApartmentsGridRequests.get(propertyId);
+      if (inFlight) {
+        return inFlight;
+      }
+    }
+
+    const request = apiRequest<PropertyApartmentsGridResponse>(`${API_ENDPOINTS.PROPERTIES.BASE}/${propertyId}/apartments`, {
       method: "GET",
       token: getRequiredToken(),
+    }).then((grid) => {
+      propertyApartmentsGridCache.set(propertyId, grid);
+      propertyApartmentsGridRequests.delete(propertyId);
+      return grid;
+    }).catch((error) => {
+      propertyApartmentsGridRequests.delete(propertyId);
+      throw error;
     });
+
+    propertyApartmentsGridRequests.set(propertyId, request);
+    return request;
+  },
+
+  getOwnerApartmentsGrid(options?: { forceRefresh?: boolean }): Promise<OwnerApartmentsGridResponse> {
+    if (options?.forceRefresh) {
+      propertyApartmentsGridCache.clear();
+      propertyApartmentsGridRequests.clear();
+    }
+
+    return apiRequest<OwnerApartmentsGridResponse>(API_ENDPOINTS.PROPERTIES.APARTMENTS, {
+      method: "GET",
+      token: getRequiredToken(),
+    }).then((response) => {
+      Object.entries(response).forEach(([propertyId, grid]) => {
+        propertyApartmentsGridCache.set(propertyId, grid);
+      });
+      return response;
+    });
+  },
+
+  invalidatePropertyApartmentsGrid(propertyId: string): void {
+    propertyApartmentsGridCache.delete(propertyId);
+    propertyApartmentsGridRequests.delete(propertyId);
   },
 
   createApartments(data: ApartmentCreateRequest[]): Promise<ApartmentResponse[]> {
