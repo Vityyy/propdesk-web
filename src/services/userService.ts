@@ -62,19 +62,45 @@ export interface ApartmentResponse {
   propertyId: string;
 }
 
+// ─── Tenant ──────────────────────────────────────────────────────────────────
+
 export interface TenantGridResponse {
   id: string;
   name: string;
+  phone: string | null;
+  email: string | null;
 }
+
+export interface TenantRequest {
+  name: string;
+  phone?: string;
+  email?: string;
+}
+
+// ─── Expense ─────────────────────────────────────────────────────────────────
+
+export interface ApartmentExpenseResponse {
+  id: string;
+  amount: number;
+  description: string;
+}
+
+export interface ApartmentExpenseRequest {
+  amount: number;
+  description: string;
+}
+
+// ─── Apartment grid ──────────────────────────────────────────────────────────
 
 export interface ApartmentGridResponse {
   id: string;
   number: number;
   dueDate: string;
-  paymentStatus: 'PAID' | string;
+  paymentStatus: 'PAID' | 'PENDING' | string;
   squareMeters: number;
   rent: number;
   tenant: TenantGridResponse | null;
+  expenses: ApartmentExpenseResponse[];
 }
 
 export type PropertyApartmentsGridResponse = Record<number, Record<number, ApartmentGridResponse>>;
@@ -216,6 +242,55 @@ export const userService = {
 
   deleteApartment(apartmentId: string): Promise<void> {
     return apiRequest<void>(`${API_ENDPOINTS.APARTMENTS.BASE}/${apartmentId}`, {
+      method: "DELETE",
+      token: getRequiredToken(),
+    });
+  },
+
+  // ─── Tenant management ───────────────────────────────────────────────────
+
+  assignTenant(apartmentId: string, data: TenantRequest): Promise<TenantGridResponse> {
+    return apiRequest<TenantGridResponse>(API_ENDPOINTS.APARTMENTS.TENANT(apartmentId), {
+      method: "POST",
+      body: data,
+      token: getRequiredToken(),
+    });
+  },
+
+  updateTenant(apartmentId: string, data: TenantRequest): Promise<TenantGridResponse> {
+    return apiRequest<TenantGridResponse>(API_ENDPOINTS.APARTMENTS.TENANT(apartmentId), {
+      method: "PUT",
+      body: data,
+      token: getRequiredToken(),
+    });
+  },
+
+  vacateApartment(apartmentId: string): Promise<void> {
+    return apiRequest<void>(API_ENDPOINTS.APARTMENTS.TENANT(apartmentId), {
+      method: "DELETE",
+      token: getRequiredToken(),
+    });
+  },
+
+  // ─── Expense management ──────────────────────────────────────────────────
+
+  getExpenses(apartmentId: string): Promise<ApartmentExpenseResponse[]> {
+    return apiRequest<ApartmentExpenseResponse[]>(API_ENDPOINTS.APARTMENTS.EXPENSES(apartmentId), {
+      method: "GET",
+      token: getRequiredToken(),
+    });
+  },
+
+  addExpense(apartmentId: string, data: ApartmentExpenseRequest): Promise<ApartmentExpenseResponse> {
+    return apiRequest<ApartmentExpenseResponse>(API_ENDPOINTS.APARTMENTS.EXPENSES(apartmentId), {
+      method: "POST",
+      body: data,
+      token: getRequiredToken(),
+    });
+  },
+
+  deleteExpense(apartmentId: string, expenseId: string): Promise<void> {
+    return apiRequest<void>(API_ENDPOINTS.APARTMENTS.EXPENSE(apartmentId, expenseId), {
       method: "DELETE",
       token: getRequiredToken(),
     });
