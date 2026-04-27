@@ -174,6 +174,36 @@ export function Apartments() {
     setIsAddDialogOpen(true);
   };
 
+  const patchApartmentInGrid = (apartmentId: string, changes: Partial<ApartmentGridResponse>): boolean => {
+    if (!gridData) return false;
+
+    const found = Object.values(gridData)
+      .some(apartmentsByNumber => Object.values(apartmentsByNumber).some(apartment => apartment.id === apartmentId));
+    if (!found) return false;
+
+    setGridData(prev => {
+      if (!prev) return prev;
+      const nextGrid: PropertyApartmentsGridResponse = {};
+
+      Object.entries(prev).forEach(([floorKey, apartmentsByNumber]) => {
+        const nextApartmentsByNumber: Record<number, ApartmentGridResponse> = {};
+        Object.entries(apartmentsByNumber).forEach(([aptNumberKey, apartmentData]) => {
+          const numericAptNumber = Number(aptNumberKey);
+          if (apartmentData.id === apartmentId) {
+            nextApartmentsByNumber[numericAptNumber] = { ...apartmentData, ...changes };
+          } else {
+            nextApartmentsByNumber[numericAptNumber] = apartmentData;
+          }
+        });
+        nextGrid[Number(floorKey)] = nextApartmentsByNumber;
+      });
+
+      return nextGrid;
+    });
+
+    return found;
+  };
+
   const advanceDueDateOneMonth = (dueDate: string): string => {
     const parts = dueDate.split('-').map(Number);
     if (parts.length !== 3 || parts.some(Number.isNaN)) {
@@ -510,10 +540,20 @@ export function Apartments() {
 
       <EditApartmentsDialog 
         isOpen={isEditDialogOpen}
+        propertyId={propertyId || ''}
         apartments={editingApartments}
         onClose={() => setIsEditDialogOpen(false)}
-        onSuccess={() => {
+        onSuccess={(result) => {
           setSelectedApartments(new Set());
+          if (result?.apartmentId && result.changes) {
+            const updatedLocally = patchApartmentInGrid(result.apartmentId, result.changes);
+            if (propertyId) {
+              userService.invalidatePropertyApartmentsGrid(propertyId);
+            }
+            if (updatedLocally) {
+              return;
+            }
+          }
           if (propertyId) {
             userService.invalidatePropertyApartmentsGrid(propertyId);
           }
