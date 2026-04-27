@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useOwner } from '../context/OwnerContext';
 import userService from '../../services/userService';
@@ -8,6 +8,7 @@ import { PropertyDetailsDialog } from '../components/dialogs/PropertyDetailsDial
 import svgPaths from "../../imports/svg-zayt9vop9f";
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import type { Property } from '../types/index';
+import type { OwnerApartmentsGridResponse, PropertyApartmentsGridResponse } from '../../services/userService';
 
 function DotsHorizontal() {
   return (
@@ -23,23 +24,31 @@ function DotsHorizontal() {
 
 interface PropertyCardProps {
   property: Property;
+  totalUnits: number;
+  occupiedUnits: number;
+  monthlyRevenue: number;
   onDelete?: (id: string) => void;
   onEdit?: (property: Property) => void;
   onViewDetails?: (property: Property) => void;
   onViewApartments?: (property: Property) => void;
 }
 
-function PropertyCard({ property, onDelete, onEdit, onViewDetails, onViewApartments }: PropertyCardProps) {
+function PropertyCard({
+  property,
+  totalUnits,
+  occupiedUnits,
+  monthlyRevenue,
+  onDelete,
+  onEdit,
+  onViewDetails,
+  onViewApartments,
+}: PropertyCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
-  const occupancyPercentage = property.totalUnits > 0 
-    ? Math.round((property.occupiedUnits / property.totalUnits) * 100) 
+  const occupancyPercentage = totalUnits > 0
+    ? Math.round((occupiedUnits / totalUnits) * 100)
     : 0;
-
-  const totalMonthlyRevenue = property.units
-    .filter(u => u.status === 'occupied')
-    .reduce((sum, u) => sum + u.rentAmount, 0);
 
   return (
     <div 
@@ -148,7 +157,7 @@ function PropertyCard({ property, onDelete, onEdit, onViewDetails, onViewApartme
             Monthly Revenue
           </p>
           <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] text-[24px] text-[#928dd3] tracking-[-0.24px]">
-            ${totalMonthlyRevenue.toLocaleString()}
+            ${monthlyRevenue.toLocaleString()}
           </p>
         </div>
 
@@ -161,7 +170,7 @@ function PropertyCard({ property, onDelete, onEdit, onViewDetails, onViewApartme
                   Units
                 </p>
                 <p className="font-['Chivo:Black',sans-serif] font-black leading-[24px] text-[20px] text-white tracking-[-0.2px]">
-                  {property.totalUnits}
+                  {totalUnits}
                 </p>
               </div>
               <div>
@@ -188,6 +197,69 @@ export function Properties() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
   const [viewingProperty, setViewingProperty] = useState<Property | null>(null);
+  const [propertyMetrics, setPropertyMetrics] = useState<Record<string, { totalUnits: number; occupiedUnits: number; monthlyRevenue: number }>>({});
+
+  const buildMetricsFromGrid = (grid: PropertyApartmentsGridResponse) => {
+    let totalUnits = 0;
+    let occupiedUnits = 0;
+    let paidRentTotal = 0;
+    let expensesTotal = 0;
+
+    Object.values(grid).forEach((apartmentsByNumber) => {
+      Object.values(apartmentsByNumber).forEach((apartment) => {
+        totalUnits += 1;
+        if (apartment.tenant) {
+          occupiedUnits += 1;
+        }
+        if (apartment.paymentStatus === 'PAID') {
+          paidRentTotal += apartment.rent || 0;
+        }
+        expensesTotal += (apartment.expenses || []).reduce((sum, expense) => sum + (expense.amount || 0), 0);
+      });
+    });
+
+    return {
+      totalUnits,
+      occupiedUnits,
+      monthlyRevenue: paidRentTotal - expensesTotal,
+    };
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchPropertyMetrics = async () => {
+      if (properties.length === 0) {
+        setPropertyMetrics({});
+        return;
+      }
+
+      try {
+        const ownerGrid: OwnerApartmentsGridResponse = await userService.getOwnerApartmentsGrid();
+        if (cancelled) return;
+
+        const metrics: Record<string, { totalUnits: number; occupiedUnits: number; monthlyRevenue: number }> = {};
+        properties.forEach((property) => {
+          const grid = ownerGrid[property.id];
+          metrics[property.id] = grid
+            ? buildMetricsFromGrid(grid)
+            : { totalUnits: 0, occupiedUnits: 0, monthlyRevenue: 0 };
+        });
+
+        setPropertyMetrics(metrics);
+      } catch (error) {
+        console.error('Error calculating property metrics', error);
+      }
+    };
+
+    fetchPropertyMetrics();
+    return () => {
+      cancelled = true;
+    };
+  }, [properties]);
+
+  const metricsForProperty = (propertyId: string) =>
+    propertyMetrics[propertyId] ?? { totalUnits: 0, occupiedUnits: 0, monthlyRevenue: 0 };
 
   const handleDeleteProperty = async (propertyId: string) => {
     if (confirm('Are you sure you want to delete this property?')) {
@@ -244,16 +316,22 @@ export function Properties() {
             </button>
           </div>
         ) : (
-          properties.map((property) => (
-            <PropertyCard 
-              key={property.id} 
-              property={property}
-              onDelete={handleDeleteProperty}
-              onEdit={handleEditProperty}
-              onViewDetails={handleViewDetails}
-              onViewApartments={(p) => navigate(`/properties/${p.id}/apartments`)}
-            />
-          ))
+          properties.map((property) => {
+            const metrics = metricsForProperty(property.id);
+            return (
+              <PropertyCard
+                key={property.id}
+                property={property}
+                totalUnits={metrics.totalUnits}
+                occupiedUnits={metrics.occupiedUnits}
+                monthlyRevenue={metrics.monthlyRevenue}
+                onDelete={handleDeleteProperty}
+                onEdit={handleEditProperty}
+                onViewDetails={handleViewDetails}
+                onViewApartments={(p) => navigate(`/properties/${p.id}/apartments`)}
+              />
+            );
+          })
         )}
       </div>
 
@@ -277,6 +355,7 @@ export function Properties() {
       <PropertyDetailsDialog
         isOpen={!!viewingProperty}
         property={viewingProperty}
+        metrics={viewingProperty ? metricsForProperty(viewingProperty.id) : undefined}
         onClose={() => setViewingProperty(null)}
       />
     </div>
