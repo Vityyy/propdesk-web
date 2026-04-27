@@ -69,6 +69,7 @@ export interface TenantGridResponse {
 
 export interface ApartmentGridResponse {
   id: string;
+  number: number;
   dueDate: string;
   paymentStatus: 'PAID' | string;
   squareMeters: number;
@@ -193,6 +194,21 @@ export const userService = {
     return apiRequest<void>(`${API_ENDPOINTS.APARTMENTS.BASE}/bulk`, {
       method: "PUT",
       body: data,
+      token: getRequiredToken(),
+    });
+  },
+
+  addSingleApartment(data: { propertyId: string; floor: number; number: number; rent: number; squareMeters: number }): Promise<ApartmentResponse> {
+    return apiRequest<ApartmentResponse>(`${API_ENDPOINTS.APARTMENTS.BASE}/single`, {
+      method: "POST",
+      body: data,
+      token: getRequiredToken(),
+    });
+  },
+
+  deleteApartment(apartmentId: string): Promise<void> {
+    return apiRequest<void>(`${API_ENDPOINTS.APARTMENTS.BASE}/${apartmentId}`, {
+      method: "DELETE",
       token: getRequiredToken(),
     });
   },
