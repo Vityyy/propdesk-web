@@ -17,6 +17,7 @@ export const API_ENDPOINTS = {
     CREATE: `${API_BASE_URL}/properties`,
     LIST: `${API_BASE_URL}/properties`,
     BASE: `${API_BASE_URL}/properties`,
+    APARTMENTS: `${API_BASE_URL}/properties/apartments`,
   },
   ADMINS: {
     LIST: `${API_BASE_URL}/admins`,
