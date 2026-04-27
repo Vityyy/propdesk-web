@@ -58,7 +58,7 @@ export interface ApartmentCreateRequest {
 
 export interface ApartmentResponse {
   id: string;
-  name: string;
+  number: number;
   propertyId: string;
 }
 

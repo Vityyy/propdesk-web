@@ -118,10 +118,10 @@ export const propertyService = {
       if (response && Array.isArray(response) && response.length > 0) {
         const newUnits: Unit[] = response.map(apt => ({
           id: apt.id,
-          unitNumber: apt.name,
-          type: units.find(u => u.unitNumber === apt.name)?.type || '1 Dormitorio',
-          squareFeet: units.find(u => u.unitNumber === apt.name)?.squareFeet || 0,
-          rentAmount: units.find(u => u.unitNumber === apt.name)?.rentAmount || 0,
+          unitNumber: String(apt.number),
+          type: units.find(u => u.unitNumber === String(apt.number))?.type || '1 Dormitorio',
+          squareFeet: units.find(u => u.unitNumber === String(apt.number))?.squareFeet || 0,
+          rentAmount: units.find(u => u.unitNumber === String(apt.number))?.rentAmount || 0,
           status: 'vacant' as const,
         }));
 
