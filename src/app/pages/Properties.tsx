@@ -43,12 +43,12 @@ function PropertyCard({ property, onDelete, onEdit, onViewDetails, onViewApartme
 
   return (
     <div 
-      className="bg-black relative rounded-[16px] overflow-hidden group cursor-pointer"
+      className="bg-black relative rounded-[16px] group cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => onViewApartments?.(property)}
     >
-      <div className="relative w-full h-[200px] overflow-hidden">
+      <div className="relative w-full h-[200px] overflow-hidden rounded-t-[16px]">
         <ImageWithFallback 
           src={property.imageUrl}
           alt={property.name}
@@ -97,7 +97,7 @@ function PropertyCard({ property, onDelete, onEdit, onViewDetails, onViewApartme
                     className="w-full text-left px-[16px] py-[12px] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
                   >
                     <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
-                      Editar Propiedad
+                      Edit Property
                     </p>
                   </button>
                   <button
@@ -109,7 +109,7 @@ function PropertyCard({ property, onDelete, onEdit, onViewDetails, onViewApartme
                     className="w-full text-left px-[16px] py-[12px] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
                   >
                     <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
-                      Ver Detalles
+                      View Details
                     </p>
                   </button>
                   <button
@@ -121,7 +121,7 @@ function PropertyCard({ property, onDelete, onEdit, onViewDetails, onViewApartme
                     className="w-full text-left px-[16px] py-[12px] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
                   >
                     <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
-                      Ver Apartamentos
+                      View Apartments
                     </p>
                   </button>
                   <div className="border-t border-[rgba(255,255,255,0.16)]" />
@@ -134,7 +134,7 @@ function PropertyCard({ property, onDelete, onEdit, onViewDetails, onViewApartme
                     className="w-full text-left px-[16px] py-[12px] hover:bg-[rgba(255,0,0,0.1)] transition-colors"
                   >
                     <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-[#ff6b6b]" style={{ fontVariationSettings: "'wdth' 100" }}>
-                      Eliminar Propiedad
+                      Delete Property
                     </p>
                   </button>
                 </div>
@@ -190,13 +190,13 @@ export function Properties() {
   const [viewingProperty, setViewingProperty] = useState<Property | null>(null);
 
   const handleDeleteProperty = async (propertyId: string) => {
-    if (confirm('¿Estás seguro de que deseas eliminar esta propiedad?')) {
+    if (confirm('Are you sure you want to delete this property?')) {
       try {
         await userService.deleteProperty(propertyId);
         refreshProperties();
       } catch (e) {
-        console.error("Error al eliminar la propiedad", e);
-        alert('Hubo un error eliminando la propiedad.');
+        console.error("Error deleting property", e);
+        alert('There was an error deleting the property.');
       }
     }
   };
@@ -235,12 +235,12 @@ export function Properties() {
       <div className="grid grid-cols-3 gap-[24px] px-[48px] pb-[48px]">
         {properties.length === 0 ? (
           <div className="col-span-3 text-center py-12">
-            <p className="text-[rgba(255,255,255,0.6)] mb-4">No hay propiedades creadas aún</p>
+            <p className="text-[rgba(255,255,255,0.6)] mb-4">No properties created yet</p>
             <button 
               onClick={() => setShowCreateDialog(true)}
               className="text-[#928dd3] hover:text-[#a89be6] transition-colors"
             >
-              Crear la primera propiedad →
+              Create your first property →
             </button>
           </div>
         ) : (
