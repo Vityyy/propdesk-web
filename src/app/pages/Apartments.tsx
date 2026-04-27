@@ -416,7 +416,11 @@ export function Apartments() {
                     // Rent gain color
                     let rentColor = '#928dd3'; // default purple (vacant)
                     if (!isVacant) {
-                      rentColor = rentGain >= 0 ? '#4ade80' : '#f87171';
+                      if (hasExpenses) {
+                        rentColor = '#f59e0b'; // orange when there are expenses
+                      } else {
+                        rentColor = rentGain >= 0 ? '#4ade80' : '#f87171';
+                      }
                     }
 
                     const isSelected = selectedApartments.has(apt.id);
