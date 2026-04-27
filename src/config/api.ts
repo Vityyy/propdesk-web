@@ -17,6 +17,7 @@ export const API_ENDPOINTS = {
     CREATE: `${API_BASE_URL}/properties`,
     LIST: `${API_BASE_URL}/properties`,
     BASE: `${API_BASE_URL}/properties`,
+    APARTMENTS: `${API_BASE_URL}/properties/apartments`,
   },
   ADMINS: {
     LIST: `${API_BASE_URL}/admins`,
@@ -29,6 +30,9 @@ export const API_ENDPOINTS = {
     CREATE: `${API_BASE_URL}/apartments`,
     LIST: `${API_BASE_URL}/apartments`,
     BASE: `${API_BASE_URL}/apartments`,
+    TENANT: (aptId: string) => `${API_BASE_URL}/apartments/${aptId}/tenant`,
+    EXPENSES: (aptId: string) => `${API_BASE_URL}/apartments/${aptId}/expenses`,
+    EXPENSE: (aptId: string, expId: string) => `${API_BASE_URL}/apartments/${aptId}/expenses/${expId}`,
   },
   EXPENSES: {
     CREATE: `${API_BASE_URL}/expenses`,

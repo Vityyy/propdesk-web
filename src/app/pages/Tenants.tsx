@@ -56,7 +56,7 @@ function TenantRow({ tenant, email, phone, property, unit, amount, status, hasAs
           <button
             onClick={() => setShowPaymentMenu(!showPaymentMenu)}
             className={`transition-opacity ${hasAssignment ? 'hover:opacity-80 cursor-pointer' : 'cursor-not-allowed opacity-50'}`}
-            title={hasAssignment ? "Cambiar estado de pago" : "Este inquilino no tiene asignaciones"}
+            title={hasAssignment ? "Change payment status" : "This tenant has no active assignment"}
             disabled={!hasAssignment}
           >
             <StatusBadge status={status} />
@@ -82,10 +82,10 @@ function TenantRow({ tenant, email, phone, property, unit, amount, status, hasAs
                         : 'hover:bg-[rgba(255,255,255,0.05)] text-white'
                     }`}
                   >
-                    {paymentStatus === 'paid' && 'Pagado'}
-                    {paymentStatus === 'pending' && 'Pendiente'}
-                    {paymentStatus === 'overdue' && 'Vencido'}
-                    {paymentStatus === 'partial' && 'Parcial'}
+                    {paymentStatus === 'paid' && 'Paid'}
+                    {paymentStatus === 'pending' && 'Pending'}
+                    {paymentStatus === 'overdue' && 'Overdue'}
+                    {paymentStatus === 'partial' && 'Partial'}
                   </button>
                 ))}
               </div>
@@ -97,7 +97,7 @@ function TenantRow({ tenant, email, phone, property, unit, amount, status, hasAs
         <button 
           onClick={() => setShowOptionsMenu(!showOptionsMenu)}
           className="hover:bg-[rgba(255,255,255,0.05)] transition-colors p-[8px] rounded-[8px] text-white hover:text-[#928dd3]"
-          title="Opciones"
+          title="Options"
         >
           ⋮
         </button>
@@ -117,7 +117,7 @@ function TenantRow({ tenant, email, phone, property, unit, amount, status, hasAs
                 className="w-full text-left px-[16px] py-[12px] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
               >
                 <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
-                  {hasAssignment ? '+Vincular unidad' : 'Vincular unidad'}
+                  {hasAssignment ? 'Link another unit' : 'Link unit'}
                 </p>
               </button>
               {hasAssignment && (
@@ -131,7 +131,7 @@ function TenantRow({ tenant, email, phone, property, unit, amount, status, hasAs
                     className="w-full text-left px-[16px] py-[12px] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
                   >
                     <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
-                      Eliminar vínculo
+                      Remove assignment
                     </p>
                   </button>
                 </>
@@ -145,7 +145,7 @@ function TenantRow({ tenant, email, phone, property, unit, amount, status, hasAs
                 className="w-full text-left px-[16px] py-[12px] hover:bg-[#ff6b6b]/10 transition-colors"
               >
                 <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-[#ff6b6b]" style={{ fontVariationSettings: "'wdth' 100" }}>
-                  Eliminar Tenant
+                  Delete tenant
                 </p>
               </button>
             </div>
@@ -218,7 +218,7 @@ export function Tenants() {
             phone: tenant.phone,
             property: property.name,
             propertyId: property.id,
-            unit: `Unidad ${unit.unitNumber}`,
+            unit: `Unit ${unit.unitNumber}`,
             unitId: unit.id,
             amount: `$${assignment.rentAmount.toLocaleString()}`,
             status: assignment.paymentStatus,
@@ -232,7 +232,7 @@ export function Tenants() {
           tenant: `${tenant.firstName} ${tenant.lastName}`,
           email: tenant.email,
           phone: tenant.phone,
-          property: 'Sin Asignar',
+          property: 'Unassigned',
           propertyId: '',
           unit: '-',
           unitId: '',
@@ -257,7 +257,7 @@ export function Tenants() {
   }, 0);
 
   const handleDeleteTenant = (tenantId: string, propertyId: string, unitId: string) => {
-    if (confirm('¿Estás seguro de que deseas eliminar este vínculo?')) {
+    if (confirm('Remove this tenant from the selected unit?')) {
       try {
         // Only unassign from this specific unit
         propertyService.unassignTenantFromUnit(propertyId, unitId);
@@ -270,13 +270,13 @@ export function Tenants() {
         refreshProperties();
       } catch (error) {
         console.error('Error deleting link:', error);
-        alert('Error al eliminar vínculo');
+        alert('Could not remove assignment');
       }
     }
   };
 
   const handleDeleteTenantCompletely = (tenantId: string) => {
-    if (confirm('¿Estás seguro de que deseas eliminar este tenant completamente? Esta acción no se puede deshacer.')) {
+    if (confirm('Delete this tenant permanently? This cannot be undone.')) {
       try {
         // Get tenant data before deleting
         const tenant = tenantService.getTenant(tenantId);
@@ -298,7 +298,7 @@ export function Tenants() {
         refreshProperties();
       } catch (error) {
         console.error('Error deleting tenant:', error);
-        alert('Error al eliminar tenant');
+        alert('Could not delete tenant');
       }
     }
   };
@@ -309,7 +309,7 @@ export function Tenants() {
       refreshTenants();
     } catch (error) {
       console.error('Error updating payment status:', error);
-      alert('Error al actualizar estado de pago');
+      alert('Could not update payment status');
     }
   };
 

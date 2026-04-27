@@ -16,10 +16,10 @@ export function StatusBadge({ status }: StatusBadgeProps) {
   };
 
   const statusText = {
-    paid: 'Pagado',
-    pending: 'Pendiente',
-    overdue: 'Vencido',
-    partial: 'Parcial'
+    paid: 'Paid',
+    pending: 'Pending',
+    overdue: 'Overdue',
+    partial: 'Partial'
   };
 
   return (

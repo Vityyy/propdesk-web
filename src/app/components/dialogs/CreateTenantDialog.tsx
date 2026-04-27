@@ -33,27 +33,25 @@ export function CreateTenantDialog({ isOpen, onClose, onSuccess }: CreateTenantD
     const errors: Record<string, string> = {};
 
     if (!tenantData.firstName?.trim()) {
-      errors.firstName = 'El nombre es requerido';
+      errors.firstName = 'First name is required';
     }
     if (!tenantData.lastName?.trim()) {
-      errors.lastName = 'El apellido es requerido';
+      errors.lastName = 'Last name is required';
     }
-    if (!tenantData.email?.trim()) {
-      errors.email = 'El email es requerido';
-    } else if (!validation.validateEmail(tenantData.email)) {
-      errors.email = 'El email no es válido (debe incluir @)';
+    if (tenantData.email?.trim() && !validation.validateEmail(tenantData.email)) {
+      errors.email = 'Enter a valid email (must include @ and a domain)';
     }
     if (!tenantData.phone?.trim()) {
-      errors.phone = 'El teléfono es requerido';
+      errors.phone = 'Phone is required';
     } else if (!validation.validatePhone(tenantData.phone)) {
-      errors.phone = 'El teléfono solo debe contener números, +, espacios y guiones';
+      errors.phone = 'Phone may only contain digits, +, spaces, hyphens, and parentheses';
     }
     if (!tenantData.documentNumber?.trim()) {
-      errors.documentNumber = 'El número de documento es requerido';
+      errors.documentNumber = 'ID number is required';
     } else if (!validation.validateDocumentNumber(tenantData.documentNumber)) {
-      errors.documentNumber = 'El número de documento solo debe contener números';
+      errors.documentNumber = 'ID number must contain digits only';
     } else if (tenantService.tenantExists(currentOwner.id, tenantData.documentNumber)) {
-      errors.documentNumber = 'Ya existe un inquilino con este número de documento';
+      errors.documentNumber = 'A tenant with this ID number already exists';
     }
 
     setValidationErrors(errors);
@@ -72,7 +70,7 @@ export function CreateTenantDialog({ isOpen, onClose, onSuccess }: CreateTenantD
         ownerId: currentOwner.id,
         firstName: tenantData.firstName!,
         lastName: tenantData.lastName!,
-        email: tenantData.email!,
+        email: tenantData.email?.trim() || '',
         phone: tenantData.phone!,
         documentNumber: tenantData.documentNumber!,
         documentType: 'DNI',
@@ -82,7 +80,7 @@ export function CreateTenantDialog({ isOpen, onClose, onSuccess }: CreateTenantD
       setStep('assignment');
     } catch (error) {
       console.error('Error creating tenant:', error);
-      alert('Error al crear el inquilino');
+      alert('Could not create tenant');
     }
   };
 
@@ -99,7 +97,7 @@ export function CreateTenantDialog({ isOpen, onClose, onSuccess }: CreateTenantD
     e.preventDefault();
 
     if (!assignmentData.propertyId || !assignmentData.unitId) {
-      alert('Por favor completa todos los campos');
+      alert('Please fill in all fields');
       return;
     }
 
@@ -109,13 +107,13 @@ export function CreateTenantDialog({ isOpen, onClose, onSuccess }: CreateTenantD
       // Get the selected unit to obtain its rent amount
       const property = propertyService.getProperty(assignmentData.propertyId);
       if (!property) {
-        alert('Propiedad no encontrada');
+        alert('Property not found');
         return;
       }
 
       const unit = property.units.find(u => u.id === assignmentData.unitId);
       if (!unit) {
-        alert('Unidad no encontrada');
+        alert('Unit not found');
         return;
       }
 
@@ -140,7 +138,7 @@ export function CreateTenantDialog({ isOpen, onClose, onSuccess }: CreateTenantD
       handleClose();
     } catch (error) {
       console.error('Error assigning tenant:', error);
-      alert('Error al asignar inquilino a la unidad');
+      alert('Could not assign tenant to unit');
     }
   };
 
@@ -171,7 +169,7 @@ export function CreateTenantDialog({ isOpen, onClose, onSuccess }: CreateTenantD
       <div className="bg-black border border-[rgba(255,255,255,0.16)] rounded-[16px] max-w-2xl w-full">
         <div className="p-6 border-b border-[rgba(255,255,255,0.16)] flex items-center justify-between">
           <h2 className="font-['Archivo:ExtraBold',sans-serif] font-extrabold text-[20px] text-white">
-            {step === 'info' ? 'Nuevo Inquilino' : 'Asignar Unidad'}
+            {step === 'info' ? 'New tenant' : 'Assign unit'}
           </h2>
           <button
             onClick={handleClose}
@@ -186,7 +184,7 @@ export function CreateTenantDialog({ isOpen, onClose, onSuccess }: CreateTenantD
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
-                  Nombre *
+                  First name *
                 </label>
                 <input
                   type="text"
@@ -200,7 +198,7 @@ export function CreateTenantDialog({ isOpen, onClose, onSuccess }: CreateTenantD
                   className={`w-full px-4 py-2 bg-[rgba(255,255,255,0.05)] border rounded-[8px] text-white placeholder-[rgba(255,255,255,0.4)] ${
                     validationErrors.firstName ? 'border-[#FF6B6B]' : 'border-[rgba(255,255,255,0.16)]'
                   }`}
-                  placeholder="Nombre"
+                  placeholder="First name"
                 />
                 {validationErrors.firstName && (
                   <p className="text-[#FF6B6B] text-xs mt-1">{validationErrors.firstName}</p>
@@ -208,7 +206,7 @@ export function CreateTenantDialog({ isOpen, onClose, onSuccess }: CreateTenantD
               </div>
               <div>
                 <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
-                  Apellido *
+                  Last name *
                 </label>
                 <input
                   type="text"
@@ -222,7 +220,7 @@ export function CreateTenantDialog({ isOpen, onClose, onSuccess }: CreateTenantD
                   className={`w-full px-4 py-2 bg-[rgba(255,255,255,0.05)] border rounded-[8px] text-white placeholder-[rgba(255,255,255,0.4)] ${
                     validationErrors.lastName ? 'border-[#FF6B6B]' : 'border-[rgba(255,255,255,0.16)]'
                   }`}
-                  placeholder="Apellido"
+                  placeholder="Last name"
                 />
                 {validationErrors.lastName && (
                   <p className="text-[#FF6B6B] text-xs mt-1">{validationErrors.lastName}</p>
@@ -232,7 +230,7 @@ export function CreateTenantDialog({ isOpen, onClose, onSuccess }: CreateTenantD
 
             <div>
               <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
-                Email *
+                Email (optional)
               </label>
               <input
                 type="email"
@@ -255,7 +253,7 @@ export function CreateTenantDialog({ isOpen, onClose, onSuccess }: CreateTenantD
 
             <div>
               <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
-                Teléfono *
+                Phone *
               </label>
               <input
                 type="tel"
@@ -279,7 +277,7 @@ export function CreateTenantDialog({ isOpen, onClose, onSuccess }: CreateTenantD
 
             <div>
               <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
-                DNI *
+                Government ID *
               </label>
               <input
                 type="text"
@@ -307,13 +305,13 @@ export function CreateTenantDialog({ isOpen, onClose, onSuccess }: CreateTenantD
                 onClick={handleClose}
                 className="flex-1 px-4 py-2 border border-[rgba(255,255,255,0.16)] text-white rounded-[8px] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
               >
-                Cancelar
+                Cancel
               </button>
               <button
                 type="submit"
                 className="flex-1 px-4 py-2 bg-[#928dd3] text-black font-semibold rounded-[8px] hover:bg-[#a89be6] transition-colors"
               >
-                Continuar
+                Continue
               </button>
             </div>
           </form>
@@ -321,7 +319,7 @@ export function CreateTenantDialog({ isOpen, onClose, onSuccess }: CreateTenantD
           <form onSubmit={handleAssignUnit} className="p-6 space-y-4">
             <div>
               <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
-                Propiedad *
+                Property *
               </label>
               <select
                 value={assignmentData.propertyId}
@@ -331,7 +329,7 @@ export function CreateTenantDialog({ isOpen, onClose, onSuccess }: CreateTenantD
                 className="w-full px-4 py-2 bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.16)] rounded-[8px] text-white"
               >
                 <option value="" className="bg-black">
-                  Selecciona una propiedad
+                  Select a property
                 </option>
                 {properties.map((prop) => (
                   <option key={prop.id} value={prop.id} className="bg-black">
@@ -344,7 +342,7 @@ export function CreateTenantDialog({ isOpen, onClose, onSuccess }: CreateTenantD
             {assignmentData.propertyId && (
               <div>
                 <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
-                  Unidad *
+                  Unit *
                 </label>
                 <select
                   value={assignmentData.unitId}
@@ -352,11 +350,11 @@ export function CreateTenantDialog({ isOpen, onClose, onSuccess }: CreateTenantD
                   className="w-full px-4 py-2 bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.16)] rounded-[8px] text-white"
                 >
                   <option value="" className="bg-black">
-                    Selecciona una unidad
+                    Select a unit
                   </option>
                   {availableUnits.map((unit) => (
                     <option key={unit.id} value={unit.id} className="bg-black">
-                      Unidad {unit.unitNumber} - {unit.type}
+                      Unit {unit.unitNumber} — {unit.type}
                     </option>
                   ))}
                 </select>
@@ -368,7 +366,7 @@ export function CreateTenantDialog({ isOpen, onClose, onSuccess }: CreateTenantD
               return selectedUnit ? (
                 <div className="p-3 bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] rounded-[8px]">
                   <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
-                    Renta Mensual
+                    Monthly rent
                   </label>
                   <p className="text-white font-semibold text-lg">
                     ${selectedUnit.rentAmount.toLocaleString()}
@@ -386,21 +384,21 @@ export function CreateTenantDialog({ isOpen, onClose, onSuccess }: CreateTenantD
                 }}
                 className="flex-1 px-4 py-2 border border-[rgba(255,255,255,0.16)] text-white rounded-[8px] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
               >
-                Atrás
+                Back
               </button>
               <button
                 type="button"
                 onClick={handleSkipAssignment}
                 className="flex-1 px-4 py-2 border border-[rgba(255,255,255,0.16)] text-white rounded-[8px] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
               >
-                Crear sin Asignar
+                Create without assigning
               </button>
               <button
                 type="submit"
                 disabled={!assignmentData.propertyId || !assignmentData.unitId}
                 className="flex-1 px-4 py-2 bg-[#928dd3] text-black font-semibold rounded-[8px] hover:bg-[#a89be6] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Asignar Inquilino
+                Assign tenant
               </button>
             </div>
           </form>

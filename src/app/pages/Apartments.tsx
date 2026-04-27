@@ -44,6 +44,15 @@ function PlusIcon() {
   );
 }
 
+function CreditCardIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="5" width="20" height="14" rx="2" />
+      <line x1="2" y1="10" x2="22" y2="10" />
+    </svg>
+  );
+}
+
 export function Apartments() {
   const { propertyId } = useParams<{ propertyId: string }>();
   const navigate = useNavigate();
@@ -55,6 +64,7 @@ export function Apartments() {
   const [lastSelectedId, setLastSelectedId] = useState<string | null>(null);
   const [editingApartments, setEditingApartments] = useState<ApartmentGridResponse[]>([]);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editDialogInitialSection, setEditDialogInitialSection] = useState<'data' | 'tenant' | 'expenses' | null>(null);
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [addDialogFloor, setAddDialogFloor] = useState(0);
@@ -62,6 +72,15 @@ export function Apartments() {
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [apartmentToDelete, setApartmentToDelete] = useState<ApartmentGridResponse | null>(null);
+  const [statusUpdatingApartmentIds, setStatusUpdatingApartmentIds] = useState<Set<string>>(new Set());
+
+  const todayIso = useMemo(() => {
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }, []);
 
   const property = properties.find(p => p.id === propertyId);
 
@@ -84,10 +103,10 @@ export function Apartments() {
     return flat;
   }, [gridData, sortedFloors]);
 
-  const fetchApartments = () => {
+  const fetchApartments = (forceRefresh = false) => {
     if (!propertyId) return;
     setLoading(true);
-    userService.getPropertyApartmentsGrid(propertyId)
+    userService.getPropertyApartmentsGrid(propertyId, { forceRefresh })
       .then(data => {
         setGridData(data);
         setLoading(false);
@@ -136,6 +155,14 @@ export function Apartments() {
   const handleEditClick = (e: React.MouseEvent, apt: ApartmentGridResponse) => {
     e.stopPropagation();
     setEditingApartments([apt]);
+    setEditDialogInitialSection('data');
+    setIsEditDialogOpen(true);
+  };
+
+  const handleOpenExpenseDetails = (e: React.MouseEvent, apt: ApartmentGridResponse) => {
+    e.stopPropagation();
+    setEditingApartments([apt]);
+    setEditDialogInitialSection('expenses');
     setIsEditDialogOpen(true);
   };
 
@@ -157,12 +184,131 @@ export function Apartments() {
     setIsAddDialogOpen(true);
   };
 
+  const patchApartmentInGrid = (apartmentId: string, changes: Partial<ApartmentGridResponse>): boolean => {
+    if (!gridData) return false;
+
+    const found = Object.values(gridData)
+      .some(apartmentsByNumber => Object.values(apartmentsByNumber).some(apartment => apartment.id === apartmentId));
+    if (!found) return false;
+
+    setGridData(prev => {
+      if (!prev) return prev;
+      const nextGrid: PropertyApartmentsGridResponse = {};
+
+      Object.entries(prev).forEach(([floorKey, apartmentsByNumber]) => {
+        const nextApartmentsByNumber: Record<number, ApartmentGridResponse> = {};
+        Object.entries(apartmentsByNumber).forEach(([aptNumberKey, apartmentData]) => {
+          const numericAptNumber = Number(aptNumberKey);
+          if (apartmentData.id === apartmentId) {
+            nextApartmentsByNumber[numericAptNumber] = { ...apartmentData, ...changes };
+          } else {
+            nextApartmentsByNumber[numericAptNumber] = apartmentData;
+          }
+        });
+        nextGrid[Number(floorKey)] = nextApartmentsByNumber;
+      });
+
+      return nextGrid;
+    });
+
+    return found;
+  };
+
+  const advanceDueDateOneMonth = (dueDate: string): string => {
+    const parts = dueDate.split('-').map(Number);
+    if (parts.length !== 3 || parts.some(Number.isNaN)) {
+      return dueDate;
+    }
+
+    const [year, month, day] = parts;
+    const baseDate = new Date(year, month - 1, day);
+    if (Number.isNaN(baseDate.getTime())) {
+      return dueDate;
+    }
+
+    const nextMonthDate = new Date(year, month, 1);
+    const lastDayOfNextMonth = new Date(nextMonthDate.getFullYear(), nextMonthDate.getMonth() + 1, 0).getDate();
+    const targetDay = Math.min(day, lastDayOfNextMonth);
+    const result = new Date(nextMonthDate.getFullYear(), nextMonthDate.getMonth(), targetDay);
+
+    const resultYear = result.getFullYear();
+    const resultMonth = String(result.getMonth() + 1).padStart(2, '0');
+    const resultDay = String(result.getDate()).padStart(2, '0');
+    return `${resultYear}-${resultMonth}-${resultDay}`;
+  };
+
+  const handleTogglePaymentStatus = async (e: React.MouseEvent, apt: ApartmentGridResponse) => {
+    e.stopPropagation();
+    if (!propertyId || !gridData || statusUpdatingApartmentIds.has(apt.id)) {
+      return;
+    }
+
+    const nextStatus = apt.paymentStatus === 'PAID' ? 'PENDING' : 'PAID';
+    const shouldAdvanceDueDate = nextStatus === 'PAID' && !!apt.dueDate && apt.dueDate <= todayIso;
+    const nextDueDate = shouldAdvanceDueDate && apt.dueDate ? advanceDueDateOneMonth(apt.dueDate) : apt.dueDate;
+    const payload: { paymentStatus: 'PAID' | 'PENDING'; dueDate?: string } = { paymentStatus: nextStatus };
+
+    if (nextStatus === 'PAID' && nextDueDate) {
+      payload.dueDate = nextDueDate;
+    }
+
+    const previousGridSnapshot = gridData;
+
+    // Optimistic update: mutate only the changed apartment in local grid state.
+    setGridData(prev => {
+      if (!prev) return prev;
+      const nextGrid: PropertyApartmentsGridResponse = {};
+
+      Object.entries(prev).forEach(([floorKey, apartmentsByNumber]) => {
+        const nextApartmentsByNumber: Record<number, ApartmentGridResponse> = {};
+        Object.entries(apartmentsByNumber).forEach(([numberKey, apartmentData]) => {
+          const numericKey = Number(numberKey);
+          nextApartmentsByNumber[numericKey] = apartmentData.id === apt.id
+            ? {
+                ...apartmentData,
+                paymentStatus: nextStatus,
+                dueDate: nextDueDate,
+              }
+            : apartmentData;
+        });
+        nextGrid[Number(floorKey)] = nextApartmentsByNumber;
+      });
+
+      return nextGrid;
+    });
+
+    setStatusUpdatingApartmentIds(prev => {
+      const next = new Set(prev);
+      next.add(apt.id);
+      return next;
+    });
+
+    try {
+      await userService.updateApartment(apt.id, payload);
+      // Keep current view responsive without full refetch; force reload next visit.
+      userService.invalidatePropertyApartmentsGrid(propertyId);
+    } catch (error: any) {
+      setGridData(previousGridSnapshot);
+      console.error('Error updating payment status', error);
+      alert(error?.message || 'Failed to update apartment status');
+    } finally {
+      setStatusUpdatingApartmentIds(prev => {
+        const next = new Set(prev);
+        next.delete(apt.id);
+        return next;
+      });
+    }
+  };
+
   const performDelete = async () => {
     if (!apartmentToDelete) return;
     try {
       await userService.deleteApartment(apartmentToDelete.id);
       setSelectedApartments(new Set());
-      fetchApartments();
+      if (propertyId) {
+        userService.invalidatePropertyApartmentsGrid(propertyId);
+      }
+      fetchApartments(true);
     } catch (err: any) {
       console.error('Error deleting apartment', err);
       alert(err.message || 'Failed to delete apartment');
@@ -205,6 +351,12 @@ export function Apartments() {
             <p><strong className="font-bold">Ctrl + Click:</strong> Select multiple</p>
             <p><strong className="font-bold">Shift + Click:</strong> Select range</p>
           </div>
+          <div className="bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.12)] rounded-lg px-4 py-2.5 mt-2 max-w-4xl">
+            <p className="text-[13px] text-[rgba(255,255,255,0.75)]">
+              Use <strong className="font-semibold text-white">Edit</strong> to update apartment details, assign or edit the tenant, and manage expenses.
+              Changes go through the apartments API (<strong className="font-semibold text-white">/apartments</strong>).
+            </p>
+          </div>
         </div>
       </div>
 
@@ -246,15 +398,31 @@ export function Apartments() {
                   Floor {floorNum}
                 </h3>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-7 gap-6 auto-rows-fr">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-6 auto-rows-fr">
                   {sortedApartmentNumbers.map(aptNum => {
                     const apt = floorApartmentsMap[aptNum];
                     const isVacant = !apt.tenant;
                     const isPaid = apt.paymentStatus === 'PAID';
-                    
+                    const isOverdue = !!apt.dueDate && apt.dueDate < todayIso;
+                    const hasExpenses = apt.expenses && apt.expenses.length > 0;
+                    const expensesTotal = (apt.expenses || []).reduce((sum, expense) => sum + (expense.amount || 0), 0);
+                    const rentGain = (apt.rent || 0) - expensesTotal;
+                    const isStatusUpdating = statusUpdatingApartmentIds.has(apt.id);
+
+                    // Card background color
                     let bgClass = 'bg-gray-600/80';
                     if (!isVacant) {
-                      bgClass = isPaid ? 'bg-green-600/80' : 'bg-red-600/80';
+                      bgClass = (!isPaid || isOverdue) ? 'bg-red-600/80' : 'bg-green-600/80';
+                    }
+
+                    // Rent gain color
+                    let rentColor = '#928dd3'; // default purple (vacant)
+                    if (!isVacant) {
+                      if (hasExpenses) {
+                        rentColor = '#f59e0b'; // orange when there are expenses
+                      } else {
+                        rentColor = rentGain >= 0 ? '#4ade80' : '#f87171';
+                      }
                     }
 
                     const isSelected = selectedApartments.has(apt.id);
@@ -266,15 +434,38 @@ export function Apartments() {
                         className={`flex flex-col rounded-xl overflow-hidden border transition-all hover:scale-[1.02] bg-[#111] cursor-pointer select-none ${isSelected ? 'border-[#928dd3] ring-2 ring-[#928dd3]/50 transform scale-[1.02]' : 'border-[rgba(255,255,255,0.1)]'}`}
                       >
                         {/* Upper half: Background color & Icon */}
-                        <div className={`relative h-[120px] flex items-center justify-center ${bgClass}`}>
+                        <div className={`relative h-[140px] flex items-center justify-center ${bgClass}`}>
                           <div className={`text-white opacity-90 drop-shadow-md ${isVacant ? 'opacity-50' : ''}`}>
                             <UserIcon />
                           </div>
                           
-                          {/* Payment status badge */}
+                          {/* Apt number badge */}
                           <div className="absolute top-3 left-3 bg-black/40 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold text-white tracking-wide">
                             APT {aptNum}
                           </div>
+
+                          {/* Quick payment status toggle */}
+                          <button
+                            onClick={(e) => handleTogglePaymentStatus(e, apt)}
+                            disabled={isStatusUpdating || isVacant}
+                            className={`absolute top-11 left-3 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold tracking-wide flex items-center gap-1 border transition-colors ${
+                              isVacant
+                                ? 'bg-white/10 border-white/20 text-white/40'
+                                : isPaid
+                                  ? 'bg-[#4ade80]/15 border-[#4ade80]/40 text-[#4ade80] hover:bg-[#4ade80]/25'
+                                  : 'bg-[#f59e0b]/15 border-[#f59e0b]/40 text-[#f59e0b] hover:bg-[#f59e0b]/25'
+                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                            title={
+                              isVacant
+                                ? 'No tenant assigned (no rent due yet)'
+                                : isPaid
+                                  ? 'Mark as unpaid (due date stays the same)'
+                                  : 'Mark as paid (due date advances one month)'
+                            }
+                          >
+                            <CreditCardIcon />
+                            <span>{isStatusUpdating ? '...' : isVacant ? 'N/A' : isPaid ? 'Paid' : 'Unpaid'}</span>
+                          </button>
                           
                           {/* Actions */}
                           <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
@@ -301,14 +492,39 @@ export function Apartments() {
                         <div className="p-4 flex flex-col gap-3 flex-1 bg-[#1a1a1a]">
                           <div className="flex justify-between items-center border-b border-[rgba(255,255,255,0.05)] pb-2">
                             <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Tenant</span>
-                            <span className="text-sm text-white font-medium truncate max-w-[100px]" title={apt.tenant?.name || 'Vacant'}>
+                            <span className="text-sm text-white font-medium truncate max-w-[140px]" title={apt.tenant?.name || 'Vacant'}>
                               {apt.tenant ? apt.tenant.name : <span className="text-[rgba(255,255,255,0.3)] italic">Vacant</span>}
                             </span>
                           </div>
                           
                           <div className="flex justify-between items-center">
-                            <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Rent</span>
-                            <span className="text-sm text-[#928dd3] font-bold">${apt.rent}</span>
+                            <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Rent Gain</span>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-sm font-bold" style={{ color: rentColor }}>${rentGain}</span>
+                              {hasExpenses && (
+                                <span
+                                  className="relative group"
+                                  title={`${apt.expenses.length} expense${apt.expenses.length > 1 ? 's' : ''}. Changes due to expenses. See details`}
+                                >
+                                  <button
+                                    type="button"
+                                    onClick={(e) => handleOpenExpenseDetails(e, apt)}
+                                    className="p-0 m-0 bg-transparent border-0"
+                                    title="Changes due to expenses. Click to see details"
+                                  >
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="cursor-pointer">
+                                      <circle cx="12" cy="12" r="10" />
+                                      <line x1="12" y1="8" x2="12" y2="12" />
+                                      <line x1="12" y1="16" x2="12.01" y2="16" />
+                                    </svg>
+                                  </button>
+                                  {/* Tooltip */}
+                                  <span className="absolute bottom-full right-0 mb-1.5 hidden group-hover:block bg-[#1a1a1a] border border-[#f59e0b]/30 text-[#f59e0b] text-xs px-2 py-1 rounded-lg whitespace-nowrap shadow-xl z-50 pointer-events-none">
+                                    Changes due to expenses. See details
+                                  </span>
+                                </span>
+                              )}
+                            </div>
                           </div>
                           
                           <div className="flex justify-between items-center">
@@ -328,7 +544,7 @@ export function Apartments() {
                   {/* Add New Apartment Card */}
                   <div 
                     onClick={() => handleAddClick(floorNum, sortedApartmentNumbers.length > 0 ? sortedApartmentNumbers[sortedApartmentNumbers.length - 1] + 1 : floorNum * 100 + 1)}
-                    className="flex flex-col rounded-xl overflow-hidden border border-[#4ade80]/30 transition-all hover:scale-[1.02] bg-[#4ade80]/5 hover:bg-[#4ade80]/10 cursor-pointer min-h-[250px] items-center justify-center text-[#4ade80]"
+                    className="flex flex-col rounded-xl overflow-hidden border border-[#4ade80]/30 transition-all hover:scale-[1.02] bg-[#4ade80]/5 hover:bg-[#4ade80]/10 cursor-pointer min-h-[290px] items-center justify-center text-[#4ade80]"
                     title={`Add apartment to floor ${floorNum}`}
                   >
                     <PlusIcon />
@@ -343,11 +559,28 @@ export function Apartments() {
 
       <EditApartmentsDialog 
         isOpen={isEditDialogOpen}
+        propertyId={propertyId || ''}
         apartments={editingApartments}
-        onClose={() => setIsEditDialogOpen(false)}
-        onSuccess={() => {
+        initialSection={editDialogInitialSection}
+        onClose={() => {
+          setIsEditDialogOpen(false);
+          setEditDialogInitialSection(null);
+        }}
+        onSuccess={(result) => {
           setSelectedApartments(new Set());
-          fetchApartments();
+          if (result?.apartmentId && result.changes) {
+            const updatedLocally = patchApartmentInGrid(result.apartmentId, result.changes);
+            if (propertyId) {
+              userService.invalidatePropertyApartmentsGrid(propertyId);
+            }
+            if (updatedLocally) {
+              return;
+            }
+          }
+          if (propertyId) {
+            userService.invalidatePropertyApartmentsGrid(propertyId);
+          }
+          fetchApartments(true);
         }}
       />
 
@@ -357,7 +590,12 @@ export function Apartments() {
         floor={addDialogFloor}
         nextNumber={addDialogNextNumber}
         onClose={() => setIsAddDialogOpen(false)}
-        onSuccess={fetchApartments}
+        onSuccess={() => {
+          if (propertyId) {
+            userService.invalidatePropertyApartmentsGrid(propertyId);
+          }
+          fetchApartments(true);
+        }}
       />
 
       <ConfirmDeleteDialog

@@ -32,7 +32,7 @@ export interface Tenant {
   email: string;
   phone: string;
   documentNumber?: string;
-  documentType?: string; // DNI, Passport, etc.
+  documentType?: string; // e.g. national ID, passport
   bankAccount?: {
     accountNumber: string;
     accountHolder: string;

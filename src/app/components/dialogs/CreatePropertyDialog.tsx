@@ -93,22 +93,22 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
     e.preventDefault();
 
     if (!formData.name.trim() || !formData.address.trim()) {
-      alert('El nombre y dirección de la propiedad no pueden estar vacíos.');
+      alert('Property name and address cannot be empty.');
       return;
     }
 
     if (rules.some(r => !r.floorRanges || !r.apartmentNumberRanges || !r.squareMeters || !r.rentValue)) {
-      alert('Por favor, completa todos los campos de todas las reglas antes de enviar.');
+      alert('Please complete every field in all apartment rules before submitting.');
       return;
     }
 
     if (formError) {
-      alert('Corrige los errores en las reglas antes de crear la propiedad.');
+      alert('Fix the errors in the apartment rules before creating the property.');
       return;
     }
 
     if (parsedRanges.length === 0) {
-      alert('Debe generarse al menos un departamento.');
+      alert('At least one apartment must be generated from the rules.');
       return;
     }
 
@@ -159,7 +159,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
       handleClose();
     } catch (error) {
       console.error('Error creating property:', error);
-      alert('Error al crear la propiedad');
+      alert('Could not create property');
     }
   };
 
@@ -182,7 +182,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
       <div className="bg-[#0f0f0f] border border-[rgba(255,255,255,0.16)] rounded-[16px] max-w-4xl w-full my-8">
         <div className="p-6 border-b border-[rgba(255,255,255,0.16)] flex items-center justify-between sticky top-0 bg-[#0f0f0f] z-10 rounded-t-[16px]">
           <h2 className="font-['Archivo:ExtraBold',sans-serif] font-extrabold text-[22px] text-white">
-            Crear Nueva Propiedad
+            Create property
           </h2>
           <button
             onClick={handleClose}
@@ -196,40 +196,40 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
           {/* General Property Information */}
           <div className="space-y-4">
             <h3 className="font-['Archivo:SemiBold',sans-serif] font-semibold text-white/90 text-lg border-l-4 border-[#928dd3] pl-3">
-              Información General
+              General information
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
-                  Nombre de la Propiedad <span className="text-[#ff6b6b]">*</span>
+                  Property name <span className="text-[#ff6b6b]">*</span>
                 </label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-4 py-3 bg-[rgba(255,255,255,0.03)] focus:bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.16)] focus:border-[#928dd3] outline-none rounded-[8px] text-white placeholder-[rgba(255,255,255,0.3)] transition-all"
-                  placeholder="ej: Sunset Apartments"
+                  placeholder="e.g. Sunset Apartments"
                 />
               </div>
 
               <div>
                 <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
-                  Dirección <span className="text-[#ff6b6b]">*</span>
+                  Address <span className="text-[#ff6b6b]">*</span>
                 </label>
                 <input
                   type="text"
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   className="w-full px-4 py-3 bg-[rgba(255,255,255,0.03)] focus:bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.16)] focus:border-[#928dd3] outline-none rounded-[8px] text-white placeholder-[rgba(255,255,255,0.3)] transition-all"
-                  placeholder="ej: 123 Main St, City, State"
+                  placeholder="e.g. 123 Main St, City, State"
                 />
               </div>
             </div>
 
             <div>
               <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
-                URL de la Imagen de Portada (Opcional)
+                Cover image URL (optional)
               </label>
               <input
                 type="url"
@@ -245,10 +245,10 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
           <div className="space-y-4">
             <div className="flex justify-between items-center border-l-4 border-[#928dd3] pl-3">
               <h3 className="font-['Archivo:SemiBold',sans-serif] font-semibold text-white/90 text-lg">
-                Reglas de Departamentos
+                Apartment generation rules
               </h3>
               <p className="text-sm text-[rgba(255,255,255,0.5)]">
-                Ejemplo de rango: 1-5, 9, 11
+                Range example: 1-5, 9, 11
               </p>
             </div>
 
@@ -260,7 +260,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                       type="button"
                       onClick={() => handleRemoveRule(rule.id)}
                       className="absolute top-3 right-3 text-[rgba(255,255,255,0.4)] hover:text-[#ff6b6b] transition-colors"
-                      title="Eliminar regla"
+                      title="Remove rule"
                     >
                       ✕
                     </button>
@@ -269,33 +269,33 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div className="md:col-span-2">
                       <label className="block text-[rgba(255,255,255,0.7)] text-xs uppercase tracking-wider mb-2 font-semibold">
-                        Pisos (Rango) <span className="text-[#928dd3] ml-1">#</span>
+                        Floors (range) <span className="text-[#928dd3] ml-1">#</span>
                       </label>
                       <input
                         type="text"
                         value={rule.floorRanges}
                         onChange={(e) => updateRule(rule.id, 'floorRanges', e.target.value)}
                         className="w-full px-3 py-2 bg-[rgba(0,0,0,0.3)] border border-[rgba(255,255,255,0.12)] focus:border-[#928dd3] outline-none rounded-[6px] text-white text-sm"
-                        placeholder="Ej: 1-5, 9, 11"
+                        placeholder="e.g. 1-5, 9, 11"
                       />
                     </div>
 
                     <div className="md:col-span-2">
                       <label className="block text-[rgba(255,255,255,0.7)] text-xs uppercase tracking-wider mb-2 font-semibold">
-                        Departamentos (Rango) <span className="text-[#928dd3] ml-1">#</span>
+                        Apartments (range) <span className="text-[#928dd3] ml-1">#</span>
                       </label>
                       <input
                         type="text"
                         value={rule.apartmentNumberRanges}
                         onChange={(e) => updateRule(rule.id, 'apartmentNumberRanges', e.target.value)}
                         className="w-full px-3 py-2 bg-[rgba(0,0,0,0.3)] border border-[rgba(255,255,255,0.12)] focus:border-[#928dd3] outline-none rounded-[6px] text-white text-sm"
-                        placeholder="Ej: 1-4, 8, 10"
+                        placeholder="e.g. 1-4, 8, 10"
                       />
                     </div>
 
                     <div className="md:col-span-2">
                       <label className="block text-[rgba(255,255,255,0.7)] text-xs uppercase tracking-wider mb-2 font-semibold">
-                        Metros Cuadrados (m²)
+                        Square meters (m²)
                       </label>
                       <input
                         type="number"
@@ -303,13 +303,13 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                         onChange={(e) => updateRule(rule.id, 'squareMeters', e.target.value)}
                         min="1"
                         className="w-full px-3 py-2 bg-[rgba(0,0,0,0.3)] border border-[rgba(255,255,255,0.12)] focus:border-[#928dd3] outline-none rounded-[6px] text-white text-sm"
-                        placeholder="Ej: 45"
+                        placeholder="e.g. 45"
                       />
                     </div>
 
                     <div className="md:col-span-2">
                       <label className="block text-[rgba(255,255,255,0.7)] text-xs uppercase tracking-wider mb-2 font-semibold">
-                        Valor Alquiler ($)
+                        Rent amount ($)
                       </label>
                       <input
                         type="number"
@@ -317,7 +317,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                         onChange={(e) => updateRule(rule.id, 'rentValue', e.target.value)}
                         min="0"
                         className="w-full px-3 py-2 bg-[rgba(0,0,0,0.3)] border border-[rgba(255,255,255,0.12)] focus:border-[#928dd3] outline-none rounded-[6px] text-white text-sm"
-                        placeholder="Ej: 1500"
+                        placeholder="e.g. 1500"
                       />
                     </div>
                   </div>
@@ -330,22 +330,22 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
               onClick={handleAddRule}
               className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-dashed border-[rgba(255,255,255,0.3)] text-[rgba(255,255,255,0.7)] font-medium rounded-[12px] hover:border-[#928dd3] hover:text-[#928dd3] hover:bg-[rgba(146,141,211,0.05)] transition-all"
             >
-              <span>+</span> Añadir Regla
+              <span>+</span> Add rule
             </button>
           </div>
 
           {/* Validation & Preview Panel */}
           {formError && (
             <div className="bg-[#ff6b6b]/10 border border-[#ff6b6b]/30 rounded-[12px] p-4 text-[#ff6b6b] text-sm animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite]">
-              <strong>Atención: </strong>
+              <strong>Warning: </strong>
               {formError}
             </div>
           )}
 
           {!formError && parsedRanges.length > 0 && (
             <div className="bg-[rgba(146,141,211,0.1)] border border-[#928dd3]/30 rounded-[12px] p-4 text-[#a89be6] text-sm">
-              <strong>Éxito: </strong>
-              Se generarán un total de <strong>{parsedRanges.length}</strong> bloques de departamentos válidos.
+              <strong>OK: </strong>
+              This will create <strong>{parsedRanges.length}</strong> valid apartment range block(s).
             </div>
           )}
 
@@ -356,14 +356,14 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
               onClick={handleClose}
               className="flex-1 px-6 py-3 border border-[rgba(255,255,255,0.16)] text-white font-medium rounded-[12px] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
             >
-              Cancelar
+              Cancel
             </button>
             <button
               type="submit"
               disabled={!!formError || parsedRanges.length === 0}
               className="flex-1 px-6 py-3 bg-[#928dd3] text-black font-bold rounded-[12px] hover:bg-[#a89be6] transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-[0_0_15px_rgba(146,141,211,0.4)]"
             >
-              Crear Propiedad
+              Create property
             </button>
           </div>
         </form>
