@@ -199,16 +199,42 @@ export function Apartments() {
 
   const handleTogglePaymentStatus = async (e: React.MouseEvent, apt: ApartmentGridResponse) => {
     e.stopPropagation();
-    if (!propertyId || statusUpdatingApartmentIds.has(apt.id)) {
+    if (!propertyId || !gridData || statusUpdatingApartmentIds.has(apt.id)) {
       return;
     }
 
     const nextStatus = apt.paymentStatus === 'PAID' ? 'PENDING' : 'PAID';
+    const nextDueDate = nextStatus === 'PAID' && apt.dueDate ? advanceDueDateOneMonth(apt.dueDate) : apt.dueDate;
     const payload: { paymentStatus: 'PAID' | 'PENDING'; dueDate?: string } = { paymentStatus: nextStatus };
 
-    if (nextStatus === 'PAID' && apt.dueDate) {
-      payload.dueDate = advanceDueDateOneMonth(apt.dueDate);
+    if (nextStatus === 'PAID' && nextDueDate) {
+      payload.dueDate = nextDueDate;
     }
+
+    const previousGridSnapshot = gridData;
+
+    // Optimistic update: mutate only the changed apartment in local grid state.
+    setGridData(prev => {
+      if (!prev) return prev;
+      const nextGrid: PropertyApartmentsGridResponse = {};
+
+      Object.entries(prev).forEach(([floorKey, apartmentsByNumber]) => {
+        const nextApartmentsByNumber: Record<number, ApartmentGridResponse> = {};
+        Object.entries(apartmentsByNumber).forEach(([numberKey, apartmentData]) => {
+          const numericKey = Number(numberKey);
+          nextApartmentsByNumber[numericKey] = apartmentData.id === apt.id
+            ? {
+                ...apartmentData,
+                paymentStatus: nextStatus,
+                dueDate: nextDueDate,
+              }
+            : apartmentData;
+        });
+        nextGrid[Number(floorKey)] = nextApartmentsByNumber;
+      });
+
+      return nextGrid;
+    });
 
     setStatusUpdatingApartmentIds(prev => {
       const next = new Set(prev);
@@ -218,9 +244,10 @@ export function Apartments() {
 
     try {
       await userService.updateApartment(apt.id, payload);
+      // Keep current view responsive without full refetch; force reload next visit.
       userService.invalidatePropertyApartmentsGrid(propertyId);
-      fetchApartments(true);
     } catch (error: any) {
+      setGridData(previousGridSnapshot);
       console.error('Error updating payment status', error);
       alert(error?.message || 'Failed to update apartment status');
     } finally {
