@@ -293,9 +293,16 @@ function TenantSection({
           const floorMap = propertyGrid[floorNumber];
           if (!floorMap) return;
           apartmentNumbers.forEach((apartmentNumber) => {
-            const target = floorMap[apartmentNumber];
+            let target = floorMap[apartmentNumber];
+            if (!target && apartmentNumber < 100) {
+              target = floorMap[floorNumber * 100 + apartmentNumber];
+            }
+            if (!target && apartmentNumber >= 100) {
+              const relativeNum = apartmentNumber % 100;
+              target = floorMap[floorNumber * 100 + relativeNum];
+            }
             if (target) {
-              targetApartments.push({ floor: floorNumber, number: apartmentNumber, apartment: target });
+              targetApartments.push({ floor: floorNumber, number: target.number, apartment: target });
             }
           });
         });

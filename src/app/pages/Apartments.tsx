@@ -59,6 +59,7 @@ export function Apartments() {
   const { properties } = useOwner();
   const [gridData, setGridData] = useState<PropertyApartmentsGridResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [floorSearch, setFloorSearch] = useState('');
 
   const [selectedApartments, setSelectedApartments] = useState<Set<string>>(new Set());
   const [lastSelectedId, setLastSelectedId] = useState<string | null>(null);
@@ -88,6 +89,11 @@ export function Apartments() {
   const sortedFloors = gridData 
     ? Object.keys(gridData).map(Number).filter(n => !isNaN(n)).sort((a, b) => a - b)
     : [];
+
+  const filteredFloors = sortedFloors.filter(floorNum => {
+    if (!floorSearch.trim()) return true;
+    return floorNum.toString().includes(floorSearch.trim());
+  });
 
   const flattenedApartments = useMemo(() => {
     if (!gridData) return [];
@@ -344,6 +350,17 @@ export function Apartments() {
                 {property ? `Managing ${property.name}` : 'Loading property data...'}
               </p>
             </div>
+            
+            <div className="flex items-center gap-2">
+              <label className="text-white/60 text-sm font-semibold">Floor:</label>
+              <input 
+                type="number" 
+                placeholder="Search floor..." 
+                value={floorSearch}
+                onChange={e => setFloorSearch(e.target.value)}
+                className="bg-black border border-[rgba(255,255,255,0.2)] rounded-lg px-3 py-1.5 text-white placeholder-white/30 text-sm focus:outline-none focus:border-[#928dd3] transition-colors w-32"
+              />
+            </div>
           </div>
           
           <div className="bg-[#928dd3]/10 border border-[#928dd3]/30 rounded-lg p-3 w-fit text-[#928dd3] text-sm flex gap-4 mt-2">
@@ -386,8 +403,12 @@ export function Apartments() {
           <div className="text-center py-12">
             <p className="text-[rgba(255,255,255,0.6)]">No floors or apartments registered for this property.</p>
           </div>
+        ) : filteredFloors.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-[rgba(255,255,255,0.6)]">No floors match your search.</p>
+          </div>
         ) : (
-          sortedFloors.map(floorNum => {
+          filteredFloors.map(floorNum => {
             const floorApartmentsMap = gridData![floorNum];
             if (!floorApartmentsMap) return null;
             const sortedApartmentNumbers = Object.keys(floorApartmentsMap).map(Number).filter(n => !isNaN(n)).sort((a, b) => a - b);
