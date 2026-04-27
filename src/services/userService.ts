@@ -145,6 +145,14 @@ export const userService = {
     });
   },
 
+  updateProperty(propertyId: string, data: { propertyName?: string; propertyAddress?: string }): Promise<PropertyResponse> {
+    return apiRequest<PropertyResponse>(`${API_ENDPOINTS.PROPERTIES.BASE}/${propertyId}`, {
+      method: "PUT",
+      body: data,
+      token: getRequiredToken(),
+    });
+  },
+
   deleteProperty(propertyId: string): Promise<void> {
     return apiRequest<void>(`${API_ENDPOINTS.PROPERTIES.BASE}/${propertyId}`, {
       method: "DELETE",
