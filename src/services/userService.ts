@@ -8,6 +8,23 @@ export interface PropertyCreateRequest {
   ownerId: string;
 }
 
+export interface ApartmentRangeData {
+  startFloor: number;
+  endFloor: number;
+  startApartmentNumber: number;
+  endApartmentNumber: number;
+  squareMeters: number;
+  rentValue: number;
+}
+
+export interface NewPropertyCreateRequest {
+  propertyName: string;
+  propertyAddress: string;
+  pictureUrl: string;
+  ownerId: string;
+  apartmentRanges: ApartmentRangeData[];
+}
+
 export interface AdminSummary {
   id: string;
   name: string;
@@ -44,6 +61,23 @@ export interface ApartmentResponse {
   name: string;
   propertyId: string;
 }
+
+export interface TenantGridResponse {
+  id: string;
+  name: string;
+}
+
+export interface ApartmentGridResponse {
+  id: string;
+  number: number;
+  dueDate: string;
+  paymentStatus: 'PAID' | string;
+  squareMeters: number;
+  rent: number;
+  tenant: TenantGridResponse | null;
+}
+
+export type PropertyApartmentsGridResponse = Record<number, Record<number, ApartmentGridResponse>>;
 
 export interface ExpenseCreateRequest {
   category: string;
@@ -103,6 +137,22 @@ export const userService = {
     });
   },
 
+  createPropertyWithRanges(data: NewPropertyCreateRequest): Promise<PropertyResponse> {
+    return apiRequest<PropertyResponse>(API_ENDPOINTS.PROPERTIES.CREATE, {
+      method: "POST",
+      body: data,
+      token: getRequiredToken(),
+    });
+  },
+
+  updateProperty(propertyId: string, data: { propertyName?: string; propertyAddress?: string }): Promise<PropertyResponse> {
+    return apiRequest<PropertyResponse>(`${API_ENDPOINTS.PROPERTIES.BASE}/${propertyId}`, {
+      method: "PUT",
+      body: data,
+      token: getRequiredToken(),
+    });
+  },
+
   deleteProperty(propertyId: string): Promise<void> {
     return apiRequest<void>(`${API_ENDPOINTS.PROPERTIES.BASE}/${propertyId}`, {
       method: "DELETE",
@@ -112,6 +162,13 @@ export const userService = {
 
   listApartments(): Promise<ApartmentResponse[]> {
     return apiRequest<ApartmentResponse[]>(API_ENDPOINTS.APARTMENTS.LIST, {
+      method: "GET",
+      token: getRequiredToken(),
+    });
+  },
+
+  getPropertyApartmentsGrid(propertyId: string): Promise<PropertyApartmentsGridResponse> {
+    return apiRequest<PropertyApartmentsGridResponse>(`${API_ENDPOINTS.PROPERTIES.BASE}/${propertyId}/apartments`, {
       method: "GET",
       token: getRequiredToken(),
     });
@@ -129,6 +186,37 @@ export const userService = {
     return apiRequest<ExpenseResponse>(API_ENDPOINTS.EXPENSES.CREATE, {
       method: "POST",
       body: data,
+      token: getRequiredToken(),
+    });
+  },
+
+  updateApartment(apartmentId: string, data: { rent?: number; squareMeters?: number }): Promise<ApartmentResponse> {
+    return apiRequest<ApartmentResponse>(`${API_ENDPOINTS.APARTMENTS.BASE}/${apartmentId}`, {
+      method: "PUT",
+      body: data,
+      token: getRequiredToken(),
+    });
+  },
+
+  bulkUpdateApartments(data: { apartmentIds: string[]; rent?: number; squareMeters?: number }): Promise<void> {
+    return apiRequest<void>(`${API_ENDPOINTS.APARTMENTS.BASE}/bulk`, {
+      method: "PUT",
+      body: data,
+      token: getRequiredToken(),
+    });
+  },
+
+  addSingleApartment(data: { propertyId: string; floor: number; number: number; rent: number; squareMeters: number }): Promise<ApartmentResponse> {
+    return apiRequest<ApartmentResponse>(`${API_ENDPOINTS.APARTMENTS.BASE}/single`, {
+      method: "POST",
+      body: data,
+      token: getRequiredToken(),
+    });
+  },
+
+  deleteApartment(apartmentId: string): Promise<void> {
+    return apiRequest<void>(`${API_ENDPOINTS.APARTMENTS.BASE}/${apartmentId}`, {
+      method: "DELETE",
       token: getRequiredToken(),
     });
   },
