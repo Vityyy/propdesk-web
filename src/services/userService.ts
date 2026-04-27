@@ -202,8 +202,9 @@ export const userService = {
     });
   },
 
-  listApartments(): Promise<ApartmentResponse[]> {
-    return apiRequest<ApartmentResponse[]>(API_ENDPOINTS.APARTMENTS.LIST, {
+  listApartments(ownerId?: string): Promise<ApartmentResponse[]> {
+    const url = ownerId ? `${API_ENDPOINTS.APARTMENTS.LIST}?ownerId=${ownerId}` : API_ENDPOINTS.APARTMENTS.LIST;
+    return apiRequest<ApartmentResponse[]>(url, {
       method: "GET",
       token: getRequiredToken(),
     });
@@ -241,13 +242,14 @@ export const userService = {
     return request;
   },
 
-  getOwnerApartmentsGrid(options?: { forceRefresh?: boolean }): Promise<OwnerApartmentsGridResponse> {
+  getOwnerApartmentsGrid(ownerId?: string, options?: { forceRefresh?: boolean }): Promise<OwnerApartmentsGridResponse> {
     if (options?.forceRefresh) {
       propertyApartmentsGridCache.clear();
       propertyApartmentsGridRequests.clear();
     }
 
-    return apiRequest<OwnerApartmentsGridResponse>(API_ENDPOINTS.PROPERTIES.APARTMENTS, {
+    const url = ownerId ? `${API_ENDPOINTS.PROPERTIES.APARTMENTS}?ownerId=${ownerId}` : API_ENDPOINTS.PROPERTIES.APARTMENTS;
+    return apiRequest<OwnerApartmentsGridResponse>(url, {
       method: "GET",
       token: getRequiredToken(),
     }).then((response) => {

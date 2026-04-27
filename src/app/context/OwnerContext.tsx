@@ -79,7 +79,7 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
       }
 
       const fetchedProperties = await userService.listProperties(isAdmin ? currentOwner.id : undefined);
-      const fetchedApartments = await userService.listApartments();
+      const fetchedApartments = await userService.listApartments(isAdmin ? currentOwner.id : undefined);
 
       const propertiesMapped: Property[] = fetchedProperties.map(p => {
         const unitsForProp = fetchedApartments

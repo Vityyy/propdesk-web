@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useOwner } from '../context/OwnerContext';
 import userService from '../../services/userService';
+import authService from '../../services/authService';
 import { CreatePropertyDialog } from '../components/dialogs/CreatePropertyDialog';
 import { EditPropertyDialog } from '../components/dialogs/EditPropertyDialog';
 import { PropertyDetailsDialog } from '../components/dialogs/PropertyDetailsDialog';
@@ -235,7 +236,10 @@ export function Properties() {
       }
 
       try {
-        const ownerGrid: OwnerApartmentsGridResponse = await userService.getOwnerApartmentsGrid();
+        const isAdmin = authService.getCurrentUserRole() === 'ADMIN';
+        const ownerGrid: OwnerApartmentsGridResponse = await userService.getOwnerApartmentsGrid(
+          isAdmin ? currentOwner.id : undefined
+        );
         if (cancelled) return;
 
         const metrics: Record<string, { totalUnits: number; occupiedUnits: number; monthlyRevenue: number }> = {};
@@ -256,7 +260,7 @@ export function Properties() {
     return () => {
       cancelled = true;
     };
-  }, [properties]);
+  }, [properties, currentOwner.id]);
 
   const metricsForProperty = (propertyId: string) =>
     propertyMetrics[propertyId] ?? { totalUnits: 0, occupiedUnits: 0, monthlyRevenue: 0 };

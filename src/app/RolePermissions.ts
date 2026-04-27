@@ -10,7 +10,7 @@ import {Apartments} from "./pages/Apartments.tsx";
  * Matriz de permisos: define qué roles pueden acceder a cada ruta
 */
 export const ROUTES_PERMISSIONS = {
-  summary: ['ADMIN'] as const,
+  summary: ['ADMIN', 'OWNER'] as const,
   properties: ['ADMIN', 'OWNER'] as const,
   "properties/:propertyId/apartments": ['ADMIN', 'OWNER'] as const,
   tenants: ['ADMIN'] as const,
