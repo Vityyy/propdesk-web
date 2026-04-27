@@ -1,15 +1,52 @@
+import React from "react";
 import { createBrowserRouter, redirect } from "react-router";
 import { Layout } from "./Layout";
-import { Summary } from "./pages/Summary";
-import { Properties } from "./pages/Properties";
-import { Apartments } from "./pages/Apartments";
-import { Tenants } from "./pages/Tenants";
-import { Expenses } from "./pages/Expenses";
-import { Reports } from "./pages/Reports";
-import { Settings } from "./pages/Settings";
 import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
+import { RoleProtectedRoute } from "./components/RoleProtectedRoute";
 import authService from "../services/authService";
+import { 
+  ROUTES_PERMISSIONS, 
+  ROUTES_COMPONENTS, 
+  ROUTES_FALLBACK,
+  type RouteName 
+} from "./RolePermissions";
+
+const createProtectedRoute = (
+  allowedRoles: readonly ('ADMIN' | 'OWNER')[],
+  Component: React.ComponentType,
+  fallbackPath?: string
+) => {
+  return () => React.createElement(
+    RoleProtectedRoute,
+    { allowedRoles: [...allowedRoles], fallbackPath, children: React.createElement(Component) }
+  );
+};
+
+// Generar rutas desde la configuración
+const generateRoutes = () => {
+  return (Object.entries(ROUTES_PERMISSIONS) as [RouteName, readonly ('ADMIN' | 'OWNER')[]][])
+    .map(([routeName, allowedRoles]) => {
+      const Component = ROUTES_COMPONENTS[routeName];
+      const fallbackPath = ROUTES_FALLBACK[routeName as keyof typeof ROUTES_FALLBACK];
+      
+      return {
+        path: routeName,
+        Component: createProtectedRoute(allowedRoles, Component, fallbackPath),
+      };
+    });
+};
+
+
+const homeLoader = () => {
+  const userRole = authService.getCurrentUserRole();
+  
+  if (userRole === 'ADMIN') {
+    return redirect("/summary");
+  }
+  
+  return redirect("/properties");
+};
 
 export const router = createBrowserRouter([
   {
@@ -46,13 +83,13 @@ export const router = createBrowserRouter([
     },
     Component: Layout,
     children: [
-      { index: true, Component: Summary },
-      { path: "properties", Component: Properties },
-      { path: "properties/:propertyId/apartments", Component: Apartments },
-      { path: "tenants", Component: Tenants },
-      { path: "expenses", Component: Expenses },
-      { path: "reports", Component: Reports },
-      { path: "settings", Component: Settings },
+      { 
+        index: true,
+        loader: homeLoader,
+      },
+      { path: "apartments", loader: () => redirect("/properties") },
+      // Generar todas las rutas
+      ...generateRoutes(),
     ],
   },
 ]);
