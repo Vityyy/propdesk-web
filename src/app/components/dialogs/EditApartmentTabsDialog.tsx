@@ -35,6 +35,7 @@ interface EditApartmentTabsDialogProps {
   isOpen: boolean;
   propertyId: string;
   apartment: ApartmentGridResponse;
+  initialSection?: 'data' | 'tenant' | 'expenses' | null;
   onClose: () => void;
   onSuccess?: (result?: { apartmentId: string; changes: Partial<ApartmentGridResponse> }) => void;
 }
@@ -639,6 +640,7 @@ export function EditApartmentTabsDialog({
   isOpen,
   propertyId,
   apartment,
+  initialSection = null,
   onClose,
   onSuccess,
 }: EditApartmentTabsDialogProps) {
@@ -646,8 +648,8 @@ export function EditApartmentTabsDialog({
 
   // Collapse all sections when the dialog opens (do not auto-expand the first accordion)
   useEffect(() => {
-    if (isOpen) setOpenSection(null);
-  }, [isOpen]);
+    if (isOpen) setOpenSection(initialSection);
+  }, [isOpen, initialSection]);
 
   if (!isOpen) return null;
 

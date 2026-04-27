@@ -6,11 +6,12 @@ interface EditApartmentsDialogProps {
   isOpen: boolean;
   propertyId: string;
   apartments: ApartmentGridResponse[];
+  initialSection?: 'data' | 'tenant' | 'expenses' | null;
   onClose: () => void;
   onSuccess?: (result?: { apartmentId: string; changes: Partial<ApartmentGridResponse> }) => void;
 }
 
-export function EditApartmentsDialog({ isOpen, propertyId, apartments, onClose, onSuccess }: EditApartmentsDialogProps) {
+export function EditApartmentsDialog({ isOpen, propertyId, apartments, initialSection = null, onClose, onSuccess }: EditApartmentsDialogProps) {
   const isBulk = apartments.length > 1;
 
   // Single apartment: use the new tabs dialog
@@ -20,6 +21,7 @@ export function EditApartmentsDialog({ isOpen, propertyId, apartments, onClose, 
         isOpen={isOpen}
         propertyId={propertyId}
         apartment={apartments[0]}
+        initialSection={initialSection}
         onClose={onClose}
         onSuccess={onSuccess}
       />
