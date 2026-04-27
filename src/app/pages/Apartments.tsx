@@ -44,6 +44,15 @@ function PlusIcon() {
   );
 }
 
+function CreditCardIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="5" width="20" height="14" rx="2" />
+      <line x1="2" y1="10" x2="22" y2="10" />
+    </svg>
+  );
+}
+
 export function Apartments() {
   const { propertyId } = useParams<{ propertyId: string }>();
   const navigate = useNavigate();
@@ -62,6 +71,15 @@ export function Apartments() {
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [apartmentToDelete, setApartmentToDelete] = useState<ApartmentGridResponse | null>(null);
+  const [statusUpdatingApartmentIds, setStatusUpdatingApartmentIds] = useState<Set<string>>(new Set());
+
+  const todayIso = useMemo(() => {
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }, []);
 
   const property = properties.find(p => p.id === propertyId);
 
@@ -154,6 +172,64 @@ export function Apartments() {
     setAddDialogFloor(floor);
     setAddDialogNextNumber(nextNum);
     setIsAddDialogOpen(true);
+  };
+
+  const advanceDueDateOneMonth = (dueDate: string): string => {
+    const parts = dueDate.split('-').map(Number);
+    if (parts.length !== 3 || parts.some(Number.isNaN)) {
+      return dueDate;
+    }
+
+    const [year, month, day] = parts;
+    const baseDate = new Date(year, month - 1, day);
+    if (Number.isNaN(baseDate.getTime())) {
+      return dueDate;
+    }
+
+    const nextMonthDate = new Date(year, month, 1);
+    const lastDayOfNextMonth = new Date(nextMonthDate.getFullYear(), nextMonthDate.getMonth() + 1, 0).getDate();
+    const targetDay = Math.min(day, lastDayOfNextMonth);
+    const result = new Date(nextMonthDate.getFullYear(), nextMonthDate.getMonth(), targetDay);
+
+    const resultYear = result.getFullYear();
+    const resultMonth = String(result.getMonth() + 1).padStart(2, '0');
+    const resultDay = String(result.getDate()).padStart(2, '0');
+    return `${resultYear}-${resultMonth}-${resultDay}`;
+  };
+
+  const handleTogglePaymentStatus = async (e: React.MouseEvent, apt: ApartmentGridResponse) => {
+    e.stopPropagation();
+    if (!propertyId || statusUpdatingApartmentIds.has(apt.id)) {
+      return;
+    }
+
+    const nextStatus = apt.paymentStatus === 'PAID' ? 'PENDING' : 'PAID';
+    const payload: { paymentStatus: 'PAID' | 'PENDING'; dueDate?: string } = { paymentStatus: nextStatus };
+
+    if (nextStatus === 'PAID' && apt.dueDate) {
+      payload.dueDate = advanceDueDateOneMonth(apt.dueDate);
+    }
+
+    setStatusUpdatingApartmentIds(prev => {
+      const next = new Set(prev);
+      next.add(apt.id);
+      return next;
+    });
+
+    try {
+      await userService.updateApartment(apt.id, payload);
+      userService.invalidatePropertyApartmentsGrid(propertyId);
+      fetchApartments(true);
+    } catch (error: any) {
+      console.error('Error updating payment status', error);
+      alert(error?.message || 'Failed to update apartment status');
+    } finally {
+      setStatusUpdatingApartmentIds(prev => {
+        const next = new Set(prev);
+        next.delete(apt.id);
+        return next;
+      });
+    }
   };
 
   const performDelete = async () => {
@@ -258,12 +334,14 @@ export function Apartments() {
                     const apt = floorApartmentsMap[aptNum];
                     const isVacant = !apt.tenant;
                     const isPaid = apt.paymentStatus === 'PAID';
+                    const isOverdue = !!apt.dueDate && apt.dueDate < todayIso;
                     const hasExpenses = apt.expenses && apt.expenses.length > 0;
+                    const isStatusUpdating = statusUpdatingApartmentIds.has(apt.id);
 
                     // Card background color
                     let bgClass = 'bg-gray-600/80';
                     if (!isVacant) {
-                      bgClass = isPaid ? 'bg-green-600/80' : 'bg-red-600/80';
+                      bgClass = (!isPaid || isOverdue) ? 'bg-red-600/80' : 'bg-green-600/80';
                     }
 
                     // Rent value color
@@ -296,6 +374,29 @@ export function Apartments() {
                           <div className="absolute top-3 left-3 bg-black/40 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold text-white tracking-wide">
                             APT {aptNum}
                           </div>
+
+                          {/* Quick payment status toggle */}
+                          <button
+                            onClick={(e) => handleTogglePaymentStatus(e, apt)}
+                            disabled={isStatusUpdating || isVacant}
+                            className={`absolute top-11 left-3 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold tracking-wide flex items-center gap-1 border transition-colors ${
+                              isVacant
+                                ? 'bg-white/10 border-white/20 text-white/40'
+                                : isPaid
+                                  ? 'bg-[#4ade80]/15 border-[#4ade80]/40 text-[#4ade80] hover:bg-[#4ade80]/25'
+                                  : 'bg-[#f59e0b]/15 border-[#f59e0b]/40 text-[#f59e0b] hover:bg-[#f59e0b]/25'
+                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                            title={
+                              isVacant
+                                ? 'No tenant assigned (no rent due yet)'
+                                : isPaid
+                                  ? 'Mark as unpaid (due date stays the same)'
+                                  : 'Mark as paid (due date advances one month)'
+                            }
+                          >
+                            <CreditCardIcon />
+                            <span>{isStatusUpdating ? '...' : isVacant ? 'N/A' : isPaid ? 'Paid' : 'Unpaid'}</span>
+                          </button>
                           
                           {/* Actions */}
                           <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">

@@ -267,7 +267,7 @@ export const userService = {
     });
   },
 
-  updateApartment(apartmentId: string, data: { rent?: number; squareMeters?: number }): Promise<ApartmentResponse> {
+  updateApartment(apartmentId: string, data: { rent?: number; squareMeters?: number; dueDate?: string; paymentStatus?: 'PAID' | 'PENDING' | 'OVERDUE' | string }): Promise<ApartmentResponse> {
     return apiRequest<ApartmentResponse>(`${API_ENDPOINTS.APARTMENTS.BASE}/${apartmentId}`, {
       method: "PUT",
       body: data,
