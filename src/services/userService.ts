@@ -113,6 +113,14 @@ export const userService = {
     });
   },
 
+  // Loads owners linked to the authenticated admin
+  listMyOwners(): Promise<AdminSummary[]> {
+    return apiRequest<AdminSummary[]>(API_ENDPOINTS.ADMINS.GET_MY_OWNERS, {
+      method: "GET",
+      token: getRequiredToken(),
+    });
+  },
+
   // Associates the authenticated owner with the selected admin account.
   associateAdmin(data: AssociateAdminRequest): Promise<OwnerAdminAssociationResponse> {
     return apiRequest<OwnerAdminAssociationResponse>(API_ENDPOINTS.OWNERS.ASSOCIATE_ADMIN, {
@@ -122,8 +130,12 @@ export const userService = {
     });
   },
 
-  listProperties(): Promise<PropertyResponse[]> {
-    return apiRequest<PropertyResponse[]>(API_ENDPOINTS.PROPERTIES.LIST, {
+  listProperties(ownerId?: string): Promise<PropertyResponse[]> {
+    let url: string = API_ENDPOINTS.PROPERTIES.LIST;
+    if (ownerId) {
+      url = `${url}?ownerId=${ownerId}`;
+    }
+    return apiRequest<PropertyResponse[]>(url, {
       method: "GET",
       token: getRequiredToken(),
     });
