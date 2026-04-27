@@ -2,6 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router';
 import svgPaths from "../../imports/svg-zayt9vop9f";
 import { OwnerSelector } from './OwnerSelector';
 import { useAuth } from '../context/AuthContext';
+import { useOwner } from '../context/OwnerContext';
 import authService from '../../services/authService';
 import { getAccessibleRoutes, type UserRole } from '../RolePermissions';
 
@@ -135,6 +136,7 @@ export function Sidebar({ isCollapsed, onToggle }: { isCollapsed: boolean; onTog
   const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const { currentOwner } = useOwner();
   const userRole = authService.getCurrentUserRole() as UserRole | null;
   const accessibleRoutes = userRole ? getAccessibleRoutes(userRole) : [];
 
@@ -158,6 +160,15 @@ export function Sidebar({ isCollapsed, onToggle }: { isCollapsed: boolean; onTog
       <div className="bg-black content-stretch flex h-full flex-col items-start overflow-clip py-[24px] px-[24px] relative shrink-0 w-full z-[1]" data-name="Side Panel Menu">
         <div className="flex items-center w-full mb-[16px]">
           {!isCollapsed && userRole === 'ADMIN' && <OwnerSelector />}
+          {!isCollapsed && userRole === 'OWNER' && (
+            <p
+              className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] text-[14px] text-[rgba(255,255,255,0.65)] truncate max-w-[260px]"
+              style={{ fontVariationSettings: "'wdth' 100" }}
+              title={currentOwner.name}
+            >
+              Owner: {currentOwner.name}
+            </p>
+          )}
           <button
             onClick={onToggle}
             className="ml-auto hover:bg-[rgba(255,255,255,0.05)] transition-colors p-[8px] rounded-[8px]"
