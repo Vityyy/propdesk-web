@@ -83,10 +83,10 @@ export function Apartments() {
     return flat;
   }, [gridData, sortedFloors]);
 
-  const fetchApartments = () => {
+  const fetchApartments = (forceRefresh = false) => {
     if (!propertyId) return;
     setLoading(true);
-    userService.getPropertyApartmentsGrid(propertyId)
+    userService.getPropertyApartmentsGrid(propertyId, { forceRefresh })
       .then(data => {
         setGridData(data);
         setLoading(false);
@@ -161,7 +161,10 @@ export function Apartments() {
     try {
       await userService.deleteApartment(apartmentToDelete.id);
       setSelectedApartments(new Set());
-      fetchApartments();
+      if (propertyId) {
+        userService.invalidatePropertyApartmentsGrid(propertyId);
+      }
+      fetchApartments(true);
     } catch (err: any) {
       console.error('Error deleting apartment', err);
       alert(err.message || 'Failed to delete apartment');
@@ -204,6 +207,12 @@ export function Apartments() {
             <p><strong className="font-bold">Ctrl + Click:</strong> Select multiple</p>
             <p><strong className="font-bold">Shift + Click:</strong> Select range</p>
           </div>
+          <div className="bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.12)] rounded-lg px-4 py-2.5 mt-2 max-w-4xl">
+            <p className="text-[13px] text-[rgba(255,255,255,0.75)]">
+              Use <strong className="font-semibold text-white">Edit</strong> to update apartment details, assign or edit the tenant, and manage expenses.
+              Changes go through the apartments API (<strong className="font-semibold text-white">/apartments</strong>).
+            </p>
+          </div>
         </div>
       </div>
 
@@ -244,7 +253,7 @@ export function Apartments() {
                   Floor {floorNum}
                 </h3>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-7 gap-6 auto-rows-fr">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 auto-rows-fr">
                   {sortedApartmentNumbers.map(aptNum => {
                     const apt = floorApartmentsMap[aptNum];
                     const isVacant = !apt.tenant;
@@ -278,7 +287,7 @@ export function Apartments() {
                         className={`flex flex-col rounded-xl overflow-hidden border transition-all hover:scale-[1.02] bg-[#111] cursor-pointer select-none ${isSelected ? 'border-[#928dd3] ring-2 ring-[#928dd3]/50 transform scale-[1.02]' : 'border-[rgba(255,255,255,0.1)]'}`}
                       >
                         {/* Upper half: Background color & Icon */}
-                        <div className={`relative h-[120px] flex items-center justify-center ${bgClass}`}>
+                        <div className={`relative h-[140px] flex items-center justify-center ${bgClass}`}>
                           <div className={`text-white opacity-90 drop-shadow-md ${isVacant ? 'opacity-50' : ''}`}>
                             <UserIcon />
                           </div>
@@ -313,7 +322,7 @@ export function Apartments() {
                         <div className="p-4 flex flex-col gap-3 flex-1 bg-[#1a1a1a]">
                           <div className="flex justify-between items-center border-b border-[rgba(255,255,255,0.05)] pb-2">
                             <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Tenant</span>
-                            <span className="text-sm text-white font-medium truncate max-w-[100px]" title={apt.tenant?.name || 'Vacant'}>
+                            <span className="text-sm text-white font-medium truncate max-w-[140px]" title={apt.tenant?.name || 'Vacant'}>
                               {apt.tenant ? apt.tenant.name : <span className="text-[rgba(255,255,255,0.3)] italic">Vacant</span>}
                             </span>
                           </div>
@@ -358,7 +367,7 @@ export function Apartments() {
                   {/* Add New Apartment Card */}
                   <div 
                     onClick={() => handleAddClick(floorNum, sortedApartmentNumbers.length > 0 ? sortedApartmentNumbers[sortedApartmentNumbers.length - 1] + 1 : floorNum * 100 + 1)}
-                    className="flex flex-col rounded-xl overflow-hidden border border-[#4ade80]/30 transition-all hover:scale-[1.02] bg-[#4ade80]/5 hover:bg-[#4ade80]/10 cursor-pointer min-h-[250px] items-center justify-center text-[#4ade80]"
+                    className="flex flex-col rounded-xl overflow-hidden border border-[#4ade80]/30 transition-all hover:scale-[1.02] bg-[#4ade80]/5 hover:bg-[#4ade80]/10 cursor-pointer min-h-[290px] items-center justify-center text-[#4ade80]"
                     title={`Add apartment to floor ${floorNum}`}
                   >
                     <PlusIcon />
@@ -377,7 +386,10 @@ export function Apartments() {
         onClose={() => setIsEditDialogOpen(false)}
         onSuccess={() => {
           setSelectedApartments(new Set());
-          fetchApartments();
+          if (propertyId) {
+            userService.invalidatePropertyApartmentsGrid(propertyId);
+          }
+          fetchApartments(true);
         }}
       />
 
@@ -387,7 +399,12 @@ export function Apartments() {
         floor={addDialogFloor}
         nextNumber={addDialogNextNumber}
         onClose={() => setIsAddDialogOpen(false)}
-        onSuccess={fetchApartments}
+        onSuccess={() => {
+          if (propertyId) {
+            userService.invalidatePropertyApartmentsGrid(propertyId);
+          }
+          fetchApartments(true);
+        }}
       />
 
       <ConfirmDeleteDialog
