@@ -1,7 +1,6 @@
 import { useState, useMemo } from 'react';
 import type { Unit } from '../../types/index';
 import { propertyService } from '../../../services/propertyService';
-import authService from '../../../services/authService';
 import userService, { ApartmentRangeData } from '../../../services/userService';
 import { useOwner } from '../../context/OwnerContext';
 import { parseRange, generateApartmentRanges, findOverlapError } from '../../../utils/rangeParser';
@@ -21,7 +20,7 @@ interface Rule {
 }
 
 export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePropertyDialogProps) {
-  const { refreshProperties } = useOwner();
+  const { refreshProperties, currentOwner } = useOwner();
   const [formData, setFormData] = useState({
     name: '',
     address: '',
@@ -114,16 +113,16 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
     }
 
     try {
-      const authenticatedOwnerId = authService.getCurrentUserId();
-      if (!authenticatedOwnerId) {
-        throw new Error('No authenticated owner found');
+      const targetOwnerId = currentOwner?.id;
+      if (!targetOwnerId) {
+        throw new Error('No target owner found');
       }
 
       const createdProperty = await userService.createPropertyWithRanges({
         propertyName: formData.name,
         propertyAddress: formData.address,
         pictureUrl: formData.imageUrl,
-        ownerId: authenticatedOwnerId,
+        ownerId: targetOwnerId,
         apartmentRanges: parsedRanges,
       });
 
@@ -143,7 +142,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
 
       propertyService.storeProperty({
         id: createdProperty.id || crypto.randomUUID(),
-        ownerId: authenticatedOwnerId,
+        ownerId: targetOwnerId,
         name: formData.name,
         address: formData.address,
         imageUrl: formData.imageUrl || 'https://via.placeholder.com/400x300?text=Property',

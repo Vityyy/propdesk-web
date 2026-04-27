@@ -70,7 +70,15 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
 
   const fetchBackendData = useCallback(async () => {
     try {
-      const fetchedProperties = await userService.listProperties(currentOwner.id);
+      const isAdmin = authService.getCurrentUserRole() === 'ADMIN';
+      
+      // If the user is an admin but the currentOwner hasn't been switched to a managed owner yet
+      // (it still holds the admin's session ID from initial state), skip fetching.
+      if (isAdmin && currentOwner.id === authService.getCurrentUserId()) {
+        return;
+      }
+
+      const fetchedProperties = await userService.listProperties(isAdmin ? currentOwner.id : undefined);
       const fetchedApartments = await userService.listApartments();
 
       const propertiesMapped: Property[] = fetchedProperties.map(p => {

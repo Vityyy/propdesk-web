@@ -4,6 +4,7 @@ import { Tenants } from "./pages/Tenants";
 import { Expenses } from "./pages/Expenses";
 import { Reports } from "./pages/Reports";
 import { Settings } from "./pages/Settings";
+import {Apartments} from "./pages/Apartments.tsx";
 
 /**
  * Matriz de permisos: define qué roles pueden acceder a cada ruta
@@ -11,6 +12,7 @@ import { Settings } from "./pages/Settings";
 export const ROUTES_PERMISSIONS = {
   summary: ['ADMIN'] as const,
   properties: ['ADMIN', 'OWNER'] as const,
+  "properties/:propertyId/apartments": ['ADMIN', 'OWNER'] as const,
   tenants: ['ADMIN'] as const,
   expenses: ['ADMIN'] as const,
   reports: ['ADMIN'] as const,
@@ -23,6 +25,7 @@ export const ROUTES_PERMISSIONS = {
 export const ROUTES_COMPONENTS = {
   summary: Summary,
   properties: Properties,
+  "properties/:propertyId/apartments": Apartments,
   tenants: Tenants,
   expenses: Expenses,
   reports: Reports,

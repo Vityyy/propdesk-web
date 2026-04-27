@@ -67,7 +67,7 @@ export function Apartments() {
 
   // Convert the Record<number, Record<number, ApartmentGridResponse>> to sorted arrays for rendering
   const sortedFloors = gridData 
-    ? Object.keys(gridData).map(Number).sort((a, b) => a - b)
+    ? Object.keys(gridData).map(Number).filter(n => !isNaN(n)).sort((a, b) => a - b)
     : [];
 
   const flattenedApartments = useMemo(() => {
@@ -75,9 +75,10 @@ export function Apartments() {
     const flat: ApartmentGridResponse[] = [];
     sortedFloors.forEach(floor => {
       const aptsMap = gridData[floor];
-      const sortedAptNums = Object.keys(aptsMap).map(Number).sort((a, b) => a - b);
+      if (!aptsMap) return;
+      const sortedAptNums = Object.keys(aptsMap).map(Number).filter(n => !isNaN(n)).sort((a, b) => a - b);
       sortedAptNums.forEach(num => {
-        flat.push(aptsMap[num]);
+        if (aptsMap[num]) flat.push(aptsMap[num]);
       });
     });
     return flat;
@@ -236,7 +237,8 @@ export function Apartments() {
         ) : (
           sortedFloors.map(floorNum => {
             const floorApartmentsMap = gridData![floorNum];
-            const sortedApartmentNumbers = Object.keys(floorApartmentsMap).map(Number).sort((a, b) => a - b);
+            if (!floorApartmentsMap) return null;
+            const sortedApartmentNumbers = Object.keys(floorApartmentsMap).map(Number).filter(n => !isNaN(n)).sort((a, b) => a - b);
             
             return (
               <div key={floorNum} className="flex flex-col gap-6">
