@@ -503,7 +503,7 @@ function TenantSection({
       <ConfirmDeleteDialog
         isOpen={isVacateDialogOpen}
         title="Vacate apartment"
-        description="Remove this tenant from the apartment? If the tenant has no other apartments, they will be deleted from the sys."
+        description="Remove this tenant from the apartment? If the tenant has no other apartments, they will be deleted from the system."
         confirmText="Vacate"
         cancelText="Cancel"
         onClose={() => setIsVacateDialogOpen(false)}
