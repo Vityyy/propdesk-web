@@ -86,7 +86,7 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
             .filter(a => a.propertyId === p.id)
             .map(a => ({
                id: a.id,
-               unitNumber: a.name,
+               unitNumber: String(a.number),
                type: 'Default',
                squareFeet: 0,
                rentAmount: 0,
