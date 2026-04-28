@@ -160,12 +160,8 @@ export const userService = {
     });
   },
 
-  listProperties(ownerId?: string): Promise<PropertyResponse[]> {
-    let url: string = API_ENDPOINTS.PROPERTIES.LIST;
-    if (ownerId) {
-      url = `${url}?ownerId=${ownerId}`;
-    }
-    return apiRequest<PropertyResponse[]>(url, {
+  listProperties(currentOwnerId: string): Promise<PropertyResponse[]> {
+    return apiRequest<PropertyResponse[]>(API_ENDPOINTS.PROPERTIES.LIST(currentOwnerId), {
       method: "GET",
       token: getRequiredToken(),
     });
@@ -203,8 +199,7 @@ export const userService = {
   },
 
   listApartments(ownerId?: string): Promise<ApartmentResponse[]> {
-    const url = ownerId ? `${API_ENDPOINTS.APARTMENTS.LIST}?ownerId=${ownerId}` : API_ENDPOINTS.APARTMENTS.LIST;
-    return apiRequest<ApartmentResponse[]>(url, {
+    return apiRequest<ApartmentResponse[]>(`${API_ENDPOINTS.APARTMENTS.LIST(ownerId)}`, {
       method: "GET",
       token: getRequiredToken(),
     });
