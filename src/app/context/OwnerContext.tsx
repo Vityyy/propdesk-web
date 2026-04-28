@@ -78,8 +78,8 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      const fetchedProperties = await userService.listProperties(isAdmin ? currentOwner.id : undefined);
-      const fetchedApartments = await userService.listApartments(isAdmin ? currentOwner.id : undefined);
+      const fetchedProperties = await userService.listProperties(isAdmin ? currentOwner.id : authService.getCurrentUserId() ?? undefined);
+      const fetchedApartments = await userService.listApartments(isAdmin ? currentOwner.id : authService.getCurrentUserId() ?? undefined);
 
       const propertiesMapped: Property[] = fetchedProperties.map(p => {
         const unitsForProp = fetchedApartments
@@ -111,7 +111,6 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
       setProperties(propertiesMapped);
     } catch(e) {
       console.error('Failed to load backend properties', e);
-      setProperties(propertyService.getPropertiesByOwner(currentOwner.id));
     }
   }, [currentOwner.id]);
 
