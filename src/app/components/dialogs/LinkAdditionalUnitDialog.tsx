@@ -29,7 +29,7 @@ export function LinkAdditionalUnitDialog({
     e.preventDefault();
 
     if (!propertyId || !unitId) {
-      alert('Por favor selecciona propiedad y unidad');
+      alert('Please select a property and a unit');
       return;
     }
 
@@ -37,13 +37,13 @@ export function LinkAdditionalUnitDialog({
       // Get the selected unit to obtain its rent amount
       const property = propertyService.getProperty(propertyId);
       if (!property) {
-        alert('Propiedad no encontrada');
+        alert('Property not found');
         return;
       }
 
       const unit = property.units.find(u => u.id === unitId);
       if (!unit) {
-        alert('Unidad no encontrada');
+        alert('Unit not found');
         return;
       }
 
@@ -60,7 +60,7 @@ export function LinkAdditionalUnitDialog({
       handleClose();
     } catch (error) {
       console.error('Error linking unit:', error);
-      alert('Error al vincular unidad');
+      alert('Could not link unit');
     }
   };
 
@@ -77,7 +77,7 @@ export function LinkAdditionalUnitDialog({
       <div className="bg-black border border-[rgba(255,255,255,0.16)] rounded-[16px] max-w-2xl w-full">
         <div className="p-6 border-b border-[rgba(255,255,255,0.16)] flex items-center justify-between">
           <h2 className="font-['Archivo:ExtraBold',sans-serif] font-extrabold text-[20px] text-white">
-            Vincular Unidad Adicional
+            Link additional unit
           </h2>
           <button
             onClick={handleClose}
@@ -90,7 +90,7 @@ export function LinkAdditionalUnitDialog({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
             <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
-              Propiedad *
+              Property *
             </label>
             <select
               value={propertyId}
@@ -101,7 +101,7 @@ export function LinkAdditionalUnitDialog({
               className="w-full px-4 py-2 bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.16)] rounded-[8px] text-white"
             >
               <option value="" className="bg-black">
-                Selecciona una propiedad
+                Select a property
               </option>
               {properties.map((prop) => (
                 <option key={prop.id} value={prop.id} className="bg-black">
@@ -114,7 +114,7 @@ export function LinkAdditionalUnitDialog({
           {propertyId && (
             <div>
               <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
-                Unidad Disponible *
+                Available unit *
               </label>
               <select
                 value={unitId}
@@ -122,17 +122,17 @@ export function LinkAdditionalUnitDialog({
                 className="w-full px-4 py-2 bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.16)] rounded-[8px] text-white"
               >
                 <option value="" className="bg-black">
-                  Selecciona una unidad
+                  Select a unit
                 </option>
                 {availableUnits.map((unit) => (
                   <option key={unit.id} value={unit.id} className="bg-black">
-                    Unidad {unit.unitNumber} - {unit.type} - ${unit.rentAmount.toLocaleString()}/mes
+                    Unit {unit.unitNumber} — {unit.type} — ${unit.rentAmount.toLocaleString()}/mo
                   </option>
                 ))}
               </select>
               {availableUnits.length === 0 && (
                 <p className="text-[#ff6b6b] text-sm mt-2">
-                  No hay unidades disponibles en esta propiedad
+                  No vacant units on this property
                 </p>
               )}
             </div>
@@ -143,7 +143,7 @@ export function LinkAdditionalUnitDialog({
             return selectedUnit ? (
               <div className="p-3 bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] rounded-[8px]">
                 <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
-                  Renta Mensual
+                  Monthly rent
                 </label>
                 <p className="text-white font-semibold text-lg">
                   ${selectedUnit.rentAmount.toLocaleString()}
@@ -158,14 +158,14 @@ export function LinkAdditionalUnitDialog({
               onClick={handleClose}
               className="flex-1 px-4 py-2 border border-[rgba(255,255,255,0.16)] text-white rounded-[8px] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
             >
-              Cancelar
+              Cancel
             </button>
             <button
               type="submit"
               disabled={!propertyId || !unitId}
               className="flex-1 px-4 py-2 bg-[#928dd3] text-black font-semibold rounded-[8px] hover:bg-[#a89be6] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Vincular
+              Link unit
             </button>
           </div>
         </form>

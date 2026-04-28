@@ -1,14 +1,53 @@
+import React from "react";
 import { createBrowserRouter, redirect } from "react-router";
 import { Layout } from "./Layout";
-import { Summary } from "./pages/Summary";
-import { Properties } from "./pages/Properties";
-import { Tenants } from "./pages/Tenants";
-import { Expenses } from "./pages/Expenses";
-import { Reports } from "./pages/Reports";
-import { Settings } from "./pages/Settings";
 import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
+import { SelectOwner } from "./pages/SelectOwner";
+import { RoleProtectedRoute } from "./components/RoleProtectedRoute";
 import authService from "../services/authService";
+import { 
+  ROUTES_PERMISSIONS, 
+  ROUTES_COMPONENTS, 
+  ROUTES_FALLBACK,
+  type RouteName 
+} from "./RolePermissions";
+
+const createProtectedRoute = (
+  allowedRoles: readonly ('ADMIN' | 'OWNER')[],
+  Component: React.ComponentType,
+  fallbackPath?: string
+) => {
+  return () => React.createElement(
+    RoleProtectedRoute,
+    { allowedRoles: [...allowedRoles], fallbackPath, children: React.createElement(Component) }
+  );
+};
+
+// Generar rutas desde la configuración
+const generateRoutes = () => {
+  return (Object.entries(ROUTES_PERMISSIONS) as [RouteName, readonly ('ADMIN' | 'OWNER')[]][])
+    .map(([routeName, allowedRoles]) => {
+      const Component = ROUTES_COMPONENTS[routeName];
+      const fallbackPath = ROUTES_FALLBACK[routeName as keyof typeof ROUTES_FALLBACK];
+      
+      return {
+        path: routeName,
+        Component: createProtectedRoute(allowedRoles, Component, fallbackPath),
+      };
+    });
+};
+
+
+const homeLoader = () => {
+  const userRole = authService.getCurrentUserRole();
+  
+  if (userRole === 'ADMIN') {
+    return redirect("/summary");
+  }
+  
+  return redirect("/properties");
+};
 
 export const router = createBrowserRouter([
   {
@@ -34,6 +73,23 @@ export const router = createBrowserRouter([
     Component: Register,
   },
   {
+    path: "/select-owner",
+    loader: () => {
+      if (!authService.isSessionValidB()) {
+        authService.clearToken();
+        return redirect("/login");
+      }
+
+      const isAdmin = authService.getCurrentUserRole() === 'ADMIN';
+      if (!isAdmin) {
+        return redirect("/");
+      }
+
+      return null;
+    },
+    Component: SelectOwner,
+  },
+  {
     path: "/",
     loader: () => {
       if (!authService.isSessionValidB()) {
@@ -41,17 +97,24 @@ export const router = createBrowserRouter([
         return redirect("/login");
       }
 
+      // If admin, redirect to owner selection
+      const isAdmin = authService.getCurrentUserRole() === 'ADMIN';
+      const hasSelectedOwner = sessionStorage.getItem('selectedOwnerId');
+      if (isAdmin && !hasSelectedOwner) {
+        return redirect("/select-owner");
+      }
+
       return null;
     },
     Component: Layout,
     children: [
-      { index: true, Component: Summary },
-      { path: "properties", Component: Properties },
+      { 
+        index: true,
+        loader: homeLoader,
+      },
       { path: "apartments", loader: () => redirect("/properties") },
-      { path: "tenants", Component: Tenants },
-      { path: "expenses", Component: Expenses },
-      { path: "reports", Component: Reports },
-      { path: "settings", Component: Settings },
+      // Generar todas las rutas
+      ...generateRoutes(),
     ],
   },
 ]);

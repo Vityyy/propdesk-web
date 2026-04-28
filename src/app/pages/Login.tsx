@@ -34,12 +34,12 @@ export function Login() {
     } catch (error) {
       if (error instanceof ApiError) {
         if (error.status === 401) {
-          setError("Usuario o contraseña incorrectos.");
+          setError("Incorrect username or password.");
         } else {
-          setError(`Error ${error.status}: ${error.message || "No se pudo iniciar sesion."}`);
+          setError(`Error ${error.status}: ${error.message || "Could not sign in."}`);
         }
       } else {
-        setError("Ha ocurrido un error. Intenta nuevamente.");
+        setError("Something went wrong. Please try again.");
       }
     } finally {
       setIsSubmitting(false);
@@ -55,14 +55,14 @@ export function Login() {
               Login
             </p>
             <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] text-[15px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
-              Inicia sesion para acceder a tu panel.
+              Sign in to open your dashboard.
             </p>
           </div>
 
           <form className="flex flex-col gap-[14px]" onSubmit={onSubmit}>
             <label className="flex flex-col gap-[8px]" htmlFor="login-name">
               <span className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
-                Nombre
+                Username
               </span>
               <input
                 id="login-name"
@@ -70,14 +70,14 @@ export function Login() {
                 autoComplete="username"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                placeholder="Ingresa tu nombre"
+                placeholder="Enter your username"
                 className="h-[44px] rounded-[8px] border border-white bg-black px-[12px] text-white placeholder:text-[rgba(255,255,255,0.45)] outline-none focus:border-[#928dd3]"
               />
             </label>
 
             <label className="flex flex-col gap-[8px]" htmlFor="login-password">
               <span className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
-                Contraseña
+                Password
               </span>
               <div className="relative">
                 <input
@@ -86,7 +86,7 @@ export function Login() {
                   autoComplete="current-password"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
-                  placeholder="Ingresa tu contraseña"
+                  placeholder="Enter your password"
                   className="h-[44px] w-full rounded-[8px] border border-white bg-black px-[12px] pr-[90px] text-white placeholder:text-[rgba(255,255,255,0.45)] outline-none focus:border-[#928dd3]"
                 />
                 <button
@@ -94,7 +94,7 @@ export function Login() {
                   onClick={() => setShowPassword((current) => !current)}
                   className="absolute right-[10px] top-1/2 -translate-y-1/2 text-[13px] text-[#928dd3] hover:underline"
                 >
-                  {showPassword ? "Ocultar" : "Mostrar"}
+                  {showPassword ? "Hide" : "Show"}
                 </button>
               </div>
             </label>
@@ -111,13 +111,13 @@ export function Login() {
               className="mt-[4px] h-[44px] rounded-[8px] bg-[#928dd3] font-['Archivo:SemiBold',sans-serif] font-semibold text-[15px] leading-[20px] text-black transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
               style={{ fontVariationSettings: "'wdth' 100" }}
             >
-              {isSubmitting ? "Ingresando..." : "Ingresar"}
+              {isSubmitting ? "Signing in…" : "Sign in"}
             </button>
 
             <p className="text-center text-[13px] text-[rgba(255,255,255,0.6)]">
-              ¿No tienes cuenta?{" "}
+              Don&apos;t have an account?{" "}
               <Link to="/register" className="text-[#928dd3] hover:underline">
-                Regístrate aquí
+                Register here
               </Link>
             </p>
           </form>

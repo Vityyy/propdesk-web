@@ -1,13 +1,15 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { useOwner } from '../context/OwnerContext';
-import { propertyService } from '../../services/propertyService';
 import userService from '../../services/userService';
+import authService from '../../services/authService';
 import { CreatePropertyDialog } from '../components/dialogs/CreatePropertyDialog';
 import { EditPropertyDialog } from '../components/dialogs/EditPropertyDialog';
 import { PropertyDetailsDialog } from '../components/dialogs/PropertyDetailsDialog';
 import svgPaths from "../../imports/svg-zayt9vop9f";
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import type { Property } from '../types/index';
+import type { OwnerApartmentsGridResponse, PropertyApartmentsGridResponse } from '../../services/userService';
 
 function DotsHorizontal() {
   return (
@@ -23,30 +25,40 @@ function DotsHorizontal() {
 
 interface PropertyCardProps {
   property: Property;
+  totalUnits: number;
+  occupiedUnits: number;
+  monthlyRevenue: number;
   onDelete?: (id: string) => void;
   onEdit?: (property: Property) => void;
   onViewDetails?: (property: Property) => void;
+  onViewApartments?: (property: Property) => void;
 }
 
-function PropertyCard({ property, onDelete, onEdit, onViewDetails }: PropertyCardProps) {
+function PropertyCard({
+  property,
+  totalUnits,
+  occupiedUnits,
+  monthlyRevenue,
+  onDelete,
+  onEdit,
+  onViewDetails,
+  onViewApartments,
+}: PropertyCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
-  const occupancyPercentage = property.totalUnits > 0 
-    ? Math.round((property.occupiedUnits / property.totalUnits) * 100) 
+  const occupancyPercentage = totalUnits > 0
+    ? Math.round((occupiedUnits / totalUnits) * 100)
     : 0;
-
-  const totalMonthlyRevenue = property.units
-    .filter(u => u.status === 'occupied')
-    .reduce((sum, u) => sum + u.rentAmount, 0);
 
   return (
     <div 
-      className="bg-black relative rounded-[16px] overflow-hidden group"
+      className="bg-black relative rounded-[16px] group cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={() => onViewApartments?.(property)}
     >
-      <div className="relative w-full h-[200px] overflow-hidden">
+      <div className="relative w-full h-[200px] overflow-hidden rounded-t-[16px]">
         <ImageWithFallback 
           src={property.imageUrl}
           alt={property.name}
@@ -67,7 +79,10 @@ function PropertyCard({ property, onDelete, onEdit, onViewDetails }: PropertyCar
           </div>
           <div className="relative">
             <button 
-              onClick={() => setShowMenu(!showMenu)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowMenu(!showMenu);
+              }}
               className="hover:opacity-70 transition-opacity p-[4px]"
             >
               <DotsHorizontal />
@@ -77,41 +92,59 @@ function PropertyCard({ property, onDelete, onEdit, onViewDetails }: PropertyCar
               <>
                 <div 
                   className="fixed inset-0 z-[10]" 
-                  onClick={() => setShowMenu(false)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowMenu(false);
+                  }}
                 />
                 <div className="absolute top-[calc(100%+8px)] right-0 bg-black border border-[rgba(255,255,255,0.16)] rounded-[8px] min-w-[200px] z-[11] overflow-hidden">
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setShowMenu(false);
                       onEdit?.(property);
                     }}
                     className="w-full text-left px-[16px] py-[12px] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
                   >
                     <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
-                      Editar Propiedad
+                      Edit Property
                     </p>
                   </button>
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setShowMenu(false);
                       onViewDetails?.(property);
                     }}
                     className="w-full text-left px-[16px] py-[12px] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
                   >
                     <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
-                      Ver Detalles
+                      View Details
+                    </p>
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowMenu(false);
+                      onViewApartments?.(property);
+                    }}
+                    className="w-full text-left px-[16px] py-[12px] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
+                  >
+                    <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
+                      View Apartments
                     </p>
                   </button>
                   <div className="border-t border-[rgba(255,255,255,0.16)]" />
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setShowMenu(false);
                       onDelete?.(property.id);
                     }}
                     className="w-full text-left px-[16px] py-[12px] hover:bg-[rgba(255,0,0,0.1)] transition-colors"
                   >
                     <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-[#ff6b6b]" style={{ fontVariationSettings: "'wdth' 100" }}>
-                      Eliminar Propiedad
+                      Delete Property
                     </p>
                   </button>
                 </div>
@@ -125,7 +158,7 @@ function PropertyCard({ property, onDelete, onEdit, onViewDetails }: PropertyCar
             Monthly Revenue
           </p>
           <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] text-[24px] text-[#928dd3] tracking-[-0.24px]">
-            ${totalMonthlyRevenue.toLocaleString()}
+            ${monthlyRevenue.toLocaleString()}
           </p>
         </div>
 
@@ -138,7 +171,7 @@ function PropertyCard({ property, onDelete, onEdit, onViewDetails }: PropertyCar
                   Units
                 </p>
                 <p className="font-['Chivo:Black',sans-serif] font-black leading-[24px] text-[20px] text-white tracking-[-0.2px]">
-                  {property.totalUnits}
+                  {totalUnits}
                 </p>
               </div>
               <div>
@@ -160,19 +193,86 @@ function PropertyCard({ property, onDelete, onEdit, onViewDetails }: PropertyCar
 }
 
 export function Properties() {
+  const navigate = useNavigate();
   const { currentOwner, properties, refreshProperties } = useOwner();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
   const [viewingProperty, setViewingProperty] = useState<Property | null>(null);
+  const [propertyMetrics, setPropertyMetrics] = useState<Record<string, { totalUnits: number; occupiedUnits: number; monthlyRevenue: number }>>({});
+
+  const buildMetricsFromGrid = (grid: PropertyApartmentsGridResponse) => {
+    let totalUnits = 0;
+    let occupiedUnits = 0;
+    let paidRentTotal = 0;
+    let expensesTotal = 0;
+
+    Object.values(grid).forEach((apartmentsByNumber) => {
+      Object.values(apartmentsByNumber).forEach((apartment) => {
+        totalUnits += 1;
+        if (apartment.tenant) {
+          occupiedUnits += 1;
+        }
+        if (apartment.paymentStatus === 'PAID') {
+          paidRentTotal += apartment.rent || 0;
+        }
+        expensesTotal += (apartment.expenses || []).reduce((sum, expense) => sum + (expense.amount || 0), 0);
+      });
+    });
+
+    return {
+      totalUnits,
+      occupiedUnits,
+      monthlyRevenue: paidRentTotal - expensesTotal,
+    };
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchPropertyMetrics = async () => {
+      if (properties.length === 0) {
+        setPropertyMetrics({});
+        return;
+      }
+
+      try {
+        const isAdmin = authService.getCurrentUserRole() === 'ADMIN';
+        const ownerGrid: OwnerApartmentsGridResponse = await userService.getOwnerApartmentsGrid(
+          isAdmin ? currentOwner.id : undefined
+        );
+        if (cancelled) return;
+
+        const metrics: Record<string, { totalUnits: number; occupiedUnits: number; monthlyRevenue: number }> = {};
+        properties.forEach((property) => {
+          const grid = ownerGrid[property.id];
+          metrics[property.id] = grid
+            ? buildMetricsFromGrid(grid)
+            : { totalUnits: 0, occupiedUnits: 0, monthlyRevenue: 0 };
+        });
+
+        setPropertyMetrics(metrics);
+      } catch (error) {
+        console.error('Error calculating property metrics', error);
+      }
+    };
+
+    fetchPropertyMetrics();
+    return () => {
+      cancelled = true;
+    };
+  }, [properties, currentOwner.id]);
+
+  const metricsForProperty = (propertyId: string) =>
+    propertyMetrics[propertyId] ?? { totalUnits: 0, occupiedUnits: 0, monthlyRevenue: 0 };
 
   const handleDeleteProperty = async (propertyId: string) => {
-    if (confirm('¿Estás seguro de que deseas eliminar esta propiedad?')) {
+    if (confirm('Are you sure you want to delete this property?')) {
       try {
         await userService.deleteProperty(propertyId);
         refreshProperties();
       } catch (e) {
-        console.error("Error al eliminar la propiedad", e);
-        alert('Hubo un error eliminando la propiedad.');
+        console.error("Error deleting property", e);
+        alert('There was an error deleting the property.');
       }
     }
   };
@@ -211,24 +311,31 @@ export function Properties() {
       <div className="grid grid-cols-3 gap-[24px] px-[48px] pb-[48px]">
         {properties.length === 0 ? (
           <div className="col-span-3 text-center py-12">
-            <p className="text-[rgba(255,255,255,0.6)] mb-4">No hay propiedades creadas aún</p>
+            <p className="text-[rgba(255,255,255,0.6)] mb-4">No properties created yet</p>
             <button 
               onClick={() => setShowCreateDialog(true)}
               className="text-[#928dd3] hover:text-[#a89be6] transition-colors"
             >
-              Crear la primera propiedad →
+              Create your first property →
             </button>
           </div>
         ) : (
-          properties.map((property) => (
-            <PropertyCard 
-              key={property.id} 
-              property={property}
-              onDelete={handleDeleteProperty}
-              onEdit={handleEditProperty}
-              onViewDetails={handleViewDetails}
-            />
-          ))
+          properties.map((property) => {
+            const metrics = metricsForProperty(property.id);
+            return (
+              <PropertyCard
+                key={property.id}
+                property={property}
+                totalUnits={metrics.totalUnits}
+                occupiedUnits={metrics.occupiedUnits}
+                monthlyRevenue={metrics.monthlyRevenue}
+                onDelete={handleDeleteProperty}
+                onEdit={handleEditProperty}
+                onViewDetails={handleViewDetails}
+                onViewApartments={(p) => navigate(`/properties/${p.id}/apartments`)}
+              />
+            );
+          })
         )}
       </div>
 
@@ -252,6 +359,7 @@ export function Properties() {
       <PropertyDetailsDialog
         isOpen={!!viewingProperty}
         property={viewingProperty}
+        metrics={viewingProperty ? metricsForProperty(viewingProperty.id) : undefined}
         onClose={() => setViewingProperty(null)}
       />
     </div>

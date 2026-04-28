@@ -136,7 +136,7 @@ export function Settings() {
         setSelectedAdminId((currentAdminId) => currentAdminId || availableAdmins[0]?.id || '');
       } catch (error) {
         if (!ignore) {
-          setAssociationError(error instanceof ApiError ? error.message : 'No se pudieron cargar los administradores');
+          setAssociationError(error instanceof ApiError ? error.message : 'Could not load admins');
         }
       }
     };
@@ -164,9 +164,9 @@ export function Settings() {
         adminCut: adminCut.trim() ? Number(adminCut) : undefined,
       });
 
-      setAssociationMessage(`Ahora ${response.adminName} administra tus propiedades con tu permiso.`);
+      setAssociationMessage(`${response.adminName} is now authorized to manage your properties on your behalf.`);
     } catch (error) {
-      setAssociationError(error instanceof ApiError ? error.message : 'No se pudo asociar el administrador');
+      setAssociationError(error instanceof ApiError ? error.message : 'Could not associate admin');
     } finally {
       setIsAssociatingAdmin(false);
     }

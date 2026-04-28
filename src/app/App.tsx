@@ -9,7 +9,7 @@ function AppRouter() {
   if (isBootstrapping) {
     return (
       <div className="bg-black flex h-screen w-screen items-center justify-center">
-        <p className="font-['Archivo:SemiBold',sans-serif] text-[15px] text-white">Cargando sesion...</p>
+        <p className="font-['Archivo:SemiBold',sans-serif] text-[15px] text-white">Loading session…</p>
       </div>
     );
   }
