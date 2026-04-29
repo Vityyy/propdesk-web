@@ -30,6 +30,17 @@ export interface AdminSummary {
   name: string;
 }
 
+export interface OwnerSummary {
+  id: string;
+  name: string;
+}
+
+export interface OwnerAssociationRequestSummary {
+  ownerId: string;
+  ownerName: string;
+  adminCut: number | null;
+}
+
 export interface PropertyResponse {
   id: string;
   name: string;
@@ -48,6 +59,7 @@ export interface OwnerAdminAssociationResponse {
   adminId: string;
   adminName: string;
   adminCut: number | null;
+  associationAccepted: boolean;
 }
 
 export interface ApartmentCreateRequest {
@@ -144,8 +156,16 @@ export const userService = {
   },
 
   // Loads owners linked to the authenticated admin
-  listMyOwners(): Promise<AdminSummary[]> {
-    return apiRequest<AdminSummary[]>(API_ENDPOINTS.ADMINS.GET_MY_OWNERS, {
+  listMyOwners(): Promise<OwnerSummary[]> {
+    return apiRequest<OwnerSummary[]>(API_ENDPOINTS.ADMINS.GET_MY_OWNERS, {
+      method: "GET",
+      token: getRequiredToken(),
+    });
+  },
+
+  // Loads pending owner requests sent to the authenticated admin.
+  listPendingOwnerRequests(): Promise<OwnerAssociationRequestSummary[]> {
+    return apiRequest<OwnerAssociationRequestSummary[]>(API_ENDPOINTS.ADMINS.GET_PENDING_OWNER_REQUESTS, {
       method: "GET",
       token: getRequiredToken(),
     });
@@ -156,6 +176,22 @@ export const userService = {
     return apiRequest<OwnerAdminAssociationResponse>(API_ENDPOINTS.OWNERS.ASSOCIATE_ADMIN, {
       method: "POST",
       body: data,
+      token: getRequiredToken(),
+    });
+  },
+
+  getAssociatedAdmin(): Promise<OwnerAdminAssociationResponse | null> {
+    return apiRequest<OwnerAdminAssociationResponse | null>(API_ENDPOINTS.OWNERS.GET_ASSOCIATED_ADMIN, {
+      method: "GET",
+      token: getRequiredToken(),
+      allowNoContent: true,
+    });
+  },
+
+  // Accepts a pending owner request for the authenticated admin.
+  acceptOwnerRequest(ownerId: string): Promise<OwnerAdminAssociationResponse> {
+    return apiRequest<OwnerAdminAssociationResponse>(API_ENDPOINTS.ADMINS.ACCEPT_OWNER_REQUEST(ownerId), {
+      method: "POST",
       token: getRequiredToken(),
     });
   },
