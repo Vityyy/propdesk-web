@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, useCallback, type ReactNode } from 'react';
 import type { Property, Tenant, Unit } from '../types/index';
-import { propertyService } from '../../services/propertyService';
 import { tenantService } from '../../services/tenantService';
 import authService from '../../services/authService';
 import { userService } from '../../services/userService';
