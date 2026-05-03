@@ -138,7 +138,7 @@ export function Summary() {
           trend={`Due: ${formatCurrency(summary.unpaidAmount)}`}
         />
         <MetricCard 
-          title="Total Expense Payments" 
+          title="Expenses & Maintenance Fees" 
           value={formatCurrency(summary.totalExpensesThisMonth)} 
           subtitle={summary.expensesTrend}
         />
@@ -204,7 +204,7 @@ export function Summary() {
             <div className="overflow-clip rounded-[inherit] size-full">
               <div className="content-stretch flex flex-col gap-[8px] items-start p-[24px] relative w-full">
                 <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
-                  Total Expenses
+                  Expenses & Fees
                 </p>
                 <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] text-[24px] text-white tracking-[-0.24px]">
                   {formatCurrency(summary.monthlyBreakdown.totalExpenses)}
