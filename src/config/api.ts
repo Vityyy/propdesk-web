@@ -33,6 +33,8 @@ export const API_ENDPOINTS = {
     TENANT: (aptId: string) => `${API_BASE_URL}/apartments/${aptId}/tenant`,
     EXPENSES: (aptId: string) => `${API_BASE_URL}/apartments/${aptId}/expenses`,
     EXPENSE: (aptId: string, expId: string) => `${API_BASE_URL}/apartments/${aptId}/expenses/${expId}`,
+    MAINTENANCE_FEES: (aptId: string) => `${API_BASE_URL}/apartments/${aptId}/maintenance-fees`,
+    MAINTENANCE_FEE: (aptId: string, feeId: string) => `${API_BASE_URL}/apartments/${aptId}/maintenance-fees/${feeId}`,
   },
   EXPENSES: {
     CREATE: `${API_BASE_URL}/expenses`,
