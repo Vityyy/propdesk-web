@@ -167,7 +167,7 @@ export function Summary() {
                     <Tooltip 
                       contentStyle={{ backgroundColor: '#000', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '8px' }}
                       itemStyle={{ color: '#fff' }}
-                      formatter={(value: number) => [formatCurrency(value), '']}
+                      formatter={(value: any) => [formatCurrency(value as number), '']}
                     />
                     <Legend wrapperStyle={{ paddingTop: '20px' }} />
                     <Line type="monotone" name="Total Revenue" dataKey="revenue" stroke="#928dd3" strokeWidth={3} dot={{ r: 4, fill: '#928dd3' }} activeDot={{ r: 6 }} />
