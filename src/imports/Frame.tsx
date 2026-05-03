@@ -216,7 +216,7 @@ function MenuItem3() {
         <div className="content-stretch flex gap-[16px] items-center px-[16px] py-[8px] relative w-full">
           <Tools />
           <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] relative shrink-0 text-[15px] text-white whitespace-nowrap" style={{ fontVariationSettings: "'wdth' 100" }}>
-            Expenses
+            Maintenance Fees
           </p>
         </div>
       </div>
@@ -548,7 +548,7 @@ function TabItem2() {
   return (
     <div className="content-stretch flex items-center justify-center px-[24px] py-[12px] relative shrink-0" data-name="tabItem3?">
       <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] relative shrink-0 text-[15px] text-[rgba(255,255,255,0.6)] whitespace-nowrap" style={{ fontVariationSettings: "'wdth' 100" }}>
-        Expenses
+        Maintenance Fees
       </p>
     </div>
   );
