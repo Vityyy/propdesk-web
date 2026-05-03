@@ -90,6 +90,21 @@ export interface ApartmentExpenseRequest {
   description: string;
 }
 
+// ─── Maintenance Fee ─────────────────────────────────────────────────────────
+
+export interface MaintenanceFeeResponse {
+  id: string;
+  category: string;
+  description: string;
+  amount: number;
+}
+
+export interface MaintenanceFeeRequest {
+  category: string;
+  description: string;
+  amount: number;
+}
+
 // ─── Apartment grid ──────────────────────────────────────────────────────────
 
 export interface ApartmentGridResponse {
@@ -101,6 +116,7 @@ export interface ApartmentGridResponse {
   rent: number;
   tenant: TenantGridResponse | null;
   expenses: ApartmentExpenseResponse[];
+  maintenanceFees: MaintenanceFeeResponse[];
 }
 
 export type PropertyApartmentsGridResponse = Record<number, Record<number, ApartmentGridResponse>>;
@@ -351,6 +367,30 @@ export const userService = {
 
   deleteExpense(apartmentId: string, expenseId: string): Promise<void> {
     return apiRequest<void>(API_ENDPOINTS.APARTMENTS.EXPENSE(apartmentId, expenseId), {
+      method: "DELETE",
+      token: getRequiredToken(),
+    });
+  },
+
+  // ─── Maintenance Fee management ──────────────────────────────────────────
+
+  getMaintenanceFees(apartmentId: string): Promise<MaintenanceFeeResponse[]> {
+    return apiRequest<MaintenanceFeeResponse[]>(API_ENDPOINTS.APARTMENTS.MAINTENANCE_FEES(apartmentId), {
+      method: "GET",
+      token: getRequiredToken(),
+    });
+  },
+
+  addMaintenanceFee(apartmentId: string, data: MaintenanceFeeRequest): Promise<MaintenanceFeeResponse> {
+    return apiRequest<MaintenanceFeeResponse>(API_ENDPOINTS.APARTMENTS.MAINTENANCE_FEES(apartmentId), {
+      method: "POST",
+      body: data,
+      token: getRequiredToken(),
+    });
+  },
+
+  deleteMaintenanceFee(apartmentId: string, feeId: string): Promise<void> {
+    return apiRequest<void>(API_ENDPOINTS.APARTMENTS.MAINTENANCE_FEE(apartmentId, feeId), {
       method: "DELETE",
       token: getRequiredToken(),
     });
