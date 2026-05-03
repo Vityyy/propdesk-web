@@ -218,7 +218,7 @@ export function Summary() {
             <div className="overflow-clip rounded-[inherit] size-full">
               <div className="content-stretch flex flex-col gap-[8px] items-start p-[24px] relative w-full">
                 <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
-                  Admin Commission ({currentOwner?.adminCut ? currentOwner.adminCut + '%' : '0%'})
+                  Admin Commission {summary.monthlyBreakdown.grossRevenue > 0 ? `(${Math.round((summary.monthlyBreakdown.adminCommission / summary.monthlyBreakdown.grossRevenue) * 100)}%)` : ''}
                 </p>
                 <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] text-[24px] text-white tracking-[-0.24px]">
                   {formatCurrency(summary.monthlyBreakdown.adminCommission)}
