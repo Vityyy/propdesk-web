@@ -199,7 +199,7 @@ export const userService = {
   },
 
   listApartments(ownerId?: string): Promise<ApartmentResponse[]> {
-    return apiRequest<ApartmentResponse[]>(`${API_ENDPOINTS.APARTMENTS.LIST(ownerId)}`, {
+    return apiRequest<ApartmentResponse[]>(`${API_ENDPOINTS.APARTMENTS.LIST(ownerId ?? '')}`, {
       method: "GET",
       token: getRequiredToken(),
     });
