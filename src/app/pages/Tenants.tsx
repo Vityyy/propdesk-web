@@ -3,7 +3,7 @@ import { useOwner } from '../context/OwnerContext';
 import type { Tenant } from '../types/index';
 import { EditTenantDialog } from '../components/dialogs/EditTenantDialog';
 import { TenantDetailsDialog } from '../components/dialogs/TenantDetailsDialog';
-import userService from '../../services/userService';
+import userService, { type ApartmentGridResponse } from '../../services/userService';
 
 function EditIcon() {
   return (
@@ -28,11 +28,33 @@ interface TenantRowProps {
   tenant: string;
   email: string;
   phone: string;
+  paymentStatus: 'PAID' | 'PENDING' | 'UNKNOWN';
   onEdit?: () => void;
   onClick?: () => void;
 }
 
-function TenantRow({ id, tenant, email, phone, onEdit, onClick }: TenantRowProps) {
+function TenantRow({ tenant, email, phone, paymentStatus, onEdit, onClick }: TenantRowProps) {
+  const displayEmail = email && email.trim() ? email : '-';
+  const displayPhone = phone && phone.trim() ? phone : '-';
+
+  // Badge color and text based on payment status
+  let badgeColor = '#928dd3'; // default (UNKNOWN)
+  let badgeText = 'No Data';
+  let badgeBg = 'bg-[#928dd3]/15';
+  let badgeBorder = 'border-[#928dd3]/40';
+
+  if (paymentStatus === 'PAID') {
+    badgeColor = '#4ade80';
+    badgeText = 'Al día';
+    badgeBg = 'bg-[#4ade80]/15';
+    badgeBorder = 'border-[#4ade80]/40';
+  } else if (paymentStatus === 'PENDING') {
+    badgeColor = '#f59e0b';
+    badgeText = 'Pendiente';
+    badgeBg = 'bg-[#f59e0b]/15';
+    badgeBorder = 'border-[#f59e0b]/40';
+  }
+
   return (
     <div 
       className="content-stretch flex items-center justify-between py-[16px] px-[24px] relative shrink-0 w-full border-b border-[rgba(255,255,255,0.16)] hover:bg-[rgba(255,255,255,0.03)] transition-colors cursor-pointer"
@@ -46,16 +68,25 @@ function TenantRow({ id, tenant, email, phone, onEdit, onClick }: TenantRowProps
       
       <div className="flex-1 min-w-0 px-[24px]">
         <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)] truncate" style={{ fontVariationSettings: "'wdth' 100" }}>
-          {email}
+          {displayEmail}
         </p>
       </div>
       
-      <div className="flex-1 min-w-0 px-[24px]">
+      <div className="flex-1 min-w-0 px-[24px] text-center">
         <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)] truncate" style={{ fontVariationSettings: "'wdth' 100" }}>
-          {phone}
+          {displayPhone}
         </p>
       </div>
-      
+
+      <div className="flex-shrink-0 mr-4">
+        <span
+          className={`px-3 py-1 rounded-full text-xs font-semibold border ${badgeBg} ${badgeBorder}`}
+          style={{ color: badgeColor }}
+        >
+          {badgeText}
+        </span>
+      </div>
+
       <div className="flex items-center gap-3 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
         <button 
           onClick={onEdit}
@@ -91,31 +122,51 @@ function SummaryCard({ title, value, subtitle }: { title: string; value: string;
 }
 
 export function Tenants() {
-  const { currentOwner, tenants, properties, refreshTenants, refreshProperties } = useOwner();
+  const { currentOwner, tenants, properties, refreshTenants } = useOwner();
   const [editingTenant, setEditingTenant] = useState<Tenant | null>(null);
   const [detailsTenant, setDetailsTenant] = useState<Tenant | null>(null);
   const [occupancyRate, setOccupancyRate] = useState(0);
   const [occupiedApartments, setOccupiedApartments] = useState(0);
   const [totalApartments, setTotalApartments] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
-  
+  const [tenantPaymentStatus, setTenantPaymentStatus] = useState<Record<string, 'PAID' | 'PENDING' | 'UNKNOWN'>>({});
+
   useEffect(() => {
     refreshTenants();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
   useEffect(() => {
     const calculateOccupancy = async () => {
       let totalApartments = 0;
       let occupiedApartments = 0;
-      
+      const paymentStatusMap: Record<string, 'PAID' | 'PENDING' | 'UNKNOWN'> = {};
+
+      // Initialize all tenants as UNKNOWN
+      tenants.forEach(tenant => {
+        paymentStatusMap[tenant.id] = 'UNKNOWN';
+      });
+
       for (const property of properties) {
         try {
           const gridData = await userService.getPropertyApartmentsGrid(property.id);
           Object.values(gridData).forEach(floorApts => {
-            Object.values(floorApts).forEach((apt: any) => {
+            Object.values(floorApts).forEach((apt: ApartmentGridResponse) => {
               totalApartments++;
               if (apt.tenant) {
                 occupiedApartments++;
+
+                // Track payment status for this tenant across all apartments
+                const tenantId = apt.tenant.id;
+                if (tenantId && Object.prototype.hasOwnProperty.call(paymentStatusMap, tenantId)) {
+                  // If we haven't seen this tenant yet, initialize based on first apartment
+                  if (paymentStatusMap[tenantId] === 'UNKNOWN') {
+                    paymentStatusMap[tenantId] = apt.paymentStatus === 'PAID' ? 'PAID' : 'PENDING';
+                  } else if (paymentStatusMap[tenantId] === 'PAID' && apt.paymentStatus !== 'PAID') {
+                    // If tenant was PAID but this apartment is not, change to PENDING
+                    paymentStatusMap[tenantId] = 'PENDING';
+                  }
+                }
               }
             });
           });
@@ -128,12 +179,13 @@ export function Tenants() {
       setOccupancyRate(rate);
       setTotalApartments(totalApartments);
       setOccupiedApartments(occupiedApartments);
+      setTenantPaymentStatus(paymentStatusMap);
     };
     
     if (properties.length > 0) {
       calculateOccupancy();
     }
-  }, [properties]);
+  }, [properties, tenants]);
 
   const getTenantRows = () => {
     return tenants
@@ -146,6 +198,7 @@ export function Tenants() {
         tenant: tenant.name,
         email: tenant.email,
         phone: tenant.phone,
+        paymentStatus: tenantPaymentStatus[tenant.id] || 'UNKNOWN',
       }));
   };
 
@@ -201,34 +254,41 @@ export function Tenants() {
       <div className="bg-black mx-[48px] mb-[48px] rounded-[16px] relative">
         <div aria-hidden="true" className="absolute border border-solid border-white inset-0 pointer-events-none rounded-[16px]" />
         <div className="overflow-visible rounded-[inherit] size-full">
-          <div className="content-stretch flex items-center justify-between py-[16px] px-[24px] relative shrink-0 w-full border-b border-[rgba(255,255,255,0.16)]">
-            <p className="flex-1 font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
-              Name
-            </p>
-            <p className="flex-1 px-[24px] font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
-              Email
-            </p>
-            <p className="flex-1 px-[24px] font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
-              Phone
-            </p>
-            <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white flex-shrink-0" style={{ fontVariationSettings: "'wdth' 100" }}>
-              Actions
-            </p>
-          </div>
-          {tenantRows.length === 0 ? (
-            <div className="py-8 px-4 text-center text-[rgba(255,255,255,0.6)]">
-              No tenants yet. Create one to get started!
-            </div>
-          ) : (
-            tenantRows.map((row) => (
-              <TenantRow
-                key={row.id}
-                {...row}
-                onEdit={() => handleEditTenant(row.id)}
-                onClick={() => handleViewTenantDetails(row.id)}
-              />
-            ))
-          )}
+           <div className="content-stretch flex items-center justify-between py-[16px] px-[24px] relative shrink-0 w-full border-b border-[rgba(255,255,255,0.16)]">
+             <p className="flex-1 font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
+               Name
+             </p>
+             <p className="flex-1 px-[24px] font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
+               Email
+             </p>
+             <p className="flex-1 px-[24px] text-center font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
+               Phone
+             </p>
+             <p className="flex-shrink-0 mr-4 font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
+               Status
+             </p>
+             <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white flex-shrink-0" style={{ fontVariationSettings: "'wdth' 100" }}>
+               Actions
+             </p>
+           </div>
+           {tenantRows.length === 0 ? (
+             <div className="py-8 px-4 text-center text-[rgba(255,255,255,0.6)]">
+               No tenants yet. Create one to get started!
+             </div>
+           ) : (
+             tenantRows.map((row) => (
+               <TenantRow
+                 key={row.id}
+                 id={row.id}
+                 tenant={row.tenant}
+                 email={row.email}
+                 phone={row.phone}
+                 paymentStatus={row.paymentStatus}
+                 onEdit={() => handleEditTenant(row.id)}
+                 onClick={() => handleViewTenantDetails(row.id)}
+               />
+             ))
+           )}
         </div>
       </div>
 
