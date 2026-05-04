@@ -74,8 +74,8 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      const fetchedProperties = await userService.listProperties(isAdmin ? currentOwner.id : authService.getCurrentUserId() ?? undefined);
-      const fetchedApartments = await userService.listApartments(isAdmin ? currentOwner.id : authService.getCurrentUserId() ?? undefined);
+      const fetchedProperties = await userService.listProperties(isAdmin ? currentOwner.id : authService.getCurrentUserId() ?? '');
+      const fetchedApartments = await userService.listApartments(isAdmin ? currentOwner.id : authService.getCurrentUserId() ?? '');
 
       const propertiesMapped: Property[] = fetchedProperties.map(p => {
         const unitsForProp = fetchedApartments
@@ -143,6 +143,7 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
     
     const isAdmin = authService.getCurrentUserRole() === 'ADMIN';
     if (isAdmin) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       loadAdminOwners();
     } else {
       const sessionOwner = buildSessionOwner();
@@ -152,6 +153,7 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
   }, [isAuthenticated]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchBackendData();
   }, [currentOwner.id, fetchBackendData]);
 

@@ -1,6 +1,17 @@
+import { useEffect, useState } from 'react';
 import { useOwner } from '../context/OwnerContext';
+import { summaryService, SummaryResponse } from '../../services/summaryService';
 import svgPaths from "../../imports/svg-zayt9vop9f";
-import { imgTable } from "../../imports/svg-9p2x7";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend
+} from 'recharts';
 
 function DotsHorizontal() {
   return (
@@ -54,50 +65,45 @@ function MetricCard({ title, value, subtitle, trend }: MetricCardProps) {
   );
 }
 
-function RevenueChart() {
-  return (
-    <div className="bg-black flex-[1_0_0] min-h-px min-w-px relative rounded-[16px]">
-      <div className="overflow-clip rounded-[inherit] size-full">
-        <div className="content-stretch flex flex-col gap-[24px] items-start p-[24px] relative w-full">
-          <div className="content-stretch flex items-center justify-between relative shrink-0 w-full">
-            <div>
-              <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] relative shrink-0 text-[17px] text-white whitespace-nowrap mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
-                Total Revenue vs Net Profit
-              </p>
-              <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
-                Monthly comparison over time
-              </p>
-            </div>
-            <button className="hover:opacity-70 transition-opacity">
-              <DotsHorizontal />
-            </button>
-          </div>
-          <div className="relative w-full h-[300px]">
-            <img src={imgTable} alt="Revenue Chart" className="w-full h-full object-contain" />
-          </div>
-          <div className="flex gap-[24px] w-full">
-            <div className="flex items-center gap-[8px]">
-              <div className="w-[12px] h-[12px] rounded-[2px] bg-[#928dd3]" />
-              <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
-                Total Revenue
-              </p>
-            </div>
-            <div className="flex items-center gap-[8px]">
-              <div className="w-[12px] h-[12px] rounded-[2px] bg-[#0DC44A]" />
-              <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
-                Net Profit (Owner)
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div aria-hidden="true" className="absolute border border-solid border-white inset-0 pointer-events-none rounded-[16px]" />
-    </div>
-  );
-}
-
 export function Summary() {
   const { currentOwner } = useOwner();
+  const [summary, setSummary] = useState<SummaryResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSummary = async () => {
+      if (!currentOwner) return;
+      try {
+        setLoading(true);
+        const data = await summaryService.getSummary(currentOwner.id);
+        setSummary(data);
+      } catch (error) {
+        console.error("Failed to fetch summary", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSummary();
+  }, [currentOwner]);
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(value);
+  };
+
+  if (loading || !summary) {
+    return (
+      <div className="bg-black min-h-full w-full flex items-center justify-center">
+        <p className="text-white text-xl">Loading summary...</p>
+      </div>
+    );
+  }
+
+  const unpaidPercentage = summary.totalTenantsCount > 0 
+    ? Math.round((summary.unpaidTenantsCount / summary.totalTenantsCount) * 100) 
+    : 0;
+
+  // Reverse historical data to show oldest first (left to right)
+  const chartData = [...summary.historicalData].reverse();
 
   return (
     <div className="bg-black min-h-full w-full">
@@ -108,7 +114,7 @@ export function Summary() {
               Summary
             </p>
             <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] text-[15px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
-              Financial overview for {currentOwner.name}
+              Financial overview for {currentOwner?.name}
             </p>
           </div>
           <button className="bg-[#928dd3] content-stretch flex items-center justify-center px-[16px] py-[8px] relative rounded-[8px] shrink-0 hover:bg-[#7f7ab8] transition-colors">
@@ -122,26 +128,57 @@ export function Summary() {
       <div className="content-stretch flex gap-[24px] items-start px-[48px] pb-[24px] relative w-full flex-wrap">
         <MetricCard 
           title="Total Collected This Month" 
-          value="$105,000" 
-          subtitle="+8.5% from last month"
-          trend="Mar 2026"
+          value={formatCurrency(summary.totalCollectedThisMonth)} 
+          subtitle={summary.collectedTrend}
         />
         <MetricCard 
           title="Unpaid Tenants" 
-          value="12%" 
-          subtitle="3 of 25 tenants"
-          trend="Due: $4,200"
+          value={`${unpaidPercentage}%`} 
+          subtitle={`${summary.unpaidTenantsCount} of ${summary.totalTenantsCount} tenants`}
+          trend={`Due: ${formatCurrency(summary.unpaidAmount)}`}
         />
         <MetricCard 
-          title="Total Expense Payments" 
-          value="$28,400" 
-          subtitle="+3.2% from last month"
-          trend="Mar 2026"
+          title="Expenses & Maintenance Fees" 
+          value={formatCurrency(summary.totalExpensesThisMonth)} 
+          subtitle={summary.expensesTrend}
         />
       </div>
 
       <div className="px-[48px] pb-[48px]">
-        <RevenueChart />
+        <div className="bg-black flex-[1_0_0] min-h-px min-w-px relative rounded-[16px]">
+          <div className="overflow-clip rounded-[inherit] size-full">
+            <div className="content-stretch flex flex-col gap-[24px] items-start p-[24px] relative w-full">
+              <div className="content-stretch flex items-center justify-between relative shrink-0 w-full">
+                <div>
+                  <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] relative shrink-0 text-[17px] text-white whitespace-nowrap mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
+                    Total Revenue vs Net Profit
+                  </p>
+                  <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
+                    Monthly comparison over time
+                  </p>
+                </div>
+              </div>
+              <div className="relative w-full h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                    <XAxis dataKey="month" stroke="rgba(255,255,255,0.6)" tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }} />
+                    <YAxis stroke="rgba(255,255,255,0.6)" tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }} tickFormatter={(val) => `$${val}`} />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#000', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '8px' }}
+                      itemStyle={{ color: '#fff' }}
+                      formatter={(value: any) => [formatCurrency(value as number), '']}
+                    />
+                    <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                    <Line type="monotone" name="Total Revenue" dataKey="revenue" stroke="#928dd3" strokeWidth={3} dot={{ r: 4, fill: '#928dd3' }} activeDot={{ r: 6 }} />
+                    <Line type="monotone" name="Net Profit (Owner)" dataKey="profit" stroke="#0DC44A" strokeWidth={3} dot={{ r: 4, fill: '#0DC44A' }} activeDot={{ r: 6 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+          <div aria-hidden="true" className="absolute border border-solid border-white inset-0 pointer-events-none rounded-[16px]" />
+        </div>
       </div>
 
       <div className="px-[48px] pb-[48px]">
@@ -156,7 +193,7 @@ export function Summary() {
                   Gross Revenue
                 </p>
                 <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] text-[24px] text-white tracking-[-0.24px]">
-                  $105,000
+                  {formatCurrency(summary.monthlyBreakdown.grossRevenue)}
                 </p>
               </div>
             </div>
@@ -167,10 +204,10 @@ export function Summary() {
             <div className="overflow-clip rounded-[inherit] size-full">
               <div className="content-stretch flex flex-col gap-[8px] items-start p-[24px] relative w-full">
                 <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
-                  Total Expenses
+                  Expenses & Fees
                 </p>
                 <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] text-[24px] text-white tracking-[-0.24px]">
-                  $28,400
+                  {formatCurrency(summary.monthlyBreakdown.totalExpenses)}
                 </p>
               </div>
             </div>
@@ -181,10 +218,10 @@ export function Summary() {
             <div className="overflow-clip rounded-[inherit] size-full">
               <div className="content-stretch flex flex-col gap-[8px] items-start p-[24px] relative w-full">
                 <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
-                  Admin Commission (10%)
+                  Admin Commission {summary.monthlyBreakdown.grossRevenue > 0 ? `(${Math.round((summary.monthlyBreakdown.adminCommission / summary.monthlyBreakdown.grossRevenue) * 100)}%)` : ''}
                 </p>
                 <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] text-[24px] text-white tracking-[-0.24px]">
-                  $10,500
+                  {formatCurrency(summary.monthlyBreakdown.adminCommission)}
                 </p>
               </div>
             </div>
@@ -198,7 +235,7 @@ export function Summary() {
                   Net Profit (Owner)
                 </p>
                 <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] text-[24px] text-[#0DC44A] tracking-[-0.24px]">
-                  $66,100
+                  {formatCurrency(summary.monthlyBreakdown.netProfit)}
                 </p>
               </div>
             </div>

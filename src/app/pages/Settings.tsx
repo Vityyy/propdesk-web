@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react';
 import { ApiError } from '../../utils/httpUtils';
 import authService from '../../services/authService';
-import userService, { type AdminSummary } from '../../services/userService';
+import userService, {
+  type AdminSummary,
+  type OwnerAdminAssociationResponse,
+  type OwnerAssociationRequestSummary,
+  type OwnerSummary,
+} from '../../services/userService';
 import svgPaths from "../../imports/svg-zayt9vop9f";
 
 function CaretDown() {
@@ -100,6 +105,7 @@ function SettingsSection({ title, children }: { title: string; children: React.R
 
 export function Settings() {
   const isOwner = authService.getCurrentUserRole() === 'OWNER';
+  const isAdmin = authService.getCurrentUserRole() === 'ADMIN';
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(false);
   const [autoPayment, setAutoPayment] = useState(true);
@@ -113,9 +119,15 @@ export function Settings() {
   const [admins, setAdmins] = useState<AdminSummary[]>([]);
   const [selectedAdminId, setSelectedAdminId] = useState('');
   const [adminCut, setAdminCut] = useState('10');
-  const [associationMessage, setAssociationMessage] = useState<string | null>(null);
-  const [associationError, setAssociationError] = useState<string | null>(null);
+  const [associatedAdmin, setAssociatedAdmin] = useState<OwnerAdminAssociationResponse | null>(null);
+  const [associatedOwners, setAssociatedOwners] = useState<OwnerSummary[]>([]);
+  const [pendingOwnerRequests, setPendingOwnerRequests] = useState<OwnerAssociationRequestSummary[]>([]);
+  const [adminAssociationMessage, setAdminAssociationMessage] = useState<string | null>(null);
+  const [adminAssociationError, setAdminAssociationError] = useState<string | null>(null);
+  const [ownerAssociationMessage, setOwnerAssociationMessage] = useState<string | null>(null);
+  const [ownerAssociationError, setOwnerAssociationError] = useState<string | null>(null);
   const [isAssociatingAdmin, setIsAssociatingAdmin] = useState(false);
+  const [acceptingOwnerId, setAcceptingOwnerId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isOwner) {
@@ -126,17 +138,26 @@ export function Settings() {
 
     // Loads the admin options used by the owner association flow.
     const loadAdmins = async () => {
+      setAdminAssociationError(null);
+
       try {
-        const availableAdmins = await userService.listAdmins();
+        const [availableAdmins, currentAssociation] = await Promise.all([
+          userService.listAdmins(),
+          userService.getAssociatedAdmin(),
+        ]);
         if (ignore) {
           return;
         }
 
         setAdmins(availableAdmins);
-        setSelectedAdminId((currentAdminId) => currentAdminId || availableAdmins[0]?.id || '');
+        setAssociatedAdmin(currentAssociation);
+        setSelectedAdminId((currentAdminId) => currentAdminId || currentAssociation?.adminId || availableAdmins[0]?.id || '');
+        if (currentAssociation?.adminCut != null) {
+          setAdminCut(String(currentAssociation.adminCut));
+        }
       } catch (error) {
         if (!ignore) {
-          setAssociationError(error instanceof ApiError ? error.message : 'Could not load admins');
+          setAdminAssociationError(error instanceof ApiError ? error.message : 'Could not load admins');
         }
       }
     };
@@ -148,6 +169,46 @@ export function Settings() {
     };
   }, [isOwner]);
 
+  useEffect(() => {
+    if (!isAdmin) {
+      return;
+    }
+
+    let ignore = false;
+
+    const loadAdminAssociationData = async () => {
+      setOwnerAssociationError(null);
+
+      try {
+        const owners = await userService.listMyOwners();
+        if (!ignore) {
+          setAssociatedOwners(owners);
+        }
+      } catch (error) {
+        if (!ignore) {
+          setOwnerAssociationError(error instanceof ApiError ? error.message : 'Could not load associated owners');
+        }
+      }
+
+      try {
+        const requests = await userService.listPendingOwnerRequests();
+        if (!ignore) {
+          setPendingOwnerRequests(requests);
+        }
+      } catch (error) {
+        if (!ignore) {
+          setOwnerAssociationError(error instanceof ApiError ? error.message : 'Could not load owner requests');
+        }
+      }
+    };
+
+    loadAdminAssociationData();
+
+    return () => {
+      ignore = true;
+    };
+  }, [isAdmin]);
+
   // Associates the current owner with the selected admin using the backend API.
   const handleAssociateAdmin = async () => {
     if (!selectedAdminId || isAssociatingAdmin) {
@@ -155,8 +216,8 @@ export function Settings() {
     }
 
     try {
-      setAssociationError(null);
-      setAssociationMessage(null);
+      setAdminAssociationError(null);
+      setAdminAssociationMessage(null);
       setIsAssociatingAdmin(true);
 
       const response = await userService.associateAdmin({
@@ -164,11 +225,30 @@ export function Settings() {
         adminCut: adminCut.trim() ? Number(adminCut) : undefined,
       });
 
-      setAssociationMessage(`${response.adminName} is now authorized to manage your properties on your behalf.`);
+      setAssociatedAdmin(response);
+      setAdminAssociationMessage(`Association request sent to ${response.adminName}.`);
     } catch (error) {
-      setAssociationError(error instanceof ApiError ? error.message : 'Could not associate admin');
+      setAdminAssociationError(error instanceof ApiError ? error.message : 'Could not associate admin');
     } finally {
       setIsAssociatingAdmin(false);
+    }
+  };
+
+  const handleAcceptOwner = async (request: OwnerAssociationRequestSummary) => {
+    try {
+      setOwnerAssociationError(null);
+      setOwnerAssociationMessage(null);
+      setAcceptingOwnerId(request.ownerId);
+
+      const response = await userService.acceptOwnerRequest(request.ownerId);
+      const remainingRequests = pendingOwnerRequests.filter((pendingRequest) => pendingRequest.ownerId !== request.ownerId);
+      setOwnerAssociationMessage(`${response.ownerName} is now associated with your admin account.`);
+      setPendingOwnerRequests(remainingRequests);
+      setAssociatedOwners((currentOwners) => [...currentOwners, { id: response.ownerId, name: response.ownerName }]);
+    } catch (error) {
+      setOwnerAssociationError(error instanceof ApiError ? error.message : 'Could not associate owner');
+    } finally {
+      setAcceptingOwnerId(null);
     }
   };
 
@@ -261,6 +341,34 @@ export function Settings() {
         </SettingsSection>
 
         {isOwner && (
+          <SettingsSection title="Associated Administrator">
+            <div className="px-[24px] py-[20px] space-y-4">
+              {!associatedAdmin && (
+                <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)]">
+                  You do not have an associated administrator yet.
+                </p>
+              )}
+
+              {associatedAdmin && (
+                <div className="rounded-[8px] border border-[rgba(255,255,255,0.16)] px-[12px] py-[10px]">
+                  <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white">
+                    {associatedAdmin.adminName}
+                  </p>
+                  <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)]">
+                    Offered percentage: {associatedAdmin.adminCut ?? 0}%
+                  </p>
+                  <p className={`font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] ${
+                    associatedAdmin.associationAccepted ? 'text-[#0DC44A]' : 'text-[#F4C430]'
+                  }`}>
+                    {associatedAdmin.associationAccepted ? 'Accepted' : 'Pending admin acceptance'}
+                  </p>
+                </div>
+              )}
+            </div>
+          </SettingsSection>
+        )}
+
+        {isOwner && (
           <SettingsSection title="Administrator Association">
             <div className="px-[24px] py-[20px] space-y-4">
               <div>
@@ -268,7 +376,7 @@ export function Settings() {
                   Select Administrator
                 </p>
                 <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)] mb-[12px]">
-                  Choose the admin you want to authorize to manage your properties.
+                  Choose the admin you want to ask for management of your properties.
                 </p>
                 <select
                   value={selectedAdminId}
@@ -291,7 +399,7 @@ export function Settings() {
                   Admin Cut
                 </p>
                 <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)] mb-[12px]">
-                  Define the percentage this admin will charge for managing your portfolio.
+                  Define the percentage you offer this admin for managing your portfolio.
                 </p>
                 <input
                   type="number"
@@ -303,15 +411,15 @@ export function Settings() {
                 />
               </div>
 
-              {associationMessage && (
+              {adminAssociationMessage && (
                 <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[#0DC44A]">
-                  {associationMessage}
+                  {adminAssociationMessage}
                 </p>
               )}
 
-              {associationError && (
+              {adminAssociationError && (
                 <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[#FF6B6B]">
-                  {associationError}
+                  {adminAssociationError}
                 </p>
               )}
 
@@ -324,6 +432,75 @@ export function Settings() {
                   {isAssociatingAdmin ? 'Associating...' : 'Associate Administrator'}
                 </p>
               </button>
+            </div>
+          </SettingsSection>
+        )}
+
+        {isAdmin && (
+          <SettingsSection title="Owner Requests">
+            <div className="px-[24px] py-[20px] space-y-4">
+              <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)]">
+                Review owner requests and accept the ones you want to manage.
+              </p>
+
+              {pendingOwnerRequests.length === 0 && (
+                <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)]">
+                  No pending owner requests.
+                </p>
+              )}
+
+              {pendingOwnerRequests.map((request) => (
+                <div key={request.ownerId} className="rounded-[8px] border border-[rgba(255,255,255,0.16)] px-[12px] py-[10px]">
+                  <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white">
+                    {request.ownerName}
+                  </p>
+                  <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)] mb-[12px]">
+                    Offered percentage: {request.adminCut ?? 0}%
+                  </p>
+                  <button
+                    onClick={() => handleAcceptOwner(request)}
+                    disabled={acceptingOwnerId === request.ownerId}
+                    className="bg-[#928dd3] content-stretch flex items-center justify-center px-[16px] py-[10px] relative rounded-[8px] shrink-0 hover:bg-[#7f7ab8] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-black whitespace-nowrap">
+                      {acceptingOwnerId === request.ownerId ? 'Accepting...' : 'Accept Owner'}
+                    </p>
+                  </button>
+                </div>
+              ))}
+
+              {ownerAssociationMessage && (
+                <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[#0DC44A]">
+                  {ownerAssociationMessage}
+                </p>
+              )}
+
+              {ownerAssociationError && (
+                <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[#FF6B6B]">
+                  {ownerAssociationError}
+                </p>
+              )}
+
+            </div>
+          </SettingsSection>
+        )}
+
+        {isAdmin && (
+          <SettingsSection title="Associated Owners">
+            <div className="px-[24px] py-[20px] space-y-4">
+              {associatedOwners.length === 0 && (
+                <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)]">
+                  You have not accepted any owner requests yet.
+                </p>
+              )}
+
+              {associatedOwners.map((owner) => (
+                <div key={owner.id} className="rounded-[8px] border border-[rgba(255,255,255,0.16)] px-[12px] py-[10px]">
+                  <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white">
+                    {owner.name}
+                  </p>
+                </div>
+              ))}
             </div>
           </SettingsSection>
         )}

@@ -21,11 +21,12 @@ type ApiRequestOptions = {
   token?: string | null;
   signal?: AbortSignal;
   credentials?: RequestCredentials;
+  allowNoContent?: boolean;
 };
 
 export async function apiRequest<T>(
   url: string,
-  { method = "GET", body, headers = {}, token, signal, credentials }: ApiRequestOptions = {},
+  { method = "GET", body, headers = {}, token, signal, credentials, allowNoContent = false }: ApiRequestOptions = {},
 ): Promise<T> {
   const finalHeaders: Record<string, string> = {
     ...COMMON_HEADERS,
@@ -44,6 +45,10 @@ export async function apiRequest<T>(
     credentials,
   });
 
+  if (response.status === 204 && allowNoContent) {
+    return null as T;
+  }
+
   const contentType = response.headers.get("content-type") || "";
   const isJson = contentType.includes("application/json");
   const payload = isJson ? await response.json() : await response.text();
@@ -59,4 +64,3 @@ export async function apiRequest<T>(
 
   return payload as T;
 }
-

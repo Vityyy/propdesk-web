@@ -30,6 +30,17 @@ export interface AdminSummary {
   name: string;
 }
 
+export interface OwnerSummary {
+  id: string;
+  name: string;
+}
+
+export interface OwnerAssociationRequestSummary {
+  ownerId: string;
+  ownerName: string;
+  adminCut: number | null;
+}
+
 export interface PropertyResponse {
   id: string;
   name: string;
@@ -48,6 +59,7 @@ export interface OwnerAdminAssociationResponse {
   adminId: string;
   adminName: string;
   adminCut: number | null;
+  associationAccepted: boolean;
 }
 
 export interface ApartmentCreateRequest {
@@ -90,6 +102,21 @@ export interface ApartmentExpenseRequest {
   description: string;
 }
 
+// ─── Maintenance Fee ─────────────────────────────────────────────────────────
+
+export interface MaintenanceFeeResponse {
+  id: string;
+  category: string;
+  description: string;
+  amount: number;
+}
+
+export interface MaintenanceFeeRequest {
+  category: string;
+  description: string;
+  amount: number;
+}
+
 // ─── Apartment grid ──────────────────────────────────────────────────────────
 
 export interface ApartmentGridResponse {
@@ -101,6 +128,7 @@ export interface ApartmentGridResponse {
   rent: number;
   tenant: TenantGridResponse | null;
   expenses: ApartmentExpenseResponse[];
+  maintenanceFees: MaintenanceFeeResponse[];
 }
 
 export type PropertyApartmentsGridResponse = Record<number, Record<number, ApartmentGridResponse>>;
@@ -144,8 +172,16 @@ export const userService = {
   },
 
   // Loads owners linked to the authenticated admin
-  listMyOwners(): Promise<AdminSummary[]> {
-    return apiRequest<AdminSummary[]>(API_ENDPOINTS.ADMINS.GET_MY_OWNERS, {
+  listMyOwners(): Promise<OwnerSummary[]> {
+    return apiRequest<OwnerSummary[]>(API_ENDPOINTS.ADMINS.GET_MY_OWNERS, {
+      method: "GET",
+      token: getRequiredToken(),
+    });
+  },
+
+  // Loads pending owner requests sent to the authenticated admin.
+  listPendingOwnerRequests(): Promise<OwnerAssociationRequestSummary[]> {
+    return apiRequest<OwnerAssociationRequestSummary[]>(API_ENDPOINTS.ADMINS.GET_PENDING_OWNER_REQUESTS, {
       method: "GET",
       token: getRequiredToken(),
     });
@@ -160,6 +196,23 @@ export const userService = {
     });
   },
 
+  getAssociatedAdmin(): Promise<OwnerAdminAssociationResponse | null> {
+    return apiRequest<OwnerAdminAssociationResponse | null>(API_ENDPOINTS.OWNERS.GET_ASSOCIATED_ADMIN, {
+      method: "GET",
+      token: getRequiredToken(),
+      allowNoContent: true,
+    });
+  },
+
+  // Accepts a pending owner request for the authenticated admin.
+  acceptOwnerRequest(ownerId: string): Promise<OwnerAdminAssociationResponse> {
+    return apiRequest<OwnerAdminAssociationResponse>(API_ENDPOINTS.ADMINS.ACCEPT_OWNER_REQUEST(ownerId), {
+      method: "POST",
+      token: getRequiredToken(),
+    });
+  },
+
+ 
   listProperties(currentOwnerId: string): Promise<PropertyResponse[]> {
     return apiRequest<PropertyResponse[]>(API_ENDPOINTS.PROPERTIES.LIST(currentOwnerId), {
       method: "GET",
@@ -199,7 +252,7 @@ export const userService = {
   },
 
   listApartments(ownerId?: string): Promise<ApartmentResponse[]> {
-    return apiRequest<ApartmentResponse[]>(`${API_ENDPOINTS.APARTMENTS.LIST(ownerId)}`, {
+    return apiRequest<ApartmentResponse[]>(`${API_ENDPOINTS.APARTMENTS.LIST(ownerId ?? '')}`, {
       method: "GET",
       token: getRequiredToken(),
     });
@@ -351,6 +404,30 @@ export const userService = {
 
   deleteExpense(apartmentId: string, expenseId: string): Promise<void> {
     return apiRequest<void>(API_ENDPOINTS.APARTMENTS.EXPENSE(apartmentId, expenseId), {
+      method: "DELETE",
+      token: getRequiredToken(),
+    });
+  },
+
+  // ─── Maintenance Fee management ──────────────────────────────────────────
+
+  getMaintenanceFees(apartmentId: string): Promise<MaintenanceFeeResponse[]> {
+    return apiRequest<MaintenanceFeeResponse[]>(API_ENDPOINTS.APARTMENTS.MAINTENANCE_FEES(apartmentId), {
+      method: "GET",
+      token: getRequiredToken(),
+    });
+  },
+
+  addMaintenanceFee(apartmentId: string, data: MaintenanceFeeRequest): Promise<MaintenanceFeeResponse> {
+    return apiRequest<MaintenanceFeeResponse>(API_ENDPOINTS.APARTMENTS.MAINTENANCE_FEES(apartmentId), {
+      method: "POST",
+      body: data,
+      token: getRequiredToken(),
+    });
+  },
+
+  deleteMaintenanceFee(apartmentId: string, feeId: string): Promise<void> {
+    return apiRequest<void>(API_ENDPOINTS.APARTMENTS.MAINTENANCE_FEE(apartmentId, feeId), {
       method: "DELETE",
       token: getRequiredToken(),
     });

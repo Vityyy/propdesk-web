@@ -426,8 +426,12 @@ export function Apartments() {
                     const isPaid = apt.paymentStatus === 'PAID';
                     const isOverdue = !!apt.dueDate && apt.dueDate < todayIso;
                     const hasExpenses = apt.expenses && apt.expenses.length > 0;
+                    const hasFees = apt.maintenanceFees && apt.maintenanceFees.length > 0;
                     const expensesTotal = (apt.expenses || []).reduce((sum, expense) => sum + (expense.amount || 0), 0);
-                    const rentGain = (apt.rent || 0) - expensesTotal;
+                    const feesTotal = (apt.maintenanceFees || []).reduce((sum, fee) => sum + (fee.amount || 0), 0);
+                    const totalDeductions = expensesTotal + feesTotal;
+                    const hasDeductions = totalDeductions > 0;
+                    const rentGain = (apt.rent || 0) - totalDeductions;
                     const isStatusUpdating = statusUpdatingApartmentIds.has(apt.id);
 
                     // Card background color
@@ -439,8 +443,8 @@ export function Apartments() {
                     // Rent gain color
                     let rentColor = '#928dd3'; // default purple (vacant)
                     if (!isVacant) {
-                      if (hasExpenses) {
-                        rentColor = '#f59e0b'; // orange when there are expenses
+                      if (hasDeductions) {
+                        rentColor = '#f59e0b'; // orange when there are expenses/fees
                       } else {
                         rentColor = rentGain >= 0 ? '#4ade80' : '#f87171';
                       }
@@ -522,16 +526,16 @@ export function Apartments() {
                             <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Rent Gain</span>
                             <div className="flex items-center gap-1.5">
                               <span className="text-sm font-bold" style={{ color: rentColor }}>${rentGain}</span>
-                              {hasExpenses && (
+                              {hasDeductions && (
                                 <span
                                   className="relative group"
-                                  title={`${apt.expenses.length} expense${apt.expenses.length > 1 ? 's' : ''}. Changes due to expenses. See details`}
+                                  title={`${apt.expenses?.length || 0} expense(s), ${apt.maintenanceFees?.length || 0} fee(s). Changes due to deductions. See details`}
                                 >
                                   <button
                                     type="button"
                                     onClick={(e) => handleOpenExpenseDetails(e, apt)}
                                     className="p-0 m-0 bg-transparent border-0"
-                                    title="Changes due to expenses. Click to see details"
+                                    title="Changes due to expenses and fees. Click to see details"
                                   >
                                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="cursor-pointer">
                                       <circle cx="12" cy="12" r="10" />

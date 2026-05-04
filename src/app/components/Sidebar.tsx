@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useOwner } from '../context/OwnerContext';
 import authService from '../../services/authService';
 import { getAccessibleRoutes, type UserRole } from '../RolePermissions';
+import {PieChart} from "recharts";
 
 function Building() {
   return (
@@ -150,8 +151,8 @@ export function Sidebar({ isCollapsed, onToggle }: { isCollapsed: boolean; onTog
     'summary': { label: 'Summary', icon: <ChartLine /> },
     'properties': { label: 'Properties', icon: <Building />, pathPrefix: '/properties' },
     'tenants': { label: 'Tenants', icon: <Users />, pathPrefix: '/tenants' },
-    'expenses': { label: 'Expenses', icon: <Tools />, pathPrefix: '/expenses' },
-    'reports': { label: 'Reports', icon: <Clipboard />, pathPrefix: '/reports' },
+    'maintenanceFees': { label: 'Maintenance Fees', icon: <Tools />, pathPrefix: '/maintenance-fees' },
+    'reports': { label: 'Reports', icon: <PieChart />, pathPrefix: '/reports' },
     'settings': { label: 'Settings', icon: <SettingsIcon />, pathPrefix: '/settings' },
   };
 
