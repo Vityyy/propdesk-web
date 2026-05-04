@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, useCallback, type ReactNode } from 'react';
 import type { Property, Tenant, Unit } from '../types/index';
-import { propertyService } from '../../services/propertyService';
 import { tenantService } from '../../services/tenantService';
 import authService from '../../services/authService';
 import { userService } from '../../services/userService';
@@ -78,8 +77,8 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      const fetchedProperties = await userService.listProperties(isAdmin ? currentOwner.id : undefined);
-      const fetchedApartments = await userService.listApartments(isAdmin ? currentOwner.id : undefined);
+      const fetchedProperties = await userService.listProperties(isAdmin ? currentOwner.id : authService.getCurrentUserId() ?? '');
+      const fetchedApartments = await userService.listApartments(isAdmin ? currentOwner.id : authService.getCurrentUserId() ?? '');
 
       const propertiesMapped: Property[] = fetchedProperties.map(p => {
         const unitsForProp = fetchedApartments
@@ -111,7 +110,6 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
       setProperties(propertiesMapped);
     } catch(e) {
       console.error('Failed to load backend properties', e);
-      setProperties(propertyService.getPropertiesByOwner(currentOwner.id));
     }
   }, [currentOwner.id]);
 
@@ -120,6 +118,7 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
     
     const isAdmin = authService.getCurrentUserRole() === 'ADMIN';
     if (isAdmin) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       loadAdminOwners();
     } else {
       const sessionOwner = buildSessionOwner();
@@ -129,7 +128,9 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
   }, [isAuthenticated]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchBackendData();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTenants(tenantService.getTenantsByOwner(currentOwner.id));
   }, [currentOwner.id, fetchBackendData]);
 

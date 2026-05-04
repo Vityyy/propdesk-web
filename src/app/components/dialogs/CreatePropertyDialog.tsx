@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react';
 import type { Unit } from '../../types/index';
-import { propertyService } from '../../../services/propertyService';
 import userService, { ApartmentRangeData } from '../../../services/userService';
 import { useOwner } from '../../context/OwnerContext';
 import { parseRange, generateApartmentRanges, findOverlapError } from '../../../utils/rangeParser';
@@ -138,20 +137,6 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
           rentAmount: r.rentValue,
           status: 'vacant' as const,
         };
-      });
-
-      propertyService.storeProperty({
-        id: createdProperty.id || crypto.randomUUID(),
-        ownerId: targetOwnerId,
-        name: formData.name,
-        address: formData.address,
-        imageUrl: formData.imageUrl || 'https://via.placeholder.com/400x300?text=Property',
-        description: '',
-        units: mappedUnits,
-        totalUnits: mappedUnits.length,
-        occupiedUnits: 0,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
       });
 
       refreshProperties();

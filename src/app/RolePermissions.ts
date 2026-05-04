@@ -1,7 +1,7 @@
 import { Summary } from "./pages/Summary";
 import { Properties } from "./pages/Properties";
 import { Tenants } from "./pages/Tenants";
-import { Expenses } from "./pages/Expenses";
+import { MaintenanceFees } from "./pages/MaintenanceFees";
 import { Reports } from "./pages/Reports";
 import { Settings } from "./pages/Settings";
 import {Apartments} from "./pages/Apartments.tsx";
@@ -14,7 +14,7 @@ export const ROUTES_PERMISSIONS = {
   properties: ['ADMIN', 'OWNER'] as const,
   "properties/:propertyId/apartments": ['ADMIN', 'OWNER'] as const,
   tenants: ['ADMIN'] as const,
-  expenses: ['ADMIN'] as const,
+  maintenanceFees: ['ADMIN'] as const,
   reports: ['ADMIN'] as const,
   settings: ['ADMIN', 'OWNER'] as const,
 } as const;
@@ -27,7 +27,7 @@ export const ROUTES_COMPONENTS = {
   properties: Properties,
   "properties/:propertyId/apartments": Apartments,
   tenants: Tenants,
-  expenses: Expenses,
+  maintenanceFees: MaintenanceFees,
   reports: Reports,
   settings: Settings,
 } as const;

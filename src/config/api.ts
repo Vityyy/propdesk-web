@@ -15,7 +15,7 @@ export const API_ENDPOINTS = {
   },
   PROPERTIES: {
     CREATE: `${API_BASE_URL}/properties`,
-    LIST: `${API_BASE_URL}/properties`,
+    LIST: (currentOwnerId: string) => `${API_BASE_URL}/properties?ownerId=${currentOwnerId}`,
     BASE: `${API_BASE_URL}/properties`,
     APARTMENTS: `${API_BASE_URL}/properties/apartments`,
   },
@@ -31,11 +31,13 @@ export const API_ENDPOINTS = {
   },
   APARTMENTS: {
     CREATE: `${API_BASE_URL}/apartments`,
-    LIST: `${API_BASE_URL}/apartments`,
+    LIST: (ownerId: string) => `${API_BASE_URL}/apartments?ownerId=${ownerId}`,
     BASE: `${API_BASE_URL}/apartments`,
     TENANT: (aptId: string) => `${API_BASE_URL}/apartments/${aptId}/tenant`,
     EXPENSES: (aptId: string) => `${API_BASE_URL}/apartments/${aptId}/expenses`,
     EXPENSE: (aptId: string, expId: string) => `${API_BASE_URL}/apartments/${aptId}/expenses/${expId}`,
+    MAINTENANCE_FEES: (aptId: string) => `${API_BASE_URL}/apartments/${aptId}/maintenance-fees`,
+    MAINTENANCE_FEE: (aptId: string, feeId: string) => `${API_BASE_URL}/apartments/${aptId}/maintenance-fees/${feeId}`,
   },
   EXPENSES: {
     CREATE: `${API_BASE_URL}/expenses`,
