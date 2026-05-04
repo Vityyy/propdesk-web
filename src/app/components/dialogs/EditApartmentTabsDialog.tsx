@@ -8,6 +8,14 @@ import userService, {
 import { parseRange } from '../../../utils/rangeParser';
 import { ConfirmDeleteDialog } from './ConfirmDeleteDialog';
 
+const getTodayIso = (): string => {
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+};
+
 // ─── Icons ───────────────────────────────────────────────────────────────────
 
 function ChevronIcon({ open }: { open: boolean }) {
@@ -108,7 +116,7 @@ function ApartmentDataSection({
 
   const handleSave = async () => {
     setError(null);
-    const updates: { rent?: number; squareMeters?: number; dueDate?: string } = {};
+    const updates: { rent?: number; squareMeters?: number; dueDate?: string; paymentStatus?: 'PAID' | 'PENDING' } = {};
     if (rent.trim()) {
       const v = parseFloat(rent);
       if (isNaN(v) || v <= 0) { setError('Rent must be a positive number'); return; }
@@ -121,6 +129,8 @@ function ApartmentDataSection({
     }
     if (dueDate.trim()) {
       updates.dueDate = dueDate;
+      const todayIso = getTodayIso();
+      updates.paymentStatus = dueDate < todayIso ? 'PENDING' : 'PAID';
     }
     setSaving(true);
     try {
@@ -131,6 +141,7 @@ function ApartmentDataSection({
         rent: updates.rent ?? apartment.rent,
         squareMeters: updates.squareMeters ?? apartment.squareMeters,
         dueDate: updates.dueDate ?? apartment.dueDate,
+        paymentStatus: updates.paymentStatus ?? apartment.paymentStatus,
       });
     } catch (e: any) {
       setError(e.message || 'Error saving');
@@ -324,12 +335,14 @@ function TenantSection({
           return;
         }
 
+        const todayIso = getTodayIso();
+        const nextStatus = dueDate.trim() && dueDate < todayIso ? 'PENDING' : 'PAID';
         for (const target of targetApartments) {
           await userService.assignTenant(target.apartment.id, payload);
-          if (dueDate.trim() || !target.apartment.paymentStatus || target.apartment.paymentStatus !== 'PAID') {
+          if (dueDate.trim() || !target.apartment.paymentStatus || target.apartment.paymentStatus !== nextStatus) {
             await userService.updateApartment(target.apartment.id, {
               dueDate: dueDate.trim() || undefined,
-              paymentStatus: 'PAID',
+              paymentStatus: nextStatus,
             });
           }
         }
@@ -347,10 +360,12 @@ function TenantSection({
       } else {
         savedTenant = await userService.assignTenant(apartment.id, payload);
       }
-      if (dueDate.trim() || !apartment.paymentStatus || apartment.paymentStatus !== 'PAID') {
+      const todayIso = getTodayIso();
+      const nextStatus = dueDate.trim() && dueDate < todayIso ? 'PENDING' : 'PAID';
+      if (dueDate.trim() || !apartment.paymentStatus || apartment.paymentStatus !== nextStatus) {
         await userService.updateApartment(apartment.id, {
           dueDate: dueDate.trim() || undefined,
-          paymentStatus: 'PAID',
+          paymentStatus: nextStatus,
         });
       }
       setCurrentTenant(savedTenant);
@@ -362,7 +377,7 @@ function TenantSection({
         changes: {
           tenant: savedTenant,
           dueDate: dueDate.trim() ? dueDate : apartment.dueDate,
-          paymentStatus: 'PAID',
+          paymentStatus: nextStatus,
         },
       });
     } catch (e: any) {
