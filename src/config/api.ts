@@ -42,6 +42,9 @@ export const API_ENDPOINTS = {
   EXPENSES: {
     CREATE: `${API_BASE_URL}/expenses`,
   },
+  TENANTS: {
+    DELETE: (tenantId: string, ownerId: string) => `${API_BASE_URL}/tenants/${tenantId}?ownerId=${ownerId}`,
+  }
 } as const;
 
 export const COMMON_HEADERS: Record<string, string> = {
