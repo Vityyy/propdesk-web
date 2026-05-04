@@ -66,7 +66,7 @@ function TenantRow({ tenant, email, phone, paymentStatus, onEdit, onClick }: Ten
         </p>
       </div>
       
-      <div className="flex-1 min-w-0 px-[24px]">
+      <div className="flex-1 min-w-0 px-[24px] text-center">
         <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)] truncate" style={{ fontVariationSettings: "'wdth' 100" }}>
           {displayEmail}
         </p>
@@ -258,7 +258,7 @@ export function Tenants() {
              <p className="flex-1 font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
                Name
              </p>
-             <p className="flex-1 px-[24px] font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
+             <p className="flex-1 px-[24px] text-center font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
                Email
              </p>
              <p className="flex-1 px-[24px] text-center font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
