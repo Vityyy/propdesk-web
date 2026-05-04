@@ -150,7 +150,7 @@ export function Sidebar({ isCollapsed, onToggle }: { isCollapsed: boolean; onTog
   const routeConfig: { [key: string]: { label: string; icon: React.ReactNode; pathPrefix?: string } } = {
     'summary': { label: 'Summary', icon: <ChartLine /> },
     'properties': { label: 'Properties', icon: <Building />, pathPrefix: '/properties' },
-    'tenants': { label: 'Tenants', icon: <Users />, pathPrefix: '/tenants' },
+    'tenants': { label: 'Tenants info', icon: <Users />, pathPrefix: '/tenants' },
     'maintenanceFees': { label: 'Maintenance Fees', icon: <Tools />, pathPrefix: '/maintenance-fees' },
     'reports': { label: 'Reports', icon: <PieChart />, pathPrefix: '/reports' },
     'settings': { label: 'Settings', icon: <SettingsIcon />, pathPrefix: '/settings' },
