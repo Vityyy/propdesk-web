@@ -91,16 +91,20 @@ export const router = createBrowserRouter([
   },
   {
     path: "/",
-    loader: () => {
+    loader: ({ request }) => {
       if (!authService.isSessionValidB()) {
         authService.clearToken();
         return redirect("/login");
       }
 
-      // If admin, redirect to owner selection
+      // Admins need a selected owner for owner-scoped pages, but must still be able
+      // to reach settings to accept pending owner associations.
       const isAdmin = authService.getCurrentUserRole() === 'ADMIN';
       const hasSelectedOwner = sessionStorage.getItem('selectedOwnerId');
-      if (isAdmin && !hasSelectedOwner) {
+      const pathname = new URL(request.url).pathname;
+      const canAccessWithoutOwnerSelection = pathname.startsWith("/settings");
+
+      if (isAdmin && !hasSelectedOwner && !canAccessWithoutOwnerSelection) {
         return redirect("/select-owner");
       }
 
