@@ -57,7 +57,7 @@ function TenantRow({ tenant, email, phone, paymentStatus, onEdit, onClick }: Ten
 
   return (
     <div 
-      className="content-stretch grid grid-cols-[minmax(140px,1fr)_minmax(180px,1fr)_minmax(140px,1fr)_auto_auto] items-center gap-4 py-[16px] px-[24px] relative shrink-0 w-full border-b border-[rgba(255,255,255,0.16)] hover:bg-[rgba(255,255,255,0.03)] transition-colors cursor-pointer"
+      className="content-stretch grid grid-cols-[minmax(140px,1.5fr)_minmax(180px,2fr)_minmax(140px,1.5fr)_120px_80px] items-center gap-4 py-[16px] px-[24px] relative shrink-0 w-full border-b border-[rgba(255,255,255,0.16)] hover:bg-[rgba(255,255,255,0.03)] transition-colors cursor-pointer"
       onClick={onClick}
     >
       <div className="min-w-0">
@@ -254,7 +254,7 @@ export function Tenants() {
       <div className="bg-black mx-[48px] mb-[48px] rounded-[16px] relative">
         <div aria-hidden="true" className="absolute border border-solid border-white inset-0 pointer-events-none rounded-[16px]" />
         <div className="overflow-visible rounded-[inherit] size-full">
-           <div className="content-stretch grid grid-cols-[minmax(140px,1fr)_minmax(180px,1fr)_minmax(140px,1fr)_auto_auto] items-center gap-4 py-[16px] px-[24px] relative shrink-0 w-full border-b border-[rgba(255,255,255,0.16)]">
+           <div className="content-stretch grid grid-cols-[minmax(140px,1.5fr)_minmax(180px,2fr)_minmax(140px,1.5fr)_120px_80px] items-center gap-4 py-[16px] px-[24px] relative shrink-0 w-full border-b border-[rgba(255,255,255,0.16)]">
              <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
                Name
              </p>

@@ -128,8 +128,8 @@ export function Summary() {
       <div className="content-stretch flex gap-[24px] items-start px-[48px] pb-[24px] relative w-full flex-wrap">
         <MetricCard 
           title="Total Collected This Month" 
-          value={formatCurrency(summary.totalCollectedThisMonth)} 
-          subtitle={summary.collectedTrend}
+          value={formatCurrency(summary.monthlyBreakdown.grossRevenue - summary.monthlyBreakdown.totalExpenses)}
+          subtitle={`Gross: ${formatCurrency(summary.monthlyBreakdown.grossRevenue)} — Expenses: ${formatCurrency(summary.monthlyBreakdown.totalExpenses)}`}
         />
         <MetricCard 
           title="Unpaid Tenants" 
