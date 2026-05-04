@@ -458,10 +458,10 @@ export function Apartments() {
                       <div 
                         key={apt.id} 
                         onClick={(e) => handleCardClick(apt, e)}
-                        className={`flex flex-col rounded-xl overflow-hidden border transition-all hover:scale-[1.02] bg-[#111] cursor-pointer select-none ${isSelected ? 'border-[#928dd3] ring-2 ring-[#928dd3]/50 transform scale-[1.02]' : 'border-[rgba(255,255,255,0.1)]'}`}
+                        className={`flex flex-col rounded-xl border transition-all hover:scale-[1.02] bg-[#111] cursor-pointer select-none ${isSelected ? 'border-[#928dd3] ring-2 ring-[#928dd3]/50 transform scale-[1.02]' : 'border-[rgba(255,255,255,0.1)]'}`}
                       >
                         {/* Upper half: Background color & Icon */}
-                        <div className={`relative h-[140px] flex items-center justify-center ${bgClass}`}>
+                        <div className={`relative h-[140px] flex items-center justify-center overflow-hidden rounded-t-xl ${bgClass}`}>
                           <div className={`text-white opacity-90 drop-shadow-md ${isVacant ? 'opacity-50' : ''}`}>
                             <UserIcon />
                           </div>
@@ -516,7 +516,7 @@ export function Apartments() {
                         </div>
                         
                         {/* Lower half: Details */}
-                        <div className="p-4 flex flex-col gap-3 flex-1 bg-[#1a1a1a]">
+                        <div className="p-4 flex flex-col gap-3 flex-1 bg-[#1a1a1a] rounded-b-xl overflow-visible">
                           <div className="flex justify-between items-center border-b border-[rgba(255,255,255,0.05)] pb-2">
                             <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Tenant</span>
                             <span className="text-sm text-white font-medium truncate max-w-[140px]" title={apt.tenant?.name || 'Vacant'}>
