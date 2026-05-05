@@ -203,7 +203,9 @@ export function Properties() {
   const buildMetricsFromGrid = (grid: PropertyApartmentsGridResponse) => {
     let totalUnits = 0;
     let occupiedUnits = 0;
+    // Sum of rents that are PAID (actual income, not pending)
     let paidRentTotal = 0;
+    // Sum of all expenses in the property
     let expensesTotal = 0;
 
     Object.values(grid).forEach((apartmentsByNumber) => {
@@ -211,18 +213,21 @@ export function Properties() {
         totalUnits += 1;
         if (apartment.tenant) {
           occupiedUnits += 1;
-        }
-        if (apartment.paymentStatus === 'PAID') {
-          paidRentTotal += apartment.rent || 0;
+          // Only count rent if payment status is PAID
+          if (apartment.paymentStatus === 'PAID') {
+            paidRentTotal += apartment.rent || 0;
+          }
         }
         expensesTotal += (apartment.expenses || []).reduce((sum, expense) => sum + (expense.amount || 0), 0);
       });
     });
 
+    const monthlyRevenue = paidRentTotal > 0 ? (paidRentTotal - expensesTotal) : 0;
+
     return {
       totalUnits,
       occupiedUnits,
-      monthlyRevenue: paidRentTotal - expensesTotal,
+      monthlyRevenue,
     };
   };
 

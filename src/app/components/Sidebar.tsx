@@ -90,6 +90,19 @@ function Users() {
   );
 }
 
+function PieChart() {
+  return (
+    <div className="relative shrink-0 size-[24px]" data-name="pie-chart">
+      <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 24">
+        <g id="pie-chart">
+          <path d="M12 2V12H22C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2Z" stroke="var(--stroke-0, white)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
+          <path d="M12 2C12 2 12 12 12 12" stroke="var(--stroke-0, white)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
+        </g>
+      </svg>
+    </div>
+  );
+}
+
 interface MenuItemProps {
   icon: React.ReactNode;
   label: string;
@@ -149,9 +162,9 @@ export function Sidebar({ isCollapsed, onToggle }: { isCollapsed: boolean; onTog
   const routeConfig: { [key: string]: { label: string; icon: React.ReactNode; pathPrefix?: string } } = {
     'summary': { label: 'Summary', icon: <ChartLine /> },
     'properties': { label: 'Properties', icon: <Building />, pathPrefix: '/properties' },
-    'tenants': { label: 'Tenants', icon: <Users />, pathPrefix: '/tenants' },
-    'expenses': { label: 'Expenses', icon: <Tools />, pathPrefix: '/expenses' },
-    'reports': { label: 'Reports', icon: <Clipboard />, pathPrefix: '/reports' },
+    'tenants': { label: 'Tenants info', icon: <Users />, pathPrefix: '/tenants' },
+    'maintenanceFees': { label: 'Maintenance Fees', icon: <Tools />, pathPrefix: '/maintenance-fees' },
+    'reports': { label: 'Reports', icon: <PieChart />, pathPrefix: '/reports' },
     'settings': { label: 'Settings', icon: <SettingsIcon />, pathPrefix: '/settings' },
   };
 

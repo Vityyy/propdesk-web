@@ -2,10 +2,19 @@ import { useState, useEffect } from 'react';
 import userService, {
   ApartmentGridResponse,
   ApartmentExpenseResponse,
+  MaintenanceFeeResponse,
   TenantGridResponse,
 } from '../../../services/userService';
 import { parseRange } from '../../../utils/rangeParser';
 import { ConfirmDeleteDialog } from './ConfirmDeleteDialog';
+
+const getTodayIso = (): string => {
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+};
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
 
@@ -35,7 +44,7 @@ interface EditApartmentTabsDialogProps {
   isOpen: boolean;
   propertyId: string;
   apartment: ApartmentGridResponse;
-  initialSection?: 'data' | 'tenant' | 'expenses' | null;
+  initialSection?: 'data' | 'tenant' | 'expenses' | 'maintenanceFees' | null;
   onClose: () => void;
   onSuccess?: (result?: { apartmentId: string; changes: Partial<ApartmentGridResponse> }) => void;
 }
@@ -107,7 +116,7 @@ function ApartmentDataSection({
 
   const handleSave = async () => {
     setError(null);
-    const updates: { rent?: number; squareMeters?: number; dueDate?: string } = {};
+    const updates: { rent?: number; squareMeters?: number; dueDate?: string; paymentStatus?: 'PAID' | 'PENDING' } = {};
     if (rent.trim()) {
       const v = parseFloat(rent);
       if (isNaN(v) || v <= 0) { setError('Rent must be a positive number'); return; }
@@ -120,6 +129,8 @@ function ApartmentDataSection({
     }
     if (dueDate.trim()) {
       updates.dueDate = dueDate;
+      const todayIso = getTodayIso();
+      updates.paymentStatus = dueDate < todayIso ? 'PENDING' : 'PAID';
     }
     setSaving(true);
     try {
@@ -130,6 +141,7 @@ function ApartmentDataSection({
         rent: updates.rent ?? apartment.rent,
         squareMeters: updates.squareMeters ?? apartment.squareMeters,
         dueDate: updates.dueDate ?? apartment.dueDate,
+        paymentStatus: updates.paymentStatus ?? apartment.paymentStatus,
       });
     } catch (e: any) {
       setError(e.message || 'Error saving');
@@ -323,12 +335,14 @@ function TenantSection({
           return;
         }
 
+        const todayIso = getTodayIso();
+        const nextStatus = dueDate.trim() && dueDate < todayIso ? 'PENDING' : 'PAID';
         for (const target of targetApartments) {
           await userService.assignTenant(target.apartment.id, payload);
-          if (dueDate.trim() || !target.apartment.paymentStatus || target.apartment.paymentStatus !== 'PAID') {
+          if (dueDate.trim() || !target.apartment.paymentStatus || target.apartment.paymentStatus !== nextStatus) {
             await userService.updateApartment(target.apartment.id, {
               dueDate: dueDate.trim() || undefined,
-              paymentStatus: 'PAID',
+              paymentStatus: nextStatus,
             });
           }
         }
@@ -346,10 +360,12 @@ function TenantSection({
       } else {
         savedTenant = await userService.assignTenant(apartment.id, payload);
       }
-      if (dueDate.trim() || !apartment.paymentStatus || apartment.paymentStatus !== 'PAID') {
+      const todayIso = getTodayIso();
+      const nextStatus = dueDate.trim() && dueDate < todayIso ? 'PENDING' : 'PAID';
+      if (dueDate.trim() || !apartment.paymentStatus || apartment.paymentStatus !== nextStatus) {
         await userService.updateApartment(apartment.id, {
           dueDate: dueDate.trim() || undefined,
-          paymentStatus: 'PAID',
+          paymentStatus: nextStatus,
         });
       }
       setCurrentTenant(savedTenant);
@@ -361,7 +377,7 @@ function TenantSection({
         changes: {
           tenant: savedTenant,
           dueDate: dueDate.trim() ? dueDate : apartment.dueDate,
-          paymentStatus: 'PAID',
+          paymentStatus: nextStatus,
         },
       });
     } catch (e: any) {
@@ -641,6 +657,157 @@ function ExpensesSection({
   );
 }
 
+// ─── Sub-form: Maintenance Fees ──────────────────────────────────────────────
+
+function MaintenanceFeesSection({
+  apartment,
+  onSuccess,
+}: {
+  apartment: ApartmentGridResponse;
+  onSuccess: (changes: Partial<ApartmentGridResponse>) => void;
+}) {
+  const [fees, setFees] = useState<MaintenanceFeeResponse[]>([]);
+  const [loadingFees, setLoadingFees] = useState(true);
+  const [amount, setAmount] = useState('');
+  const [category, setCategory] = useState('GENERAL');
+  const [description, setDescription] = useState('');
+  const [adding, setAdding] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // Always fetch fresh from the API — don't rely on the possibly stale grid cache
+  useEffect(() => {
+    setLoadingFees(true);
+    userService.getMaintenanceFees(apartment.id)
+      .then(setFees)
+      .catch(() => setFees(apartment.maintenanceFees ?? []))
+      .finally(() => setLoadingFees(false));
+  }, [apartment.id]);
+
+
+  const handleAdd = async () => {
+    setError(null);
+    const amt = parseFloat(amount);
+    if (isNaN(amt) || amt <= 0) { setError('Amount must be a positive number'); return; }
+    if (!description.trim()) { setError('Description is required'); return; }
+    setAdding(true);
+    try {
+      const created = await userService.addMaintenanceFee(apartment.id, { amount: amt, category, description: description.trim() });
+      const nextFees = [...fees, created];
+      setFees(nextFees);
+      setAmount('');
+      setDescription('');
+      onSuccess({ maintenanceFees: nextFees });
+    } catch (e: any) {
+      setError(e.message || 'Error adding maintenance fee');
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  const handleDelete = async (feeId: string) => {
+    setDeletingId(feeId);
+    try {
+      await userService.deleteMaintenanceFee(apartment.id, feeId);
+      const nextFees = fees.filter(f => f.id !== feeId);
+      setFees(nextFees);
+      onSuccess({ maintenanceFees: nextFees });
+    } catch (e: any) {
+      setError(e.message || 'Error deleting maintenance fee');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  return (
+    <div className="space-y-4 pt-2">
+      {error && (
+        <div className="p-3 bg-red-500/10 border border-red-500/40 rounded-lg text-red-400 text-sm">{error}</div>
+      )}
+
+      {/* Fee list */}
+      {loadingFees ? (
+        <p className="text-sm text-white/35 italic text-center py-3">Loading fees…</p>
+      ) : fees.length === 0 ? (
+        <p className="text-sm text-white/35 italic text-center py-3">No maintenance fees assigned</p>
+      ) : (
+        <ul className="space-y-2">
+          {fees.map(fee => (
+            <li
+              key={fee.id}
+              className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10"
+            >
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#38bdf8]/20 text-[#38bdf8] uppercase">
+                    {fee.category}
+                  </span>
+                  <p className="text-sm text-white truncate">{fee.description}</p>
+                </div>
+                <p className="text-xs text-[#38bdf8] font-bold mt-0.5">${fee.amount}/mo</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleDelete(fee.id)}
+                disabled={deletingId === fee.id}
+                className="ml-3 p-1.5 rounded-lg text-red-400 hover:bg-red-500/20 transition-colors disabled:opacity-40"
+                title="Remove fee"
+              >
+                {deletingId === fee.id ? '…' : <TrashIcon />}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {/* Add fee form */}
+      <div className="flex items-center gap-3 mt-4 mb-1">
+        <div className="flex-1 h-px bg-white/10" />
+        <span className="text-xs font-semibold uppercase tracking-widest text-white/35">Assign Fee</span>
+        <div className="flex-1 h-px bg-white/10" />
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="block text-xs text-white/40 mb-1">Category</label>
+          <select
+            value={category} onChange={e => setCategory(e.target.value)}
+            className="w-full px-3 py-2.5 bg-black border border-white/10 focus:border-[#38bdf8] rounded-lg text-white text-sm transition-colors focus:outline-none"
+          >
+            <option value="GENERAL">General</option>
+            <option value="CLEANING">Cleaning</option>
+            <option value="SECURITY">Security</option>
+            <option value="AMENITIES">Amenities</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-xs text-white/40 mb-1">Monthly Amount ($)</label>
+          <input
+            type="number" step="0.01" value={amount} onChange={e => setAmount(e.target.value)}
+            className="w-full px-3 py-2.5 bg-black border border-white/10 focus:border-[#38bdf8] rounded-lg text-white text-sm placeholder-white/30 transition-colors focus:outline-none"
+            placeholder="0.00"
+          />
+        </div>
+      </div>
+      <div>
+        <label className="block text-xs text-white/40 mb-1">Description</label>
+        <input
+          type="text" value={description} onChange={e => setDescription(e.target.value)}
+          className="w-full px-3 py-2.5 bg-black border border-white/10 focus:border-[#38bdf8] rounded-lg text-white text-sm placeholder-white/30 transition-colors focus:outline-none"
+          placeholder="e.g. Monthly hallway cleaning"
+        />
+      </div>
+
+      <button
+        type="button" onClick={handleAdd} disabled={adding}
+        className="w-full py-2.5 rounded-xl font-bold text-sm bg-[#38bdf8]/15 hover:bg-[#38bdf8]/25 border border-[#38bdf8]/40 text-[#38bdf8] transition-colors disabled:opacity-50"
+      >
+        {adding ? 'Assigning…' : '+ Assign Fee'}
+      </button>
+    </div>
+  );
+}
+
 // ─── Main dialog ─────────────────────────────────────────────────────────────
 
 export function EditApartmentTabsDialog({
@@ -651,7 +818,7 @@ export function EditApartmentTabsDialog({
   onClose,
   onSuccess,
 }: EditApartmentTabsDialogProps) {
-  const [openSection, setOpenSection] = useState<'data' | 'tenant' | 'expenses' | null>(null);
+  const [openSection, setOpenSection] = useState<'data' | 'tenant' | 'expenses' | 'maintenanceFees' | null>(null);
 
   // Collapse all sections when the dialog opens (do not auto-expand the first accordion)
   useEffect(() => {
@@ -660,7 +827,7 @@ export function EditApartmentTabsDialog({
 
   if (!isOpen) return null;
 
-  const toggle = (section: 'data' | 'tenant' | 'expenses') => {
+  const toggle = (section: 'data' | 'tenant' | 'expenses' | 'maintenanceFees') => {
     setOpenSection(prev => (prev === section ? null : section));
   };
 
@@ -710,6 +877,15 @@ export function EditApartmentTabsDialog({
             accentColor="#f59e0b"
           >
             <ExpensesSection apartment={apartment} onSuccess={(changes) => onSuccess?.({ apartmentId: apartment.id, changes })} />
+          </Accordion>
+
+          <Accordion
+            title="Maintenance Fees"
+            open={openSection === 'maintenanceFees'}
+            onToggle={() => toggle('maintenanceFees')}
+            accentColor="#38bdf8"
+          >
+            <MaintenanceFeesSection apartment={apartment} onSuccess={(changes) => onSuccess?.({ apartmentId: apartment.id, changes })} />
           </Accordion>
         </div>
 

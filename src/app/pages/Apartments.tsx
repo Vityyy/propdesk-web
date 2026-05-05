@@ -426,8 +426,12 @@ export function Apartments() {
                     const isPaid = apt.paymentStatus === 'PAID';
                     const isOverdue = !!apt.dueDate && apt.dueDate < todayIso;
                     const hasExpenses = apt.expenses && apt.expenses.length > 0;
+                    const hasFees = apt.maintenanceFees && apt.maintenanceFees.length > 0;
                     const expensesTotal = (apt.expenses || []).reduce((sum, expense) => sum + (expense.amount || 0), 0);
-                    const rentGain = (apt.rent || 0) - expensesTotal;
+                    const feesTotal = (apt.maintenanceFees || []).reduce((sum, fee) => sum + (fee.amount || 0), 0);
+                    const totalDeductions = expensesTotal + feesTotal;
+                    const hasDeductions = totalDeductions > 0;
+                    const rentGain = (apt.rent || 0) - totalDeductions;
                     const isStatusUpdating = statusUpdatingApartmentIds.has(apt.id);
 
                     // Card background color
@@ -439,8 +443,10 @@ export function Apartments() {
                     // Rent gain color
                     let rentColor = '#928dd3'; // default purple (vacant)
                     if (!isVacant) {
-                      if (hasExpenses) {
-                        rentColor = '#f59e0b'; // orange when there are expenses
+                      if (!isPaid) {
+                        rentColor = '#f87171'; // red when unpaid
+                      } else if (hasDeductions) {
+                        rentColor = '#f59e0b'; // orange when there are expenses/fees
                       } else {
                         rentColor = rentGain >= 0 ? '#4ade80' : '#f87171';
                       }
@@ -452,10 +458,10 @@ export function Apartments() {
                       <div 
                         key={apt.id} 
                         onClick={(e) => handleCardClick(apt, e)}
-                        className={`flex flex-col rounded-xl overflow-hidden border transition-all hover:scale-[1.02] bg-[#111] cursor-pointer select-none ${isSelected ? 'border-[#928dd3] ring-2 ring-[#928dd3]/50 transform scale-[1.02]' : 'border-[rgba(255,255,255,0.1)]'}`}
+                        className={`flex flex-col rounded-xl border transition-all hover:scale-[1.02] bg-[#111] cursor-pointer select-none ${isSelected ? 'border-[#928dd3] ring-2 ring-[#928dd3]/50 transform scale-[1.02]' : 'border-[rgba(255,255,255,0.1)]'}`}
                       >
                         {/* Upper half: Background color & Icon */}
-                        <div className={`relative h-[140px] flex items-center justify-center ${bgClass}`}>
+                        <div className={`relative h-[140px] flex items-center justify-center overflow-hidden rounded-t-xl ${bgClass}`}>
                           <div className={`text-white opacity-90 drop-shadow-md ${isVacant ? 'opacity-50' : ''}`}>
                             <UserIcon />
                           </div>
@@ -510,7 +516,7 @@ export function Apartments() {
                         </div>
                         
                         {/* Lower half: Details */}
-                        <div className="p-4 flex flex-col gap-3 flex-1 bg-[#1a1a1a]">
+                        <div className="p-4 flex flex-col gap-3 flex-1 bg-[#1a1a1a] rounded-b-xl overflow-visible">
                           <div className="flex justify-between items-center border-b border-[rgba(255,255,255,0.05)] pb-2">
                             <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Tenant</span>
                             <span className="text-sm text-white font-medium truncate max-w-[140px]" title={apt.tenant?.name || 'Vacant'}>
@@ -522,16 +528,29 @@ export function Apartments() {
                             <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Rent Gain</span>
                             <div className="flex items-center gap-1.5">
                               <span className="text-sm font-bold" style={{ color: rentColor }}>${rentGain}</span>
-                              {hasExpenses && (
+                              {!isVacant && !isPaid && (
+                                <span className="relative group">
+                                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="cursor-pointer">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <line x1="12" y1="8" x2="12" y2="12" />
+                                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                                  </svg>
+                                  {/* Tooltip */}
+                                  <span className="absolute bottom-full right-0 mb-1.5 hidden group-hover:block bg-[#1a1a1a] border border-[#f87171]/30 text-[#f87171] text-xs px-2 py-1 rounded-lg whitespace-nowrap shadow-xl z-50 pointer-events-none">
+                                    Unpaid rent — payment is pending
+                                  </span>
+                                </span>
+                              )}
+                              {isPaid && hasDeductions && (
                                 <span
                                   className="relative group"
-                                  title={`${apt.expenses.length} expense${apt.expenses.length > 1 ? 's' : ''}. Changes due to expenses. See details`}
+                                  title={`${apt.expenses?.length || 0} expense(s), ${apt.maintenanceFees?.length || 0} fee(s). Changes due to deductions. See details`}
                                 >
                                   <button
                                     type="button"
                                     onClick={(e) => handleOpenExpenseDetails(e, apt)}
                                     className="p-0 m-0 bg-transparent border-0"
-                                    title="Changes due to expenses. Click to see details"
+                                    title="Changes due to expenses and fees. Click to see details"
                                   >
                                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="cursor-pointer">
                                       <circle cx="12" cy="12" r="10" />

@@ -27,18 +27,9 @@ export interface Property {
 export interface Tenant {
   id: string;
   ownerId: string;
-  firstName: string;
-  lastName: string;
+  name: string;
   email: string;
   phone: string;
-  documentNumber?: string;
-  documentType?: string; // e.g. national ID, passport
-  bankAccount?: {
-    accountNumber: string;
-    accountHolder: string;
-    bankName: string;
-  };
-  assignedProperties: TenantAssignment[];
   createdAt: string;
   updatedAt: string;
 }

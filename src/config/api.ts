@@ -15,28 +15,36 @@ export const API_ENDPOINTS = {
   },
   PROPERTIES: {
     CREATE: `${API_BASE_URL}/properties`,
-    LIST: `${API_BASE_URL}/properties`,
+    LIST: (currentOwnerId: string) => `${API_BASE_URL}/properties?ownerId=${currentOwnerId}`,
     BASE: `${API_BASE_URL}/properties`,
     APARTMENTS: `${API_BASE_URL}/properties/apartments`,
   },
   ADMINS: {
     LIST: `${API_BASE_URL}/admins`,
     GET_MY_OWNERS: `${API_BASE_URL}/admins/me/owners`,
+    GET_PENDING_OWNER_REQUESTS: `${API_BASE_URL}/admins/me/owner-requests`,
+    ACCEPT_OWNER_REQUEST: (ownerId: string) => `${API_BASE_URL}/admins/me/owners/${ownerId}/accept`,
   },
   OWNERS: {
+    GET_ASSOCIATED_ADMIN: `${API_BASE_URL}/owners/me/admin`,
     ASSOCIATE_ADMIN: `${API_BASE_URL}/owners/me/admin`,
   },
   APARTMENTS: {
     CREATE: `${API_BASE_URL}/apartments`,
-    LIST: `${API_BASE_URL}/apartments`,
+    LIST: (ownerId: string) => `${API_BASE_URL}/apartments?ownerId=${ownerId}`,
     BASE: `${API_BASE_URL}/apartments`,
     TENANT: (aptId: string) => `${API_BASE_URL}/apartments/${aptId}/tenant`,
     EXPENSES: (aptId: string) => `${API_BASE_URL}/apartments/${aptId}/expenses`,
     EXPENSE: (aptId: string, expId: string) => `${API_BASE_URL}/apartments/${aptId}/expenses/${expId}`,
+    MAINTENANCE_FEES: (aptId: string) => `${API_BASE_URL}/apartments/${aptId}/maintenance-fees`,
+    MAINTENANCE_FEE: (aptId: string, feeId: string) => `${API_BASE_URL}/apartments/${aptId}/maintenance-fees/${feeId}`,
   },
   EXPENSES: {
     CREATE: `${API_BASE_URL}/expenses`,
   },
+  TENANTS: {
+    DELETE: (tenantId: string, ownerId: string) => `${API_BASE_URL}/tenants/${tenantId}?ownerId=${ownerId}`,
+  }
 } as const;
 
 export const COMMON_HEADERS: Record<string, string> = {
