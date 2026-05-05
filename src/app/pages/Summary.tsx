@@ -102,8 +102,7 @@ export function Summary() {
     ? Math.round((summary.unpaidTenantsCount / summary.totalTenantsCount) * 100) 
     : 0;
 
-  // Reverse historical data to show oldest first (left to right)
-  const chartData = [...summary.historicalData].reverse();
+  const chartData = [...summary.historicalData];
 
   return (
     <div className="bg-black min-h-full w-full">
