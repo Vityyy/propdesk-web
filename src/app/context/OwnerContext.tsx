@@ -17,7 +17,8 @@ interface OwnerContextType {
   owners: Owner[];
   properties: Property[];
   tenants: Tenant[];
-  refreshProperties: () => void;
+  isLoadingProperties: boolean;
+  refreshProperties: () => Promise<void>;
   refreshTenants: () => Promise<void>;
 }
 
@@ -41,6 +42,7 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
   const [ownersAvailable, setOwnersAvailable] = useState<Owner[]>([]);
   const [properties, setProperties] = useState<Property[]>([]);
   const [tenants, setTenants] = useState<Tenant[]>([]);
+  const [isLoadingProperties, setIsLoadingProperties] = useState(true);
 
   const loadAdminOwners = async () => {
     try {
@@ -73,6 +75,8 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
       if (isAdmin && currentOwner.id === authService.getCurrentUserId()) {
         return;
       }
+
+      setIsLoadingProperties(true);
 
       const fetchedProperties = await userService.listProperties(isAdmin ? currentOwner.id : authService.getCurrentUserId() ?? '');
       const fetchedApartments = await userService.listApartments(isAdmin ? currentOwner.id : authService.getCurrentUserId() ?? '');
@@ -135,6 +139,8 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
       setTenants(Object.values(uniqueTenants));
     } catch(e) {
       console.error('Failed to load backend properties and tenants', e);
+    } finally {
+      setIsLoadingProperties(false);
     }
   }, [currentOwner.id]);
 
@@ -166,7 +172,7 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
   };
 
   const refreshProperties = () => {
-    fetchBackendData();
+    return fetchBackendData();
   };
 
   const refreshTenants = async () => {
@@ -185,6 +191,7 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
       owners,
       properties,
       tenants,
+      isLoadingProperties,
       refreshProperties,
       refreshTenants,
     }}>
