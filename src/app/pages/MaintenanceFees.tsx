@@ -91,6 +91,53 @@ function FeeRow({ fee, aptNumber }: { fee: FeeWithContext; aptNumber: number }) 
   );
 }
 
+function SummaryCardSkeleton() {
+  return (
+    <div
+      className="flex-1 min-w-[160px] rounded-2xl p-5 relative overflow-hidden"
+      style={{ background: 'rgba(146,141,211,0.12)', border: '1px solid rgba(146,141,211,0.3)' }}
+    >
+      <div className="flex items-center gap-2 mb-3">
+        <div className="h-5 w-20 rounded bg-white/10 animate-pulse" />
+        <div className="h-4 w-14 rounded bg-white/5 animate-pulse" />
+      </div>
+      <div className="h-9 w-32 rounded bg-white/10 animate-pulse" />
+      <div className="h-3 w-24 mt-2 rounded bg-white/5 animate-pulse" />
+    </div>
+  );
+}
+
+function FeeRowSkeleton() {
+  return (
+    <div className="flex items-center justify-between py-4 px-6 border-b border-white/8">
+      <div className="flex items-center gap-3 flex-[1_0_0]">
+        <div className="h-5 w-20 rounded-full bg-white/10 animate-pulse" />
+      </div>
+      <div className="flex-[2_0_0]">
+        <div className="h-4 w-3/4 rounded bg-white/10 animate-pulse" />
+        <div className="h-3 w-24 rounded bg-white/5 mt-2 animate-pulse" />
+      </div>
+      <div className="flex-[1_0_0]">
+        <div className="h-5 w-28 rounded bg-white/10 animate-pulse" />
+      </div>
+    </div>
+  );
+}
+
+function HeaderSummarySkeleton() {
+  return (
+    <div
+      className="flex items-center gap-3 px-5 py-3 rounded-2xl min-w-[220px]"
+      style={{ background: 'rgba(146,141,211,0.12)', border: '1px solid rgba(146,141,211,0.3)' }}
+    >
+      <div className="w-full">
+        <div className="h-3 w-24 rounded bg-white/10 animate-pulse" />
+        <div className="h-8 w-32 mt-2 rounded bg-white/10 animate-pulse" />
+      </div>
+    </div>
+  );
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export function MaintenanceFees() {
@@ -164,23 +211,53 @@ export function MaintenanceFees() {
             Monthly recurring fees for {currentOwner?.name ?? ''}
           </p>
         </div>
-        <div
-          className="flex items-center gap-3 px-5 py-3 rounded-2xl"
-          style={{ background: 'rgba(146,141,211,0.12)', border: '1px solid rgba(146,141,211,0.3)' }}
-        >
-          <div>
-            <p className="text-white/50 text-xs font-semibold uppercase tracking-wider">Total / month</p>
-            <p className="font-black text-2xl text-white tracking-tight" style={{ fontFamily: "'Chivo', sans-serif" }}>
-              {loading ? '—' : formatCurrency(grandTotal)}
-            </p>
+        {loading ? (
+          <HeaderSummarySkeleton />
+        ) : (
+          <div
+            className="flex items-center gap-3 px-5 py-3 rounded-2xl"
+            style={{ background: 'rgba(146,141,211,0.12)', border: '1px solid rgba(146,141,211,0.3)' }}
+          >
+            <div>
+              <p className="text-white/50 text-xs font-semibold uppercase tracking-wider">Total / month</p>
+              <p className="font-black text-2xl text-white tracking-tight" style={{ fontFamily: "'Chivo', sans-serif" }}>
+                {formatCurrency(grandTotal)}
+              </p>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-24">
-          <p className="text-white/40 text-base">Loading fees…</p>
-        </div>
+        <>
+          <div className="flex gap-4 px-12 pb-6 flex-wrap">
+            <SummaryCardSkeleton />
+          </div>
+
+          <div className="px-12 pb-4">
+            <div className="flex gap-2 flex-wrap">
+              <div className="h-8 w-28 rounded-full bg-white/10 animate-pulse" />
+              <div className="h-8 w-24 rounded-full bg-white/5 animate-pulse" />
+              <div className="h-8 w-24 rounded-full bg-white/5 animate-pulse" />
+              <div className="h-8 w-28 rounded-full bg-white/5 animate-pulse" />
+            </div>
+          </div>
+
+          <div className="mx-12 mb-12 rounded-2xl relative overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.12)' }}>
+            <div className="flex items-center py-3 px-6 border-b border-white/10">
+              <div className="h-3 w-20 rounded bg-white/10 animate-pulse" />
+              <div className="flex-[2_0_0]" />
+              <div className="h-3 w-28 rounded bg-white/10 animate-pulse" />
+            </div>
+
+            <FeeRowSkeleton />
+
+            <div className="flex items-center justify-between px-6 py-4 border-t border-white/10 bg-white/[0.02]">
+              <div className="h-4 w-28 rounded bg-white/10 animate-pulse" />
+              <div className="h-4 w-40 rounded bg-white/10 animate-pulse" />
+            </div>
+          </div>
+        </>
       ) : allFees.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 gap-3">
           <p className="text-white/30 text-5xl">🔧</p>
