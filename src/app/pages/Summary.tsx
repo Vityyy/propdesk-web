@@ -132,9 +132,9 @@ export function Summary() {
           subtitle={`Gross: ${formatCurrency(summary.monthlyBreakdown.grossRevenue)} — Expenses: ${formatCurrency(summary.monthlyBreakdown.totalExpenses)}`}
         />
         <MetricCard 
-          title="Unpaid Tenants" 
+          title="Unpaid Apartments"
           value={`${unpaidPercentage}%`} 
-          subtitle={`${summary.unpaidTenantsCount} of ${summary.totalTenantsCount} tenants`}
+          subtitle={`${summary.unpaidTenantsCount} of ${summary.totalTenantsCount} apartments`}
           trend={`Due: ${formatCurrency(summary.unpaidAmount)}`}
         />
         <MetricCard 
