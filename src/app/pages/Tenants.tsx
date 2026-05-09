@@ -100,7 +100,7 @@ function TenantRow({ tenant, email, phone, paymentStatus, onEdit, onClick }: Ten
   );
 }
 
-function SummaryCard({ title, value, subtitle }: { title: string; value: string; subtitle: string }) {
+function SummaryCard({ title, value, subtitle, isLoading }: { title: string; value: string; subtitle: string; isLoading?: boolean }) {
   return (
     <div className="bg-black flex-[1_0_0] min-w-[200px] relative rounded-[16px]">
       <div className="overflow-clip rounded-[inherit] size-full">
@@ -108,12 +108,21 @@ function SummaryCard({ title, value, subtitle }: { title: string; value: string;
           <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] text-[17px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
             {title}
           </p>
-          <p className="font-['Chivo:Black',sans-serif] font-black leading-[40px] text-[34px] text-white tracking-[-0.34px]">
-            {value}
-          </p>
-          <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[16px] text-[13px] text-[#928dd3]" style={{ fontVariationSettings: "'wdth' 100" }}>
-            {subtitle}
-          </p>
+          {isLoading ? (
+            <>
+              <div className="h-8 w-24 bg-[rgba(255,255,255,0.06)] rounded mb-2 animate-pulse" />
+              <div className="h-3 w-40 bg-[rgba(146,141,211,0.08)] rounded animate-pulse" />
+            </>
+          ) : (
+            <>
+              <p className="font-['Chivo:Black',sans-serif] font-black leading-[40px] text-[34px] text-white tracking-[-0.34px]">
+                {value}
+              </p>
+              <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[16px] text-[13px] text-[#928dd3]" style={{ fontVariationSettings: "'wdth' 100" }}>
+                {subtitle}
+              </p>
+            </>
+          )}
         </div>
       </div>
       <div aria-hidden="true" className="absolute border border-solid border-white inset-0 pointer-events-none rounded-[16px]" />
@@ -122,7 +131,7 @@ function SummaryCard({ title, value, subtitle }: { title: string; value: string;
 }
 
 export function Tenants() {
-  const { currentOwner, tenants, properties, refreshTenants } = useOwner();
+  const { currentOwner, tenants, properties, isLoadingProperties, refreshTenants } = useOwner();
   const [editingTenant, setEditingTenant] = useState<Tenant | null>(null);
   const [detailsTenant, setDetailsTenant] = useState<Tenant | null>(null);
   const [occupancyRate, setOccupancyRate] = useState(0);
@@ -130,6 +139,7 @@ export function Tenants() {
   const [totalApartments, setTotalApartments] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [tenantPaymentStatus, setTenantPaymentStatus] = useState<Record<string, 'PAID' | 'PENDING' | 'UNKNOWN'>>({});
+  const [isCalculatingMetrics, setIsCalculatingMetrics] = useState(true);
 
   useEffect(() => {
     refreshTenants();
@@ -137,7 +147,10 @@ export function Tenants() {
   }, []);
   
   useEffect(() => {
+    let isMounted = true;
+
     const calculateOccupancy = async () => {
+      setIsCalculatingMetrics(true);
       let totalApartments = 0;
       let occupiedApartments = 0;
       const paymentStatusMap: Record<string, 'PAID' | 'PENDING' | 'UNKNOWN'> = {};
@@ -150,6 +163,7 @@ export function Tenants() {
       for (const property of properties) {
         try {
           const gridData = await userService.getPropertyApartmentsGrid(property.id);
+          if (!isMounted) return;
           Object.values(gridData).forEach(floorApts => {
             Object.values(floorApts).forEach((apt: ApartmentGridResponse) => {
               totalApartments++;
@@ -175,17 +189,29 @@ export function Tenants() {
         }
       }
       
-      const rate = totalApartments > 0 ? Math.round((occupiedApartments / totalApartments) * 100) : 0;
-      setOccupancyRate(rate);
-      setTotalApartments(totalApartments);
-      setOccupiedApartments(occupiedApartments);
-      setTenantPaymentStatus(paymentStatusMap);
+      if (isMounted) {
+        const rate = totalApartments > 0 ? Math.round((occupiedApartments / totalApartments) * 100) : 0;
+        setOccupancyRate(rate);
+        setTotalApartments(totalApartments);
+        setOccupiedApartments(occupiedApartments);
+        setTenantPaymentStatus(paymentStatusMap);
+        setIsCalculatingMetrics(false);
+      }
     };
     
     if (properties.length > 0) {
       calculateOccupancy();
     }
-  }, [properties, tenants]);
+    else if (!isLoadingProperties) {
+      setIsCalculatingMetrics(false);
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [properties, tenants, isLoadingProperties]);
+
+  const isPageLoading = isLoadingProperties || isCalculatingMetrics;
 
   const getTenantRows = () => {
     return tenants
@@ -234,8 +260,8 @@ export function Tenants() {
       </div>
 
       <div className="content-stretch flex gap-[24px] items-start px-[48px] pb-[24px] relative w-full">
-        <SummaryCard title="Total Tenants" value={tenants.length.toString()} subtitle="Active tenants" />
-        <SummaryCard title="Occupancy Rate" value={`${occupancyRate}%`} subtitle={`${occupiedApartments} occupied out of ${totalApartments} apartments`} />
+        <SummaryCard isLoading={isPageLoading} title="Total Tenants" value={tenants.length.toString()} subtitle="Active tenants" />
+        <SummaryCard isLoading={isPageLoading} title="Occupancy Rate" value={`${occupancyRate}%`} subtitle={`${occupiedApartments} occupied out of ${totalApartments} apartments`} />
       </div>
 
       <div className="content-stretch flex gap-[24px] items-start px-[48px] pb-[24px] relative w-full">
@@ -271,7 +297,9 @@ export function Tenants() {
                Actions
              </p>
            </div>
-           {tenantRows.length === 0 ? (
+           {isPageLoading ? (
+               <TenantSkeleton />
+           ) : tenantRows.length === 0 ? (
              <div className="py-8 px-4 text-center text-[rgba(255,255,255,0.6)]">
                No tenants yet. Create one to get started!
              </div>
@@ -306,6 +334,22 @@ export function Tenants() {
         tenant={detailsTenant}
         onClose={() => setDetailsTenant(null)}
       />
+    </div>
+  );
+}
+
+function TenantSkeleton() {
+  return (
+    <div className="content-stretch grid grid-cols-[minmax(140px,1.5fr)_minmax(180px,2fr)_minmax(140px,1.5fr)_120px_80px] items-center gap-4 py-[16px] px-[24px] relative shrink-0 w-full border-b border-[rgba(255,255,255,0.08)] animate-pulse">
+      <div className="h-4 w-3/4 bg-[rgba(255,255,255,0.06)] rounded" />
+      <div className="h-3 w-3/4 bg-[rgba(255,255,255,0.04)] rounded mx-auto" />
+      <div className="h-3 w-3/4 bg-[rgba(255,255,255,0.04)] rounded mx-auto" />
+      <div className="flex justify-center">
+        <div className="h-4 w-16 bg-[rgba(255,255,255,0.06)] rounded-full" />
+      </div>
+      <div className="flex items-center justify-center gap-3">
+        <div className="h-8 w-8 bg-[rgba(255,255,255,0.06)] rounded" />
+      </div>
     </div>
   );
 }
