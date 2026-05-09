@@ -97,14 +97,13 @@ export const router = createBrowserRouter([
         return redirect("/login");
       }
 
-      // Admins need a selected owner for owner-scoped pages, but must still be able
-      // to reach settings to accept pending owner associations.
+      // Admins need a selected owner for owner-scoped pages.
+      // Settings is read-only and only accessible to admins with at least one associated owner.
       const isAdmin = authService.getCurrentUserRole() === 'ADMIN';
       const hasSelectedOwner = sessionStorage.getItem('selectedOwnerId');
       const pathname = new URL(request.url).pathname;
-      const canAccessWithoutOwnerSelection = pathname.startsWith("/settings");
 
-      if (isAdmin && !hasSelectedOwner && !canAccessWithoutOwnerSelection) {
+      if (isAdmin && !hasSelectedOwner && !pathname.startsWith("/settings")) {
         return redirect("/select-owner");
       }
 

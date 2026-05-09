@@ -212,6 +212,14 @@ export const userService = {
     });
   },
 
+  // Rejects a pending owner request for the authenticated admin.
+  rejectOwnerRequest(ownerId: string): Promise<void> {
+    return apiRequest<void>(API_ENDPOINTS.ADMINS.REJECT_OWNER_REQUEST(ownerId), {
+      method: "DELETE",
+      token: getRequiredToken(),
+    });
+  },
+
  
   listProperties(currentOwnerId: string): Promise<PropertyResponse[]> {
     return apiRequest<PropertyResponse[]>(API_ENDPOINTS.PROPERTIES.LIST(currentOwnerId), {
