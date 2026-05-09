@@ -90,14 +90,14 @@ export function SelectOwner() {
           ))}
         </div>
 
-        <div className="mt-6">
-          <button
-            onClick={() => navigate('/settings')}
-            className="w-full px-4 py-3 rounded-lg border border-[rgba(255,255,255,0.16)] text-white font-semibold hover:border-blue-500 hover:text-blue-400 transition-colors"
-          >
-            Go to Settings
-          </button>
-        </div>
+        {/*<div className="mt-6">*/}
+        {/*  <button*/}
+        {/*    onClick={() => navigate('/settings')}*/}
+        {/*    className="w-full px-4 py-3 rounded-lg border border-[rgba(255,255,255,0.16)] text-white font-semibold hover:border-blue-500 hover:text-blue-400 transition-colors"*/}
+        {/*  >*/}
+        {/*    Go to Settings*/}
+        {/*  </button>*/}
+        {/*</div>*/}
       </div>
     </div>
   );

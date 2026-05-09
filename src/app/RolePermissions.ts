@@ -16,7 +16,7 @@ export const ROUTES_PERMISSIONS = {
   tenants: ['ADMIN', 'OWNER'] as const,
   "maintenance-fees": ['ADMIN', 'OWNER'] as const,
   reports: ['ADMIN', 'OWNER'] as const,
-  settings: ['ADMIN', 'OWNER'] as const,
+  settings: [] as const,
 } as const;
 
 /**
