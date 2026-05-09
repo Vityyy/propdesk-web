@@ -45,19 +45,56 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
   const loadAdminOwners = async () => {
     try {
       const adminOwnersList = await userService.listMyOwners();
-      const owners: Owner[] = adminOwnersList.map(o => ({
+
+      // Also fetch pending requests so we can exclude them from the accepted owners list.
+      // This is defensive: if the backend returns owners without an explicit flag,
+      // we'll ensure pending owners are not treated as accepted.
+      let pendingOwnerIds = new Set<string>();
+      let pendingFetchSucceeded = true;
+      try {
+        const pending = await userService.listPendingOwnerRequests();
+        pending.forEach(p => pendingOwnerIds.add(p.ownerId));
+      } catch (e) {
+        pendingFetchSucceeded = false;
+        // If this fails, we avoid treating owners without an explicit accepted flag as accepted.
+        console.warn('Failed to load pending owner requests; will require explicit accepted flag on owners', e);
+      }
+
+      const raw: any[] = adminOwnersList as any[];
+
+      // If owners include an explicit accepted flag, prefer that. Otherwise exclude
+      // any owner IDs that appear in the pending list.
+      const ownersCandidates = raw.filter(o => {
+        const explicit = (o.associationAccepted ?? o.adminAssociationAccepted);
+        if (typeof explicit === 'boolean') {
+          return explicit === true;
+        }
+
+        // No explicit flag present on the owner object.
+        // If we couldn't fetch the pending list, be conservative and exclude the owner.
+        if (!pendingFetchSucceeded) {
+          return false;
+        }
+
+        return !pendingOwnerIds.has(o.id);
+      });
+
+      const owners: Owner[] = ownersCandidates.map(o => ({
         id: o.id,
         name: o.name,
         properties: 0,
         totalRevenue: '$0',
       }));
+
       setOwnersAvailable(owners);
 
-      // Restore selected owner from sessionStorage or pick first
+      // Restore selected owner only if explicitly set in sessionStorage.
       const storedOwnerId = sessionStorage.getItem('selectedOwnerId');
-      const ownerToSelect = owners.find(o => o.id === storedOwnerId) || owners[0];
-      if (ownerToSelect) {
-        setCurrentOwnerState(ownerToSelect);
+      if (storedOwnerId) {
+        const ownerToSelect = owners.find(o => o.id === storedOwnerId);
+        if (ownerToSelect) {
+          setCurrentOwnerState(ownerToSelect);
+        }
       }
     } catch (err) {
       console.error('Failed to load admin owners', err);
