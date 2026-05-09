@@ -13,9 +13,9 @@ export const ROUTES_PERMISSIONS = {
   summary: ['ADMIN', 'OWNER'] as const,
   properties: ['ADMIN', 'OWNER'] as const,
   "properties/:propertyId/apartments": ['ADMIN', 'OWNER'] as const,
-  tenants: ['ADMIN'] as const,
-  "maintenance-fees": ['ADMIN'] as const,
-  reports: ['ADMIN'] as const,
+  tenants: ['ADMIN', 'OWNER'] as const,
+  "maintenance-fees": ['ADMIN', 'OWNER'] as const,
+  reports: ['ADMIN', 'OWNER'] as const,
   settings: ['ADMIN', 'OWNER'] as const,
 } as const;
 
