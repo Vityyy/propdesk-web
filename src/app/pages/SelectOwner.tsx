@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import authService from '../../services/authService';
+import { AdminRequestsMailbox } from '../components/AdminRequestsMailbox';
 import { useAuth } from '../context/AuthContext';
 import { useOwner } from '../context/OwnerContext';
 
@@ -36,18 +37,15 @@ export function SelectOwner() {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center p-4">
         <div className="text-center max-w-md w-full">
-          <h1 className="text-3xl font-bold text-white mb-4">Select Owner</h1>
-          <p className="text-red-400 text-lg mb-6">You do not have any associated owners</p>
+          <h1 className="text-3xl font-bold text-white mb-4">Pending Invitations</h1>
+          <p className="text-red-400 text-lg mb-6">You do not have any associated owners yet</p>
           <p className="text-gray-400 mb-6">
-            If you already have owner requests, go to Settings to accept them. Otherwise, an owner must first associate you as an administrator.
+            Use the mailbox below to review pending owner invitations.
           </p>
+          <div className="flex justify-center mb-6">
+            <AdminRequestsMailbox />
+          </div>
           <div className="flex flex-col gap-3">
-            <button
-              onClick={() => navigate('/settings')}
-              className="w-full px-4 py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-500 transition-colors"
-            >
-              Go to Settings
-            </button>
             <button
               onClick={() => {
                 logout();
