@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useOwner } from '../context/OwnerContext';
 import { summaryService, SummaryResponse } from '../../services/summaryService';
+import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import svgPaths from "../../imports/svg-zayt9vop9f";
 import {
   LineChart,
@@ -93,7 +94,7 @@ export function Summary() {
   if (loading || !summary) {
     return (
       <div className="bg-black min-h-full w-full flex items-center justify-center">
-        <p className="text-white text-xl">Loading summary...</p>
+        <LoadingSpinner label="Loading Summary..." size="lg" />
       </div>
     );
   }

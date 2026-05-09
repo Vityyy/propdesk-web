@@ -6,6 +6,7 @@ import authService from '../../services/authService';
 import { CreatePropertyDialog } from '../components/dialogs/CreatePropertyDialog';
 import { EditPropertyDialog } from '../components/dialogs/EditPropertyDialog';
 import { PropertyDetailsDialog } from '../components/dialogs/PropertyDetailsDialog';
+import { PropertySkeleton } from '../components/ui/skeleton';
 import svgPaths from "../../imports/svg-zayt9vop9f";
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import type { Property } from '../types/index';
@@ -28,7 +29,7 @@ interface PropertyCardProps {
   totalUnits: number;
   occupiedUnits: number;
   monthlyRevenue: number;
-  onDelete?: (id: string) => void;
+  onDelete?: (id: string) => Promise<void> | void;
   onEdit?: (property: Property) => void;
   onViewDetails?: (property: Property) => void;
   onViewApartments?: (property: Property) => void;
@@ -46,6 +47,7 @@ function PropertyCard({
 }: PropertyCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const occupancyPercentage = totalUnits > 0
     ? Math.round((occupiedUnits / totalUnits) * 100)
@@ -81,6 +83,7 @@ function PropertyCard({
             <button 
               onClick={(e) => {
                 e.stopPropagation();
+                if (isDeleting) return;
                 setShowMenu(!showMenu);
               }}
               className="hover:opacity-70 transition-opacity p-[4px]"
@@ -94,7 +97,7 @@ function PropertyCard({
                   className="fixed inset-0 z-[10]" 
                   onClick={(e) => {
                     e.stopPropagation();
-                    setShowMenu(false);
+                    if (!isDeleting) setShowMenu(false);
                   }}
                 />
                 <div className="absolute top-[calc(100%+8px)] right-0 bg-black border border-[rgba(255,255,255,0.16)] rounded-[8px] min-w-[200px] z-[11] overflow-hidden">
@@ -136,16 +139,32 @@ function PropertyCard({
                   </button>
                   <div className="border-t border-[rgba(255,255,255,0.16)]" />
                   <button
-                    onClick={(e) => {
+                    onClick={async (e) => {
                       e.stopPropagation();
-                      setShowMenu(false);
-                      onDelete?.(property.id);
+                      if (isDeleting) return;
+                      setIsDeleting(true);
+                      try {
+                        await onDelete?.(property.id);
+                      } finally {
+                        setIsDeleting(false);
+                        setShowMenu(false);
+                      }
                     }}
-                    className="w-full text-left px-[16px] py-[12px] hover:bg-[rgba(255,0,0,0.1)] transition-colors"
+                    disabled={isDeleting}
+                    className={`w-full text-left px-[16px] py-[12px] transition-colors ${isDeleting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[rgba(255,0,0,0.1)]'}`}
                   >
-                    <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-[#ff6b6b]" style={{ fontVariationSettings: "'wdth' 100" }}>
-                      Delete Property
-                    </p>
+                    {isDeleting ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-[rgba(255,107,107,0.35)] border-t-[#ff6b6b] rounded-full animate-spin" />
+                        <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-[#ff6b6b]" style={{ fontVariationSettings: "'wdth' 100" }}>
+                          Deleting...
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-[#ff6b6b]" style={{ fontVariationSettings: "'wdth' 100" }}>
+                        Delete Property
+                      </p>
+                    )}
                   </button>
                 </div>
               </>
@@ -194,10 +213,11 @@ function PropertyCard({
 
 export function Properties() {
   const navigate = useNavigate();
-  const { currentOwner, properties, refreshProperties } = useOwner();
+  const { currentOwner, properties, isLoadingProperties, refreshProperties } = useOwner();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
   const [viewingProperty, setViewingProperty] = useState<Property | null>(null);
+  const [isLoadingMetrics, setIsLoadingMetrics] = useState(true);
   const [propertyMetrics, setPropertyMetrics] = useState<Record<string, { totalUnits: number; occupiedUnits: number; monthlyRevenue: number }>>({});
 
   const buildMetricsFromGrid = (grid: PropertyApartmentsGridResponse) => {
@@ -235,8 +255,10 @@ export function Properties() {
     let cancelled = false;
 
     const fetchPropertyMetrics = async () => {
+      setIsLoadingMetrics(true);
       if (properties.length === 0) {
         setPropertyMetrics({});
+        setIsLoadingMetrics(false);
         return;
       }
 
@@ -256,8 +278,10 @@ export function Properties() {
         });
 
         setPropertyMetrics(metrics);
+        setIsLoadingMetrics(false);
       } catch (error) {
         console.error('Error calculating property metrics', error);
+        setIsLoadingMetrics(false);
       }
     };
 
@@ -274,7 +298,7 @@ export function Properties() {
     if (confirm('Are you sure you want to delete this property?')) {
       try {
         await userService.deleteProperty(propertyId);
-        refreshProperties();
+        await refreshProperties();
       } catch (e) {
         console.error("Error deleting property", e);
         alert('There was an error deleting the property.');
@@ -314,7 +338,15 @@ export function Properties() {
       </div>
 
       <div className="grid grid-cols-3 gap-[24px] px-[48px] pb-[48px]">
-        {properties.length === 0 ? (
+        {(isLoadingProperties || isLoadingMetrics) && properties.length > 0 ? (
+          Array.from({ length: properties.length }).map((_, index) => (
+            <PropertySkeleton key={`skeleton-${index}`} />
+          ))
+        ) : isLoadingProperties && properties.length === 0 ? (
+          Array.from({ length: 3 }).map((_, index) => (
+            <PropertySkeleton key={`skeleton-${index}`} />
+          ))
+        ) : properties.length === 0 ? (
           <div className="col-span-3 text-center py-12">
             <p className="text-[rgba(255,255,255,0.6)] mb-4">No properties created yet</p>
             <button 
@@ -355,9 +387,8 @@ export function Properties() {
         isOpen={!!editingProperty}
         property={editingProperty}
         onClose={() => setEditingProperty(null)}
-        onSuccess={() => {
-          setEditingProperty(null);
-          refreshProperties();
+        onSuccess={async () => {
+          await refreshProperties();
         }}
       />
 

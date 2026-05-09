@@ -6,7 +6,7 @@ interface EditPropertyDialogProps {
   isOpen: boolean;
   property: Property | null;
   onClose: () => void;
-  onSuccess?: () => void;
+  onSuccess?: () => void | Promise<void>;
 }
 
 export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: EditPropertyDialogProps) {
@@ -53,7 +53,7 @@ export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: Edi
         propertyAddress: formData.address,
       });
 
-      onSuccess?.();
+      await onSuccess?.();
       handleClose();
     } catch (error) {
       console.error('Error updating property:', error);
