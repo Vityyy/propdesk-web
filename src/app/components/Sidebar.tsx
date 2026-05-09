@@ -163,7 +163,7 @@ export function Sidebar({ isCollapsed, onToggle }: { isCollapsed: boolean; onTog
     'summary': { label: 'Summary', icon: <ChartLine /> },
     'properties': { label: 'Properties', icon: <Building />, pathPrefix: '/properties' },
     'tenants': { label: 'Tenants info', icon: <Users />, pathPrefix: '/tenants' },
-    'maintenanceFees': { label: 'Maintenance Fees', icon: <Tools />, pathPrefix: '/maintenance-fees' },
+    'maintenance-fees': { label: 'Maintenance Fees', icon: <Tools />, pathPrefix: '/maintenance-fees' },
     'reports': { label: 'Reports', icon: <PieChart />, pathPrefix: '/reports' },
     'settings': { label: 'Settings', icon: <SettingsIcon />, pathPrefix: '/settings' },
   };
