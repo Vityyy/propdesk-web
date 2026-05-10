@@ -552,7 +552,7 @@ export function Apartments() {
                               {isPaid && hasExpenseDeductions && (
                                 <span
                                   className="relative group"
-                                  title={`${apt.expenses?.length || 0} expense(s). Maintenance fees do not affect rent gain.`}
+                                  title={`${apt.expenses?.length || 0} expense(s). Changes due to expenses. Maintenance fees do not affect rent gain.`}
                                 >
                                   <button
                                     type="button"
@@ -590,7 +590,7 @@ export function Apartments() {
                   })}
 
                   {/* Add New Apartment Card */}
-                  <div
+                  <div 
                     onClick={() => handleAddClick(floorNum, getNextAvailableApartmentNumber(floorNum, sortedApartmentNumbers))}
                     className="flex flex-col rounded-xl overflow-hidden border border-[#4ade80]/30 transition-all hover:scale-[1.02] bg-[#4ade80]/5 hover:bg-[#4ade80]/10 cursor-pointer min-h-[290px] items-center justify-center text-[#4ade80]"
                     title={`Add apartment to floor ${floorNum}`}
