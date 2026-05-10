@@ -45,6 +45,7 @@ export interface PropertyResponse {
   id: string;
   name: string;
   address: string;
+  imageUrl: string;
   ownerId: string;
 }
 
@@ -220,7 +221,7 @@ export const userService = {
     });
   },
 
- 
+
   listProperties(currentOwnerId: string): Promise<PropertyResponse[]> {
     return apiRequest<PropertyResponse[]>(API_ENDPOINTS.PROPERTIES.LIST(currentOwnerId), {
       method: "GET",
