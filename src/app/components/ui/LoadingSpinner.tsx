@@ -17,8 +17,8 @@ export function LoadingSpinner({
 }: LoadingSpinnerProps) {
   return (
     <div className={`flex flex-col items-center justify-center gap-4 ${className}`.trim()}>
-      <div className={`${sizeClasses[size]} border-[rgba(255,255,255,0.2)] border-t-white rounded-full animate-spin`} />
-      {label && <p className="text-white/60 text-sm">{label}</p>}
+      <div className={`${sizeClasses[size]} border-[rgba(255,255,255,0.1)] border-t-[#928dd3] rounded-full animate-spin shadow-[0_0_10px_rgba(146,141,211,0.3)]`} />
+      {label && <p className="text-white/40 text-sm font-['Archivo:Medium',sans-serif]">{label}</p>}
     </div>
   );
 }
