@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useOwner } from '../context/OwnerContext';
 import { summaryService, SummaryResponse } from '../../services/summaryService';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
-import svgPaths from "../../imports/svg-zayt9vop9f";
+import { MoreHorizontal, Download, LineChart as LineChartIcon } from 'lucide-react';
 import {
   LineChart,
   Line,
@@ -14,17 +14,7 @@ import {
   Legend
 } from 'recharts';
 
-function DotsHorizontal() {
-  return (
-    <div className="relative shrink-0 size-[24px]" data-name="dots-horizontal">
-      <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 24">
-        <g id="dots-horizontal">
-          <path clipRule="evenodd" d={svgPaths.p3d5ea200} fill="var(--fill-0, white)" fillRule="evenodd" id="Union" />
-        </g>
-      </svg>
-    </div>
-  );
-}
+// Removing hardcoded DotsHorizontal, using MoreHorizontal from lucide-react directly in the component
 
 interface MetricCardProps {
   title: string;
@@ -35,15 +25,15 @@ interface MetricCardProps {
 
 function MetricCard({ title, value, subtitle, trend }: MetricCardProps) {
   return (
-    <div className="bg-black flex-[1_0_0] min-w-[250px] relative rounded-[16px]">
+    <div className="bg-white/[0.02] backdrop-blur-md flex-[1_0_0] min-w-[250px] relative rounded-[16px] hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(255,255,255,0.04)] transition-all duration-300 group">
       <div className="overflow-clip rounded-[inherit] size-full">
-        <div className="content-stretch flex flex-col gap-[16px] items-start p-[24px] relative w-full">
+        <div className="content-stretch flex flex-col gap-[16px] items-start p-[24px] relative w-full h-full">
           <div className="content-stretch flex items-center justify-between relative shrink-0 w-full">
             <p className="flex-[1_0_0] font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] min-h-px min-w-px overflow-hidden relative text-[17px] text-ellipsis text-white whitespace-nowrap" style={{ fontVariationSettings: "'wdth' 100" }}>
               {title}
             </p>
-            <button className="hover:opacity-70 transition-opacity">
-              <DotsHorizontal />
+            <button className="text-white/40 hover:text-white transition-colors">
+              <MoreHorizontal size={20} />
             </button>
           </div>
           <div className="content-stretch flex flex-col gap-[4px] items-start relative shrink-0 w-full">
@@ -61,7 +51,7 @@ function MetricCard({ title, value, subtitle, trend }: MetricCardProps) {
           </div>
         </div>
       </div>
-      <div aria-hidden="true" className="absolute border border-solid border-white inset-0 pointer-events-none rounded-[16px]" />
+      <div aria-hidden="true" className="absolute border border-solid border-white/10 group-hover:border-white/20 transition-colors inset-0 pointer-events-none rounded-[16px]" />
     </div>
   );
 }
@@ -107,25 +97,26 @@ export function Summary() {
 
   return (
     <div className="bg-black min-h-full w-full">
-      <div className="content-stretch flex flex-col gap-[24px] items-start py-[24px] px-[48px] relative shrink-0 w-full">
-        <div className="content-stretch flex items-center justify-between relative shrink-0 w-full">
-          <div>
-            <p className="font-['Chivo:Black',sans-serif] font-black leading-[40px] relative shrink-0 text-[34px] text-white tracking-[-0.34px] whitespace-nowrap">
-              Summary
-            </p>
-            <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] text-[15px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
-              Financial overview for {currentOwner?.name}
-            </p>
-          </div>
-          <button className="bg-[#928dd3] content-stretch flex items-center justify-center px-[16px] py-[8px] relative rounded-[8px] shrink-0 hover:bg-[#7f7ab8] transition-colors">
-            <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] relative shrink-0 text-[15px] text-black whitespace-nowrap" style={{ fontVariationSettings: "'wdth' 100" }}>
-              Export Report
-            </p>
-          </button>
+      {/* Header */}
+      <div className="flex items-center justify-between py-8 px-12">
+        <div>
+          <h1 className="font-black text-4xl text-white tracking-tight flex items-center gap-3" style={{ fontFamily: "'Chivo', sans-serif" }}>
+            <LineChartIcon className="text-[#928dd3]" size={36} />
+            Summary
+          </h1>
+          <p className="text-white/50 text-sm mt-2 font-['Archivo:Medium',sans-serif]">
+            Financial overview for {currentOwner?.name}
+          </p>
         </div>
+        <button className="bg-gradient-to-r from-[#928dd3] to-[#a89be6] content-stretch flex gap-2 items-center justify-center px-[16px] py-[8px] relative rounded-[8px] shrink-0 hover:opacity-100 shadow-[0_0_15px_rgba(146,141,211,0.4)] hover:shadow-[0_0_25px_rgba(146,141,211,0.7)] ring-1 ring-white/20 hover:ring-white/50 hover:-translate-y-0.5 active:scale-95 transition-all duration-300">
+          <Download size={18} className="text-black" />
+          <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] relative shrink-0 text-[15px] text-black whitespace-nowrap" style={{ fontVariationSettings: "'wdth' 100" }}>
+            Export Report
+          </p>
+        </button>
       </div>
 
-      <div className="content-stretch flex gap-[24px] items-start px-[48px] pb-[24px] relative w-full flex-wrap">
+      <div className="content-stretch flex gap-[24px] items-stretch px-[48px] pb-[24px] relative w-full flex-wrap">
         <MetricCard 
           title="Total Collected This Month" 
           value={formatCurrency(summary.monthlyBreakdown.grossRevenue - summary.monthlyBreakdown.totalExpenses)}
@@ -145,7 +136,7 @@ export function Summary() {
       </div>
 
       <div className="px-[48px] pb-[48px]">
-        <div className="bg-black flex-[1_0_0] min-h-px min-w-px relative rounded-[16px]">
+        <div className="bg-white/[0.02] backdrop-blur-md flex-[1_0_0] min-h-px min-w-px relative rounded-[16px] hover:shadow-[0_8px_30px_rgba(255,255,255,0.02)] transition-all duration-300 group">
           <div className="overflow-clip rounded-[inherit] size-full">
             <div className="content-stretch flex flex-col gap-[24px] items-start p-[24px] relative w-full">
               <div className="content-stretch flex items-center justify-between relative shrink-0 w-full">
@@ -177,7 +168,7 @@ export function Summary() {
               </div>
             </div>
           </div>
-          <div aria-hidden="true" className="absolute border border-solid border-white inset-0 pointer-events-none rounded-[16px]" />
+          <div aria-hidden="true" className="absolute border border-solid border-white/10 group-hover:border-white/20 transition-colors inset-0 pointer-events-none rounded-[16px]" />
         </div>
       </div>
 
@@ -186,7 +177,7 @@ export function Summary() {
           Monthly Breakdown
         </p>
         <div className="flex gap-[24px] flex-wrap">
-          <div className="bg-black flex-[1_0_0] min-w-[200px] relative rounded-[16px]">
+          <div className="bg-white/[0.02] backdrop-blur-md flex-[1_0_0] min-w-[200px] relative rounded-[16px] hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(255,255,255,0.04)] transition-all duration-300 group">
             <div className="overflow-clip rounded-[inherit] size-full">
               <div className="content-stretch flex flex-col gap-[8px] items-start p-[24px] relative w-full">
                 <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
@@ -197,10 +188,10 @@ export function Summary() {
                 </p>
               </div>
             </div>
-            <div aria-hidden="true" className="absolute border border-solid border-white inset-0 pointer-events-none rounded-[16px]" />
+            <div aria-hidden="true" className="absolute border border-solid border-white/10 group-hover:border-white/20 transition-colors inset-0 pointer-events-none rounded-[16px]" />
           </div>
           
-          <div className="bg-black flex-[1_0_0] min-w-[200px] relative rounded-[16px]">
+          <div className="bg-white/[0.02] backdrop-blur-md flex-[1_0_0] min-w-[200px] relative rounded-[16px] hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(255,255,255,0.04)] transition-all duration-300 group">
             <div className="overflow-clip rounded-[inherit] size-full">
               <div className="content-stretch flex flex-col gap-[8px] items-start p-[24px] relative w-full">
                 <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
@@ -211,10 +202,10 @@ export function Summary() {
                 </p>
               </div>
             </div>
-            <div aria-hidden="true" className="absolute border border-solid border-white inset-0 pointer-events-none rounded-[16px]" />
+            <div aria-hidden="true" className="absolute border border-solid border-white/10 group-hover:border-white/20 transition-colors inset-0 pointer-events-none rounded-[16px]" />
           </div>
 
-          <div className="bg-black flex-[1_0_0] min-w-[200px] relative rounded-[16px]">
+          <div className="bg-white/[0.02] backdrop-blur-md flex-[1_0_0] min-w-[200px] relative rounded-[16px] hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(255,255,255,0.04)] transition-all duration-300 group">
             <div className="overflow-clip rounded-[inherit] size-full">
               <div className="content-stretch flex flex-col gap-[8px] items-start p-[24px] relative w-full">
                 <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
@@ -225,10 +216,10 @@ export function Summary() {
                 </p>
               </div>
             </div>
-            <div aria-hidden="true" className="absolute border border-solid border-white inset-0 pointer-events-none rounded-[16px]" />
+            <div aria-hidden="true" className="absolute border border-solid border-white/10 group-hover:border-white/20 transition-colors inset-0 pointer-events-none rounded-[16px]" />
           </div>
 
-          <div className="bg-black flex-[1_0_0] min-w-[200px] relative rounded-[16px]">
+          <div className="bg-white/[0.02] backdrop-blur-md flex-[1_0_0] min-w-[200px] relative rounded-[16px] hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(13,196,74,0.15)] transition-all duration-300 group">
             <div className="overflow-clip rounded-[inherit] size-full">
               <div className="content-stretch flex flex-col gap-[8px] items-start p-[24px] relative w-full">
                 <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-[#0DC44A]" style={{ fontVariationSettings: "'wdth' 100" }}>
@@ -239,7 +230,7 @@ export function Summary() {
                 </p>
               </div>
             </div>
-            <div aria-hidden="true" className="absolute border border-solid border-[#0DC44A] inset-0 pointer-events-none rounded-[16px]" />
+            <div aria-hidden="true" className="absolute border border-solid border-[#0DC44A]/40 group-hover:border-[#0DC44A] transition-colors inset-0 pointer-events-none rounded-[16px]" />
           </div>
         </div>
       </div>
