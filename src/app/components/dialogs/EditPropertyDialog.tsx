@@ -14,6 +14,7 @@ export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: Edi
   const [formData, setFormData] = useState({
     name: property?.name || '',
     address: property?.address || '',
+    imageUrl: property?.imageUrl || '',
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -22,6 +23,7 @@ export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: Edi
     setFormData({
       name: property?.name || '',
       address: property?.address || '',
+      imageUrl: property?.imageUrl || '',
     });
     setValidationErrors({});
   };
@@ -34,6 +36,15 @@ export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: Edi
     }
     if (!formData.address?.trim()) {
       errors.address = 'Address is required';
+    }
+    if (!formData.imageUrl?.trim()) {
+      errors.imageUrl = 'Image link is required';
+    } else {
+      try {
+        new URL(formData.imageUrl);
+      } catch {
+        errors.imageUrl = 'Image link must be a valid URL';
+      }
     }
 
     setValidationErrors(errors);
@@ -52,6 +63,7 @@ export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: Edi
       await userService.updateProperty(property.id, {
         propertyName: formData.name,
         propertyAddress: formData.address,
+        pictureUrl: formData.imageUrl,
       });
 
       await onSuccess?.();
@@ -134,6 +146,30 @@ export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: Edi
             />
             {validationErrors.address && (
               <p className="text-[#ff6b6b] text-xs mt-2 font-medium">{validationErrors.address}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block font-['Archivo:SemiBold',sans-serif] font-semibold text-white/70 text-[14px] mb-2 uppercase tracking-wider">
+              Image Link *
+            </label>
+            <input
+              type="url"
+              value={formData.imageUrl}
+              onChange={(e) => {
+                setFormData({ ...formData, imageUrl: e.target.value });
+                if (validationErrors.imageUrl) {
+                  setValidationErrors({ ...validationErrors, imageUrl: '' });
+                }
+              }}
+              className={`w-full px-4 py-3 bg-white/[0.03] border rounded-[12px] text-white placeholder-white/30 transition-all duration-300 outline-none ${validationErrors.imageUrl
+                  ? 'border-[#ff6b6b] focus:border-[#ff6b6b] focus:ring-1 focus:ring-[#ff6b6b]'
+                  : 'border-white/10 focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3]'
+                }`}
+              placeholder="https://example.com/property.jpg"
+            />
+            {validationErrors.imageUrl && (
+              <p className="text-[#ff6b6b] text-xs mt-2 font-medium">{validationErrors.imageUrl}</p>
             )}
           </div>
 

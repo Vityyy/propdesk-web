@@ -245,7 +245,7 @@ export const userService = {
     });
   },
 
-  updateProperty(propertyId: string, data: { propertyName?: string; propertyAddress?: string }): Promise<PropertyResponse> {
+  updateProperty(propertyId: string, data: { propertyName?: string; propertyAddress?: string; pictureUrl?: string }): Promise<PropertyResponse> {
     return apiRequest<PropertyResponse>(`${API_ENDPOINTS.PROPERTIES.BASE}/${propertyId}`, {
       method: "PUT",
       body: data,

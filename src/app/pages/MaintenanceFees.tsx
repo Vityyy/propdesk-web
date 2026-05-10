@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Wrench } from 'lucide-react';
+import { Trash2, Wrench } from 'lucide-react';
 import { useOwner } from '../context/OwnerContext';
 import userService, {
   MaintenanceFeeResponse,
@@ -114,15 +114,19 @@ function FeeRow({
           {formatCurrency(fee.amount)}<span className="text-white/40 text-xs font-['Archivo:Medium',sans-serif] ml-1 font-normal">/mo</span>
         </p>
       </div>
-      <div className="w-16 flex justify-end">
+      <div className="w-20 flex justify-end">
         <button
           type="button"
           onClick={() => onDelete(fee)}
           disabled={deleting}
-          className="p-2 rounded-lg text-red-400 hover:bg-red-500/20 transition-colors disabled:opacity-40"
+          className="p-2 rounded-[8px] text-[#ff6b6b] hover:bg-[rgba(255,107,107,0.12)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           title="Delete maintenance fee"
         >
-          {deleting ? '...' : <TrashIcon />}
+          {deleting ? (
+            <span className="text-xs font-bold">...</span>
+          ) : (
+            <Trash2 size={16} />
+          )}
         </button>
       </div>
     </div>
@@ -155,7 +159,7 @@ function FeeRowSkeleton() {
       <div className="flex-[1_0_0]">
         <div className="h-5 w-28 rounded bg-white/10 animate-pulse" />
       </div>
-      <div className="w-16" />
+      <div className="w-20" />
     </div>
   );
 }
@@ -331,7 +335,7 @@ export function MaintenanceFees() {
               <div className="h-3 w-20 rounded bg-white/10 animate-pulse" />
               <div className="flex-[2_0_0]" />
               <div className="h-3 w-28 rounded bg-white/10 animate-pulse" />
-              <div className="w-16" />
+              <div className="w-20" />
             </div>
 
             <FeeRowSkeleton />
@@ -375,11 +379,18 @@ export function MaintenanceFees() {
 
           {/* Fee rows table */}
           <div className="mx-12 mb-12 rounded-[16px] bg-white/[0.02] border border-white/10 backdrop-blur-md shadow-lg overflow-hidden">
+            {deleteError && (
+              <div className="mx-6 mt-4 p-3 bg-[#ff6b6b]/10 border border-[#ff6b6b]/40 rounded-[12px] text-[#ff6b6b] text-sm">
+                {deleteError}
+              </div>
+            )}
+
             {/* Table header */}
             <div className="flex items-center py-4 px-6 border-b border-white/10 bg-white/[0.02]">
               <p className="flex-[1_0_0] text-[11px] font-bold uppercase tracking-widest text-white/40">Category</p>
               <p className="flex-[2_0_0] text-[11px] font-bold uppercase tracking-widest text-white/40">Description / Apartment</p>
               <p className="flex-[1_0_0] text-[11px] font-bold uppercase tracking-widest text-white/40">Monthly Cost</p>
+              <p className="w-20 text-right text-[11px] font-bold uppercase tracking-widest text-white/40">Actions</p>
             </div>
 
             {displayedFees.length === 0 ? (
