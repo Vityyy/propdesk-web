@@ -5,23 +5,7 @@ import { EditTenantDialog } from '../components/dialogs/EditTenantDialog';
 import { TenantDetailsDialog } from '../components/dialogs/TenantDetailsDialog';
 import userService, { type ApartmentGridResponse } from '../../services/userService';
 
-function EditIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 20h9"></path>
-      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-    </svg>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="11" cy="11" r="8"></circle>
-      <path d="m21 21-4.35-4.35"></path>
-    </svg>
-  );
-}
+import { Pencil, Search, Users } from 'lucide-react';
 
 interface TenantRowProps {
   id: string;
@@ -45,19 +29,19 @@ function TenantRow({ tenant, email, phone, paymentStatus, onEdit, onClick }: Ten
 
   if (paymentStatus === 'PAID') {
     badgeColor = '#4ade80';
-    badgeText = 'Al día';
+    badgeText = 'Paid';
     badgeBg = 'bg-[#4ade80]/15';
     badgeBorder = 'border-[#4ade80]/40';
   } else if (paymentStatus === 'PENDING') {
     badgeColor = '#f59e0b';
-    badgeText = 'Pendiente';
+    badgeText = 'Pending';
     badgeBg = 'bg-[#f59e0b]/15';
     badgeBorder = 'border-[#f59e0b]/40';
   }
 
   return (
     <div 
-      className="content-stretch grid grid-cols-[minmax(140px,1.5fr)_minmax(180px,2fr)_minmax(140px,1.5fr)_120px_80px] items-center gap-4 py-[16px] px-[24px] relative shrink-0 w-full border-b border-[rgba(255,255,255,0.16)] hover:bg-[rgba(255,255,255,0.03)] transition-colors cursor-pointer"
+      className="content-stretch grid grid-cols-[minmax(140px,1.5fr)_minmax(180px,2fr)_minmax(140px,1.5fr)_120px_80px] items-center gap-4 py-[16px] px-[24px] relative shrink-0 w-full border-b border-white/10 hover:bg-white/[0.04] transition-colors cursor-pointer"
       onClick={onClick}
     >
       <div className="min-w-0">
@@ -90,10 +74,10 @@ function TenantRow({ tenant, email, phone, paymentStatus, onEdit, onClick }: Ten
       <div className="flex items-center justify-center gap-3" onClick={(e) => e.stopPropagation()}>
         <button 
           onClick={onEdit}
-          className="bg-black/40 hover:bg-[#928dd3]/80 backdrop-blur-sm p-1.5 rounded transition-colors text-white hover:text-black"
+          className="bg-black/40 hover:bg-[#928dd3] backdrop-blur-md p-2 rounded-lg transition-all duration-200 text-white hover:text-black border border-white/5 hover:border-[#928dd3] hover:shadow-[0_0_15px_rgba(146,141,211,0.4)]"
           title="Edit tenant"
         >
-          <EditIcon />
+          <Pencil size={16} />
         </button>
       </div>
     </div>
@@ -102,8 +86,8 @@ function TenantRow({ tenant, email, phone, paymentStatus, onEdit, onClick }: Ten
 
 function SummaryCard({ title, value, subtitle, isLoading }: { title: string; value: string; subtitle: string; isLoading?: boolean }) {
   return (
-    <div className="bg-black flex-[1_0_0] min-w-[200px] relative rounded-[16px]">
-      <div className="overflow-clip rounded-[inherit] size-full">
+    <div className="bg-white/[0.02] backdrop-blur-md border border-white/10 hover:border-white/20 shadow-lg hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(255,255,255,0.04)] transition-all duration-300 flex-[1_0_0] min-w-[200px] relative rounded-[16px]">
+      <div className="overflow-hidden rounded-[inherit] size-full">
         <div className="content-stretch flex flex-col gap-[8px] items-start p-[24px] relative w-full">
           <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] text-[17px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
             {title}
@@ -125,7 +109,6 @@ function SummaryCard({ title, value, subtitle, isLoading }: { title: string; val
           )}
         </div>
       </div>
-      <div aria-hidden="true" className="absolute border border-solid border-white inset-0 pointer-events-none rounded-[16px]" />
     </div>
   );
 }
@@ -246,16 +229,16 @@ export function Tenants() {
 
   return (
     <div className="bg-black min-h-full w-full">
-      <div className="content-stretch flex flex-col gap-[24px] items-start py-[24px] px-[48px] relative shrink-0 w-full">
-        <div className="content-stretch flex items-center justify-between relative shrink-0 w-full">
-          <div>
-            <p className="font-['Chivo:Black',sans-serif] font-black leading-[40px] relative shrink-0 text-[34px] text-white tracking-[-0.34px] whitespace-nowrap">
-              Tenants
-            </p>
-            <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] text-[15px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
-              Manage {tenants.length} tenants for {currentOwner.name}
-            </p>
-          </div>
+      {/* Header */}
+      <div className="flex items-center justify-between py-8 px-12">
+        <div>
+          <h1 className="font-black text-4xl text-white tracking-tight flex items-center gap-3" style={{ fontFamily: "'Chivo', sans-serif" }}>
+            <Users className="text-[#928dd3]" size={36} />
+            Tenants
+          </h1>
+          <p className="text-white/50 text-sm mt-2 font-['Archivo:Medium',sans-serif]">
+            Manage {tenants.length} tenants for {currentOwner.name}
+          </p>
         </div>
       </div>
 
@@ -265,22 +248,21 @@ export function Tenants() {
       </div>
 
       <div className="content-stretch flex gap-[24px] items-start px-[48px] pb-[24px] relative w-full">
-        <div className="flex items-center gap-3 bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] rounded-lg px-4 py-2.5 text-white">
-          <SearchIcon />
+        <div className="flex items-center gap-3 bg-white/[0.03] border border-white/10 focus-within:border-[#928dd3] focus-within:bg-white/[0.05] focus-within:ring-1 focus-within:ring-[#928dd3] rounded-[12px] px-4 py-3 text-white transition-all duration-300">
+          <Search size={18} className="text-white/40" />
           <input
             type="text"
             placeholder="Search tenants by name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="bg-transparent text-white placeholder-white/40 text-sm focus:outline-none w-64"
+            className="bg-transparent text-white placeholder-white/30 text-sm focus:outline-none w-64"
           />
         </div>
       </div>
 
-      <div className="bg-black mx-[48px] mb-[48px] rounded-[16px] relative">
-        <div aria-hidden="true" className="absolute border border-solid border-white inset-0 pointer-events-none rounded-[16px]" />
+      <div className="bg-white/[0.02] backdrop-blur-md border border-white/10 shadow-lg mx-[48px] mb-[48px] rounded-[16px] relative overflow-hidden">
         <div className="overflow-visible rounded-[inherit] size-full">
-           <div className="content-stretch grid grid-cols-[minmax(140px,1.5fr)_minmax(180px,2fr)_minmax(140px,1.5fr)_120px_80px] items-center gap-4 py-[16px] px-[24px] relative shrink-0 w-full border-b border-[rgba(255,255,255,0.16)]">
+           <div className="content-stretch grid grid-cols-[minmax(140px,1.5fr)_minmax(180px,2fr)_minmax(140px,1.5fr)_120px_80px] items-center gap-4 py-[16px] px-[24px] relative shrink-0 w-full border-b border-white/10 bg-white/[0.02]">
              <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
                Name
              </p>
@@ -340,7 +322,7 @@ export function Tenants() {
 
 function TenantSkeleton() {
   return (
-    <div className="content-stretch grid grid-cols-[minmax(140px,1.5fr)_minmax(180px,2fr)_minmax(140px,1.5fr)_120px_80px] items-center gap-4 py-[16px] px-[24px] relative shrink-0 w-full border-b border-[rgba(255,255,255,0.08)] animate-pulse">
+    <div className="content-stretch grid grid-cols-[minmax(140px,1.5fr)_minmax(180px,2fr)_minmax(140px,1.5fr)_120px_80px] items-center gap-4 py-[16px] px-[24px] relative shrink-0 w-full border-b border-white/5 animate-pulse">
       <div className="h-4 w-3/4 bg-[rgba(255,255,255,0.06)] rounded" />
       <div className="h-3 w-3/4 bg-[rgba(255,255,255,0.04)] rounded mx-auto" />
       <div className="h-3 w-3/4 bg-[rgba(255,255,255,0.04)] rounded mx-auto" />
