@@ -86,7 +86,7 @@ export function Apartments() {
   const property = properties.find(p => p.id === propertyId);
 
   // Convert the Record<number, Record<number, ApartmentGridResponse>> to sorted arrays for rendering
-  const sortedFloors = gridData 
+  const sortedFloors = gridData
     ? Object.keys(gridData).map(Number).filter(n => !isNaN(n)).sort((a, b) => a - b)
     : [];
 
@@ -134,7 +134,7 @@ export function Apartments() {
       // Find indices
       const startIdx = flattenedApartments.findIndex(a => a.id === lastSelectedId);
       const endIdx = flattenedApartments.findIndex(a => a.id === apt.id);
-      
+
       if (startIdx !== -1 && endIdx !== -1) {
         const min = Math.min(startIdx, endIdx);
         const max = Math.max(startIdx, endIdx);
@@ -150,9 +150,14 @@ export function Apartments() {
       }
       setLastSelectedId(apt.id);
     } else {
-      newSelected.clear();
-      newSelected.add(apt.id);
-      setLastSelectedId(apt.id);
+      if (newSelected.has(apt.id) && newSelected.size === 1) {
+        newSelected.clear();
+        setLastSelectedId(null);
+      } else {
+        newSelected.clear();
+        newSelected.add(apt.id);
+        setLastSelectedId(apt.id);
+      }
     }
 
     setSelectedApartments(newSelected);
@@ -284,10 +289,10 @@ export function Apartments() {
           const numericKey = Number(numberKey);
           nextApartmentsByNumber[numericKey] = apartmentData.id === apt.id
             ? {
-                ...apartmentData,
-                paymentStatus: nextStatus,
-                dueDate: nextDueDate,
-              }
+              ...apartmentData,
+              paymentStatus: nextStatus,
+              dueDate: nextDueDate,
+            }
             : apartmentData;
         });
         nextGrid[Number(floorKey)] = nextApartmentsByNumber;
@@ -347,13 +352,13 @@ export function Apartments() {
     <div className="bg-black min-h-full w-full">
       <div className="content-stretch flex flex-col gap-[24px] items-start py-[24px] px-[48px] relative shrink-0 w-full">
         <div className="flex flex-col gap-[12px] w-full">
-          <button 
+          <button
             onClick={() => navigate('/properties')}
             className="text-[rgba(255,255,255,0.6)] hover:text-white transition-colors self-start mb-4"
           >
             ← Back to Properties
           </button>
-          
+
           <div className="flex items-center justify-between w-full">
             <div>
               <p className="font-['Chivo:Black',sans-serif] font-black leading-[40px] text-[34px] text-white tracking-[-0.34px]">
@@ -363,29 +368,23 @@ export function Apartments() {
                 {property ? `Managing ${property.name}` : 'Loading property data...'}
               </p>
             </div>
-            
+
             <div className="flex items-center gap-2">
               <label className="text-white/60 text-sm font-semibold">Floor:</label>
-              <input 
-                type="number" 
-                placeholder="Search floor..." 
+              <input
+                type="number"
+                placeholder="Search floor..."
                 value={floorSearch}
                 onChange={e => setFloorSearch(e.target.value)}
                 className="bg-black border border-[rgba(255,255,255,0.2)] rounded-lg px-3 py-1.5 text-white placeholder-white/30 text-sm focus:outline-none focus:border-[#928dd3] transition-colors w-32"
               />
             </div>
           </div>
-          
+
           <div className="bg-[#928dd3]/10 border border-[#928dd3]/30 rounded-lg p-3 w-fit text-[#928dd3] text-sm flex gap-4 mt-2">
             <p><strong className="font-bold">Click:</strong> Select one</p>
             <p><strong className="font-bold">Ctrl + Click:</strong> Select multiple</p>
             <p><strong className="font-bold">Shift + Click:</strong> Select range</p>
-          </div>
-          <div className="bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.12)] rounded-lg px-4 py-2.5 mt-2 max-w-4xl">
-            <p className="text-[13px] text-[rgba(255,255,255,0.75)]">
-              Use <strong className="font-semibold text-white">Edit</strong> to update apartment details, assign or edit the tenant, and manage expenses.
-              Changes go through the apartments API (<strong className="font-semibold text-white">/apartments</strong>).
-            </p>
           </div>
         </div>
       </div>
@@ -397,13 +396,13 @@ export function Apartments() {
               {selectedApartments.size} apartment{selectedApartments.size !== 1 ? 's' : ''} selected
             </span>
             <div className="flex gap-3">
-              <button 
+              <button
                 onClick={() => setSelectedApartments(new Set())}
                 className="px-4 py-2 border border-[rgba(255,255,255,0.2)] text-white hover:bg-[rgba(255,255,255,0.1)] rounded-lg transition-colors text-sm font-semibold"
               >
                 Cancel
               </button>
-              <button 
+              <button
                 onClick={handleBulkEditClick}
                 className="px-4 py-2 bg-[#928dd3] text-black hover:bg-[#a89be6] rounded-lg transition-colors text-sm font-bold"
               >
@@ -425,13 +424,13 @@ export function Apartments() {
             const floorApartmentsMap = gridData![floorNum];
             if (!floorApartmentsMap) return null;
             const sortedApartmentNumbers = Object.keys(floorApartmentsMap).map(Number).filter(n => !isNaN(n)).sort((a, b) => a - b);
-            
+
             return (
               <div key={floorNum} className="flex flex-col gap-6">
                 <h3 className="font-['Chivo:Black',sans-serif] font-black text-2xl text-white">
                   Floor {floorNum}
                 </h3>
-                
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-6 auto-rows-fr">
                   {sortedApartmentNumbers.map(aptNum => {
                     const apt = floorApartmentsMap[aptNum];
@@ -465,8 +464,8 @@ export function Apartments() {
                     const isSelected = selectedApartments.has(apt.id);
 
                     return (
-                      <div 
-                        key={apt.id} 
+                      <div
+                        key={apt.id}
                         onClick={(e) => handleCardClick(apt, e)}
                         className={`flex flex-col rounded-xl border transition-all hover:scale-[1.02] bg-[#111] cursor-pointer select-none ${isSelected ? 'border-[#928dd3] ring-2 ring-[#928dd3]/50 transform scale-[1.02]' : 'border-[rgba(255,255,255,0.1)]'}`}
                       >
@@ -475,7 +474,7 @@ export function Apartments() {
                           <div className={`text-white opacity-90 drop-shadow-md ${isVacant ? 'opacity-50' : ''}`}>
                             <UserIcon />
                           </div>
-                          
+
                           {/* Apt number badge */}
                           <div className="absolute top-3 left-3 bg-black/40 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold text-white tracking-wide">
                             APT {aptNum}
@@ -485,13 +484,12 @@ export function Apartments() {
                           <button
                             onClick={(e) => handleTogglePaymentStatus(e, apt)}
                             disabled={isStatusUpdating || isVacant}
-                            className={`absolute top-11 left-3 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold tracking-wide flex items-center gap-1 border transition-colors ${
-                              isVacant
-                                ? 'bg-white/10 border-white/20 text-white/40'
-                                : isPaid
-                                  ? 'bg-[#4ade80]/15 border-[#4ade80]/40 text-[#4ade80] hover:bg-[#4ade80]/25'
-                                  : 'bg-[#f59e0b]/15 border-[#f59e0b]/40 text-[#f59e0b] hover:bg-[#f59e0b]/25'
-                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                            className={`absolute top-11 left-3 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold tracking-wide flex items-center gap-1 border transition-colors ${isVacant
+                              ? 'bg-white/10 border-white/20 text-white/40'
+                              : isPaid
+                                ? 'bg-[#4ade80]/15 border-[#4ade80]/40 text-[#4ade80] hover:bg-[#4ade80]/25'
+                                : 'bg-[#f59e0b]/15 border-[#f59e0b]/40 text-[#f59e0b] hover:bg-[#f59e0b]/25'
+                              } disabled:opacity-50 disabled:cursor-not-allowed`}
                             title={
                               isVacant
                                 ? 'No tenant assigned (no rent due yet)'
@@ -503,11 +501,11 @@ export function Apartments() {
                             <CreditCardIcon />
                             <span>{isStatusUpdating ? '...' : isVacant ? 'N/A' : isPaid ? 'Paid' : 'Unpaid'}</span>
                           </button>
-                          
+
                           {/* Actions */}
                           <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
                             {/* Edit button */}
-                            <button 
+                            <button
                               onClick={(e) => handleEditClick(e, apt)}
                               className="bg-black/40 hover:bg-black/70 backdrop-blur-sm p-1.5 rounded transition-colors text-white"
                               title="Edit apartment data"
@@ -515,7 +513,7 @@ export function Apartments() {
                               <EditIcon />
                             </button>
                             {/* Delete button */}
-                            <button 
+                            <button
                               onClick={(e) => handleDeleteClick(e, apt)}
                               className="bg-black/40 hover:bg-[#ff6b6b]/80 backdrop-blur-sm p-1.5 rounded transition-colors text-[#ff6b6b] hover:text-white"
                               title="Delete apartment"
@@ -524,7 +522,7 @@ export function Apartments() {
                             </button>
                           </div>
                         </div>
-                        
+
                         {/* Lower half: Details */}
                         <div className="p-4 flex flex-col gap-3 flex-1 bg-[#1a1a1a] rounded-b-xl overflow-visible">
                           <div className="flex justify-between items-center border-b border-[rgba(255,255,255,0.05)] pb-2">
@@ -533,7 +531,7 @@ export function Apartments() {
                               {apt.tenant ? apt.tenant.name : <span className="text-[rgba(255,255,255,0.3)] italic">Vacant</span>}
                             </span>
                           </div>
-                          
+
                           <div className="flex justify-between items-center">
                             <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Rent Gain</span>
                             <div className="flex items-center gap-1.5">
@@ -576,12 +574,12 @@ export function Apartments() {
                               )}
                             </div>
                           </div>
-                          
+
                           <div className="flex justify-between items-center">
                             <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Area</span>
                             <span className="text-sm text-white">{apt.squareMeters} m²</span>
                           </div>
-                          
+
                           <div className="flex justify-between items-center mt-auto pt-2">
                             <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Due</span>
                             <span className="text-sm text-white">{apt.dueDate || '-'}</span>
@@ -607,7 +605,7 @@ export function Apartments() {
         )}
       </div>
 
-      <EditApartmentsDialog 
+      <EditApartmentsDialog
         isOpen={isEditDialogOpen}
         propertyId={propertyId || ''}
         apartments={editingApartments}

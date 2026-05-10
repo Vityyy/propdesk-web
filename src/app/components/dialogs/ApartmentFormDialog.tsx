@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { X } from 'lucide-react';
 
 export interface ApartmentFormDialogProps {
   isOpen: boolean;
@@ -83,9 +84,9 @@ export function ApartmentFormDialog({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-[#111] border border-[rgba(255,255,255,0.1)] rounded-2xl max-w-md w-full shadow-2xl">
-        <div className="p-6 border-b border-[rgba(255,255,255,0.1)] flex items-center justify-between">
+    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+      <div className="bg-[#0a0a0f] border border-white/10 rounded-[24px] max-w-md w-full shadow-[0_8px_30px_rgba(0,0,0,0.8)] relative z-10">
+        <div className="p-6 border-b border-white/10 flex items-center justify-between">
           <div>
             <h2 className="font-['Chivo:Black',sans-serif] font-black text-2xl text-white">
               {title}
@@ -95,10 +96,11 @@ export function ApartmentFormDialog({
             </p>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="text-[rgba(255,255,255,0.4)] hover:text-white transition-colors p-2"
+            className="p-2 text-white/60 bg-white/5 rounded-full transition-colors hover:text-white hover:bg-white/10 shadow-sm"
           >
-            ✕
+            <X size={20} />
           </button>
         </div>
 
@@ -125,7 +127,7 @@ export function ApartmentFormDialog({
               required={isAddMode}
               value={formData.rent}
               onChange={(e) => setFormData({ ...formData, rent: e.target.value })}
-              className={`w-full px-4 py-3 bg-black border border-[rgba(255,255,255,0.1)] focus:border-[${isAddMode ? '#4ade80' : '#928dd3'}] rounded-xl text-white placeholder-[rgba(255,255,255,0.3)] transition-colors focus:outline-none`}
+              className="w-full px-4 py-3 bg-white/[0.03] border border-white/10 hover:border-white/20 focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[12px] text-white placeholder-white/30 transition-all duration-300"
               placeholder={isBulk ? 'Leave blank to keep unchanged' : 'e.g., 1500.00'}
             />
           </div>
@@ -140,24 +142,24 @@ export function ApartmentFormDialog({
               required={isAddMode}
               value={formData.squareMeters}
               onChange={(e) => setFormData({ ...formData, squareMeters: e.target.value })}
-              className={`w-full px-4 py-3 bg-black border border-[rgba(255,255,255,0.1)] focus:border-[${isAddMode ? '#4ade80' : '#928dd3'}] rounded-xl text-white placeholder-[rgba(255,255,255,0.3)] transition-colors focus:outline-none`}
+              className="w-full px-4 py-3 bg-white/[0.03] border border-white/10 hover:border-white/20 focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[12px] text-white placeholder-white/30 transition-all duration-300"
               placeholder={isBulk ? 'Leave blank to keep unchanged' : 'e.g., 45.5'}
             />
           </div>
 
-          <div className="flex gap-3 pt-6 border-t border-[rgba(255,255,255,0.1)] mt-6">
+          <div className="flex gap-3 pt-6 border-t border-white/5 mt-6">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="flex-1 px-4 py-3 border border-[rgba(255,255,255,0.1)] text-white rounded-xl hover:bg-[rgba(255,255,255,0.05)] transition-colors disabled:opacity-50"
+              className={`flex-1 px-4 py-3 bg-transparent border border-white/10 text-white font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] rounded-[12px] transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/5'}`}
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`flex-1 px-4 py-3 text-black font-bold rounded-xl transition-colors disabled:opacity-50 ${isAddMode ? 'bg-[#4ade80] hover:bg-[#22c55e]' : 'bg-[#928dd3] hover:bg-[#a89be6]'}`}
+              className={`flex-1 px-4 py-3 bg-gradient-to-r from-[#928dd3] to-[#a89be6] text-black font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] rounded-[12px] transition-all duration-300 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-100 shadow-[0_0_15px_rgba(146,141,211,0.4)] hover:shadow-[0_0_25px_rgba(146,141,211,0.7)] active:scale-95'}`}
             >
               {isSubmitting ? submittingText : submitText}
             </button>

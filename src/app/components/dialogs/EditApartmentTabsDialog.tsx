@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { X } from 'lucide-react';
 import userService, {
   ApartmentGridResponse,
   ApartmentExpenseResponse,
@@ -181,7 +182,7 @@ function ApartmentDataSection({
           type="date"
           value={dueDate}
           onChange={e => setDueDate(e.target.value)}
-          className="w-full px-4 py-3 bg-black border border-white/10 focus:border-[#928dd3] rounded-xl text-white placeholder-white/30 transition-colors focus:outline-none"
+          className="w-full px-4 py-3 bg-black border border-white/10 focus:border-[#928dd3] rounded-xl text-white placeholder-white/30 transition-colors focus:outline-none [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-40 [&::-webkit-calendar-picker-indicator]:p-1 [&::-webkit-calendar-picker-indicator]:rounded-md [&::-webkit-calendar-picker-indicator]:transition-all hover:[&::-webkit-calendar-picker-indicator]:opacity-100 hover:[&::-webkit-calendar-picker-indicator]:bg-white/10 hover:[&::-webkit-calendar-picker-indicator]:scale-110 hover:[&::-webkit-calendar-picker-indicator]:cursor-pointer"
         />
       </div>
       <button
@@ -459,7 +460,7 @@ function TenantSection({
               type="date"
               value={dueDate}
               onChange={e => setDueDate(e.target.value)}
-              className="w-full px-4 py-3 bg-black border border-white/10 focus:border-[#4ade80] rounded-xl text-white placeholder-white/30 transition-colors focus:outline-none"
+              className="w-full px-4 py-3 bg-black border border-white/10 focus:border-[#4ade80] rounded-xl text-white placeholder-white/30 transition-colors focus:outline-none [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-40 [&::-webkit-calendar-picker-indicator]:p-1 [&::-webkit-calendar-picker-indicator]:rounded-md [&::-webkit-calendar-picker-indicator]:transition-all hover:[&::-webkit-calendar-picker-indicator]:opacity-100 hover:[&::-webkit-calendar-picker-indicator]:bg-white/10 hover:[&::-webkit-calendar-picker-indicator]:scale-110 hover:[&::-webkit-calendar-picker-indicator]:cursor-pointer"
             />
           </div>
 
@@ -832,8 +833,8 @@ export function EditApartmentTabsDialog({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-[#111] border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+      <div className="bg-[#0a0a0f] border border-white/10 rounded-[24px] w-full max-w-lg shadow-[0_8px_30px_rgba(0,0,0,0.8)] flex flex-col max-h-[90vh] relative z-10">
         {/* Header */}
         <div className="p-6 border-b border-white/10 flex items-center justify-between shrink-0">
           <div>
@@ -844,9 +845,9 @@ export function EditApartmentTabsDialog({
           </div>
           <button
             onClick={onClose}
-            className="text-white/40 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/5"
+            className="p-2 text-white/60 bg-white/5 rounded-full transition-colors hover:text-white hover:bg-white/10 shadow-sm"
           >
-            ✕
+            <X size={20} />
           </button>
         </div>
 

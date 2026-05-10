@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Wrench } from 'lucide-react';
 import { useOwner } from '../context/OwnerContext';
 import userService, {
   MaintenanceFeeResponse,
@@ -24,10 +25,10 @@ interface CategorySummary {
 // ─── Category config ──────────────────────────────────────────────────────────
 
 const CATEGORY_CONFIG: Record<string, { color: string; bg: string; border: string }> = {
-  GENERAL:   { color: '#928dd3', bg: 'rgba(146,141,211,0.12)', border: 'rgba(146,141,211,0.3)' },
-  CLEANING:  { color: '#4ade80', bg: 'rgba(74,222,128,0.12)',  border: 'rgba(74,222,128,0.3)'  },
-  SECURITY:  { color: '#f59e0b', bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.3)'  },
-  AMENITIES: { color: '#38bdf8', bg: 'rgba(56,189,248,0.12)', border: 'rgba(56,189,248,0.3)'  },
+  GENERAL: { color: '#928dd3', bg: 'rgba(146,141,211,0.12)', border: 'rgba(146,141,211,0.3)' },
+  CLEANING: { color: '#4ade80', bg: 'rgba(74,222,128,0.12)', border: 'rgba(74,222,128,0.3)' },
+  SECURITY: { color: '#f59e0b', bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.3)' },
+  AMENITIES: { color: '#38bdf8', bg: 'rgba(56,189,248,0.12)', border: 'rgba(56,189,248,0.3)' },
 };
 
 function categoryStyle(cat: string) {
@@ -45,24 +46,28 @@ function SummaryCard({ summary, total }: { summary: CategorySummary; total: numb
 
   return (
     <div
-      className="flex-1 min-w-[160px] rounded-2xl p-5 relative overflow-hidden"
-      style={{ background: style.bg, border: `1px solid ${style.border}` }}
+      className="flex-1 min-w-[160px] rounded-[16px] p-6 relative overflow-hidden backdrop-blur-sm shadow-lg hover:-translate-y-1 transition-all duration-300"
+      style={{ background: style.bg, border: `1px solid ${style.border}`, boxShadow: `0 8px 30px ${style.bg.replace('0.12', '0.05')}` }}
     >
-      <div className="flex items-center gap-2 mb-3">
+      <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full blur-3xl opacity-30 pointer-events-none" style={{ backgroundColor: style.color }} />
+
+      <div className="flex items-center justify-between mb-4 relative z-10">
         <span
-          className="px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider"
+          className="px-2.5 py-1 rounded-[6px] text-[10px] font-bold uppercase tracking-wider"
           style={{ color: style.color, background: `${style.color}22` }}
         >
           {summary.category}
         </span>
-        <span className="text-white/40 text-xs">{summary.count} fee{summary.count !== 1 ? 's' : ''}</span>
+        <span className="text-white/40 text-xs font-['Archivo:Medium',sans-serif]">{summary.count} fee{summary.count !== 1 ? 's' : ''}</span>
       </div>
-      <p className="font-black text-3xl text-white tracking-tight" style={{ fontFamily: "'Chivo', sans-serif" }}>
-        {formatCurrency(summary.total)}
-      </p>
-      <p className="text-xs font-semibold mt-1" style={{ color: style.color }}>
-        {pct}% of total monthly
-      </p>
+      <div className="relative z-10">
+        <p className="font-black text-[32px] leading-tight text-white tracking-tight" style={{ fontFamily: "'Chivo', sans-serif" }}>
+          {formatCurrency(summary.total)}
+        </p>
+        <p className="text-xs font-semibold mt-1" style={{ color: style.color }}>
+          {pct}% of total monthly
+        </p>
+      </div>
     </div>
   );
 }
@@ -91,22 +96,22 @@ function FeeRow({
 }) {
   const style = categoryStyle(fee.category);
   return (
-    <div className="flex items-center justify-between py-4 px-6 border-b border-white/8 hover:bg-white/[0.02] transition-colors">
+    <div className="flex items-center justify-between py-4 px-6 border-b border-white/5 hover:bg-white/[0.04] transition-colors">
       <div className="flex items-center gap-3 flex-[1_0_0]">
         <span
-          className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider"
+          className="px-2.5 py-1 rounded-[6px] text-[10px] font-bold uppercase tracking-wider"
           style={{ color: style.color, background: style.bg, border: `1px solid ${style.border}` }}
         >
           {fee.category}
         </span>
       </div>
       <div className="flex-[2_0_0]">
-        <p className="text-sm text-white font-semibold">{fee.description}</p>
-        <p className="text-xs text-white/40 mt-0.5">APT {aptNumber}</p>
+        <p className="text-sm text-white font-['Archivo:SemiBold',sans-serif] font-semibold">{fee.description}</p>
+        <p className="text-xs text-white/40 mt-1 font-['Archivo:Medium',sans-serif]">APT {aptNumber}</p>
       </div>
       <div className="flex-[1_0_0]">
         <p className="text-lg font-black text-white tracking-tight" style={{ fontFamily: "'Chivo', sans-serif" }}>
-          {formatCurrency(fee.amount)}<span className="text-white/40 text-xs font-normal">/mo</span>
+          {formatCurrency(fee.amount)}<span className="text-white/40 text-xs font-['Archivo:Medium',sans-serif] ml-1 font-normal">/mo</span>
         </p>
       </div>
       <div className="w-16 flex justify-end">
@@ -126,25 +131,22 @@ function FeeRow({
 
 function SummaryCardSkeleton() {
   return (
-    <div
-      className="flex-1 min-w-[160px] rounded-2xl p-5 relative overflow-hidden"
-      style={{ background: 'rgba(146,141,211,0.12)', border: '1px solid rgba(146,141,211,0.3)' }}
-    >
-      <div className="flex items-center gap-2 mb-3">
-        <div className="h-5 w-20 rounded bg-white/10 animate-pulse" />
+    <div className="flex-1 min-w-[160px] rounded-[16px] p-6 relative overflow-hidden bg-white/[0.02] border border-white/5 backdrop-blur-md">
+      <div className="flex items-center justify-between mb-4">
+        <div className="h-5 w-20 rounded-[6px] bg-white/10 animate-pulse" />
         <div className="h-4 w-14 rounded bg-white/5 animate-pulse" />
       </div>
       <div className="h-9 w-32 rounded bg-white/10 animate-pulse" />
-      <div className="h-3 w-24 mt-2 rounded bg-white/5 animate-pulse" />
+      <div className="h-2 mt-4 rounded-full bg-white/5 animate-pulse w-full" />
     </div>
   );
 }
 
 function FeeRowSkeleton() {
   return (
-    <div className="flex items-center justify-between py-4 px-6 border-b border-white/8">
+    <div className="flex items-center justify-between py-4 px-6 border-b border-white/5">
       <div className="flex items-center gap-3 flex-[1_0_0]">
-        <div className="h-5 w-20 rounded-full bg-white/10 animate-pulse" />
+        <div className="h-5 w-20 rounded-[6px] bg-white/10 animate-pulse" />
       </div>
       <div className="flex-[2_0_0]">
         <div className="h-4 w-3/4 rounded bg-white/10 animate-pulse" />
@@ -160,15 +162,47 @@ function FeeRowSkeleton() {
 
 function HeaderSummarySkeleton() {
   return (
-    <div
-      className="flex items-center gap-3 px-5 py-3 rounded-2xl min-w-[220px]"
-      style={{ background: 'rgba(146,141,211,0.12)', border: '1px solid rgba(146,141,211,0.3)' }}
-    >
+    <div className="flex items-center gap-3 px-6 py-4 rounded-[16px] min-w-[220px] bg-white/[0.02] border border-white/5 backdrop-blur-md">
       <div className="w-full">
         <div className="h-3 w-24 rounded bg-white/10 animate-pulse" />
         <div className="h-8 w-32 mt-2 rounded bg-white/10 animate-pulse" />
       </div>
     </div>
+  );
+}
+
+function CategoryFilterButton({ cat, isActive, onClick }: { cat: string; isActive: boolean; onClick: () => void }) {
+  const [isHovered, setIsHovered] = useState(false);
+  const style = cat === 'All' ? null : categoryStyle(cat);
+
+  const getStyle = () => {
+    if (isActive) {
+      if (style) {
+        return { background: style.bg, color: style.color, borderColor: style.border, boxShadow: `0 0 15px ${style.bg}` };
+      }
+      return { background: 'rgba(255,255,255,0.1)', color: '#fff', borderColor: 'rgba(255,255,255,0.3)' };
+    }
+    
+    if (isHovered) {
+      if (style) {
+        return { background: style.bg, color: style.color, borderColor: style.border };
+      }
+      return { background: 'rgba(255,255,255,0.1)', color: '#fff', borderColor: 'rgba(255,255,255,0.3)' };
+    }
+
+    return { background: 'transparent', color: 'rgba(255,255,255,0.5)', borderColor: 'rgba(255,255,255,0.1)' };
+  };
+
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 border ${isActive && !style ? 'shadow-[0_0_15px_rgba(255,255,255,0.1)]' : ''}`}
+      style={getStyle()}
+    >
+      {cat === 'All' ? 'All Categories' : cat.charAt(0) + cat.slice(1).toLowerCase()}
+    </button>
   );
 }
 
@@ -253,25 +287,23 @@ export function MaintenanceFees() {
   return (
     <div className="bg-black min-h-full w-full">
       {/* Header */}
-      <div className="flex items-center justify-between py-6 px-12">
+      <div className="flex items-center justify-between py-8 px-12">
         <div>
-          <h1 className="font-black text-4xl text-white tracking-tight" style={{ fontFamily: "'Chivo', sans-serif" }}>
+          <h1 className="font-black text-4xl text-white tracking-tight flex items-center gap-3" style={{ fontFamily: "'Chivo', sans-serif" }}>
+            <Wrench className="text-[#928dd3]" size={36} />
             Maintenance Fees
           </h1>
-          <p className="text-white/50 text-sm mt-1">
+          <p className="text-white/50 text-sm mt-2 font-['Archivo:Medium',sans-serif]">
             Monthly recurring fees for {currentOwner?.name ?? ''}
           </p>
         </div>
         {loading ? (
           <HeaderSummarySkeleton />
         ) : (
-          <div
-            className="flex items-center gap-3 px-5 py-3 rounded-2xl"
-            style={{ background: 'rgba(146,141,211,0.12)', border: '1px solid rgba(146,141,211,0.3)' }}
-          >
+          <div className="flex items-center gap-3 px-6 py-4 rounded-[16px] bg-white/[0.02] border border-white/10 shadow-lg backdrop-blur-md hover:border-[#928dd3]/50 transition-colors">
             <div>
-              <p className="text-white/50 text-xs font-semibold uppercase tracking-wider">Total / month</p>
-              <p className="font-black text-2xl text-white tracking-tight" style={{ fontFamily: "'Chivo', sans-serif" }}>
+              <p className="text-[#928dd3] text-[11px] font-bold uppercase tracking-widest mb-1">Total / month</p>
+              <p className="font-black text-3xl text-white tracking-tight" style={{ fontFamily: "'Chivo', sans-serif" }}>
                 {formatCurrency(grandTotal)}
               </p>
             </div>
@@ -294,8 +326,8 @@ export function MaintenanceFees() {
             </div>
           </div>
 
-          <div className="mx-12 mb-12 rounded-2xl relative overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.12)' }}>
-            <div className="flex items-center py-3 px-6 border-b border-white/10">
+          <div className="mx-12 mb-12 rounded-[16px] bg-white/[0.02] border border-white/10 backdrop-blur-md shadow-lg overflow-hidden">
+            <div className="flex items-center py-4 px-6 border-b border-white/10 bg-white/[0.02]">
               <div className="h-3 w-20 rounded bg-white/10 animate-pulse" />
               <div className="flex-[2_0_0]" />
               <div className="h-3 w-28 rounded bg-white/10 animate-pulse" />
@@ -304,17 +336,19 @@ export function MaintenanceFees() {
 
             <FeeRowSkeleton />
 
-            <div className="flex items-center justify-between px-6 py-4 border-t border-white/10 bg-white/[0.02]">
+            <div className="flex items-center justify-between px-6 py-5 border-t border-white/10 bg-white/[0.02]">
               <div className="h-4 w-28 rounded bg-white/10 animate-pulse" />
               <div className="h-4 w-40 rounded bg-white/10 animate-pulse" />
             </div>
           </div>
         </>
       ) : allFees.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24 gap-3">
-          <p className="text-white/30 text-5xl">🔧</p>
-          <p className="text-white/50 text-base">No maintenance fees assigned yet.</p>
-          <p className="text-white/30 text-sm">Open an apartment's edit dialog → Maintenance Fees tab to assign fees.</p>
+        <div className="flex flex-col items-center justify-center py-32 gap-4">
+          <div className="w-20 h-20 rounded-full bg-white/[0.02] border border-white/10 flex items-center justify-center mb-2">
+            <Wrench className="text-white/20" size={40} />
+          </div>
+          <p className="text-white/50 text-lg font-['Archivo:SemiBold',sans-serif]">No maintenance fees assigned yet.</p>
+          <p className="text-white/30 text-sm max-w-md text-center">Open an apartment's edit dialog and navigate to the Maintenance Fees tab to assign recurring fees.</p>
         </div>
       ) : (
         <>
@@ -328,47 +362,28 @@ export function MaintenanceFees() {
           {/* Category filter */}
           <div className="px-12 pb-4">
             <div className="flex gap-2 flex-wrap">
-              {categories.map((cat) => {
-                const style = cat === 'All' ? null : categoryStyle(cat);
-                const isActive = selectedCategory === cat;
-                return (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className="px-4 py-1.5 rounded-full text-sm font-semibold transition-all"
-                    style={
-                      isActive && style
-                        ? { background: style.bg, color: style.color, border: `1px solid ${style.border}` }
-                        : isActive
-                        ? { background: 'rgba(255,255,255,0.15)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)' }
-                        : { background: 'transparent', color: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.1)' }
-                    }
-                  >
-                    {cat === 'All' ? 'All Categories' : cat.charAt(0) + cat.slice(1).toLowerCase()}
-                  </button>
-                );
-              })}
+              {categories.map((cat) => (
+                <CategoryFilterButton
+                  key={cat}
+                  cat={cat}
+                  isActive={selectedCategory === cat}
+                  onClick={() => setSelectedCategory(cat)}
+                />
+              ))}
             </div>
           </div>
 
           {/* Fee rows table */}
-          <div className="mx-12 mb-12 rounded-2xl relative" style={{ border: '1px solid rgba(255,255,255,0.12)' }}>
-            {deleteError && (
-              <div className="mx-6 mt-4 p-3 rounded-lg bg-red-500/10 border border-red-500/40 text-red-400 text-sm">
-                {deleteError}
-              </div>
-            )}
-
+          <div className="mx-12 mb-12 rounded-[16px] bg-white/[0.02] border border-white/10 backdrop-blur-md shadow-lg overflow-hidden">
             {/* Table header */}
-            <div className="flex items-center py-3 px-6 border-b border-white/10">
-              <p className="flex-[1_0_0] text-xs font-bold uppercase tracking-widest text-white/40">Category</p>
-              <p className="flex-[2_0_0] text-xs font-bold uppercase tracking-widest text-white/40">Description / Apartment</p>
-              <p className="flex-[1_0_0] text-xs font-bold uppercase tracking-widest text-white/40">Monthly Cost</p>
-              <p className="w-16 text-right text-xs font-bold uppercase tracking-widest text-white/40">Actions</p>
+            <div className="flex items-center py-4 px-6 border-b border-white/10 bg-white/[0.02]">
+              <p className="flex-[1_0_0] text-[11px] font-bold uppercase tracking-widest text-white/40">Category</p>
+              <p className="flex-[2_0_0] text-[11px] font-bold uppercase tracking-widest text-white/40">Description / Apartment</p>
+              <p className="flex-[1_0_0] text-[11px] font-bold uppercase tracking-widest text-white/40">Monthly Cost</p>
             </div>
 
             {displayedFees.length === 0 ? (
-              <div className="py-12 text-center text-white/30 text-sm">No fees in this category.</div>
+              <div className="py-16 text-center text-white/30 text-sm">No fees in this category.</div>
             ) : (
               displayedFees.map((fee) => (
                 <FeeRow
@@ -382,16 +397,16 @@ export function MaintenanceFees() {
             )}
 
             {/* Footer total */}
-            <div className="flex items-center justify-between px-6 py-4 border-t border-white/10 bg-white/[0.02]">
-              <p className="text-white/40 text-sm">
+            <div className="flex items-center justify-between px-6 py-5 border-t border-white/10 bg-white/[0.02]">
+              <p className="text-white/40 text-sm font-['Archivo:Medium',sans-serif]">
                 {displayedFees.length} fee{displayedFees.length !== 1 ? 's' : ''} shown
               </p>
-              <p className="font-bold text-white text-sm">
+              <p className="font-['Archivo:SemiBold',sans-serif] font-semibold text-white text-sm">
                 Subtotal:{' '}
-                <span className="text-[#928dd3] font-black">
+                <span className="text-[#928dd3] font-black text-lg ml-2" style={{ fontFamily: "'Chivo', sans-serif" }}>
                   {formatCurrency(displayedFees.reduce((s, f) => s + f.amount, 0))}
                 </span>
-                /mo
+                <span className="text-white/40 text-xs font-normal ml-1">/mo</span>
               </p>
             </div>
           </div>
