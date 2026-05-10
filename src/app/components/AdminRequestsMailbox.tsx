@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
+import { Mail, X } from "lucide-react";
 import userService, { type OwnerAssociationRequestSummary } from "../../services/userService";
 import { ApiError } from "../../utils/httpUtils";
 
 function MailboxIcon({ count }: { count: number }) {
   return (
     <div className="relative">
-      <svg className="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
-      </svg>
+      <Mail size={22} className={count > 0 ? "text-[#928dd3]" : "text-white/60"} />
       {count > 0 && (
-        <div className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
+        <div className="absolute -top-2 -right-2 bg-gradient-to-r from-[#928dd3] to-[#a89be6] text-black rounded-full w-5 h-5 flex items-center justify-center text-[11px] font-bold shadow-sm">
           {count > 9 ? "9+" : count}
         </div>
       )}
@@ -61,59 +60,67 @@ function PendingRequestsModal({ isOpen, onClose, requests, onAccept, onReject }:
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-black border border-[rgba(255,255,255,0.16)] rounded-lg p-6 max-w-md w-full">
-        <h2 className="text-2xl font-bold text-white mb-4">Pending Requests</h2>
-
-        {requests.length === 0 && (
-          <p className="font-['Archivo:Medium',sans-serif] font-medium text-[13px] text-[rgba(255,255,255,0.6)] mb-4">
-            No pending owner requests
-          </p>
-        )}
-
-        {error && (
-          <div className="mb-4 p-3 rounded-[8px] bg-red-500/10 border border-red-500/30">
-            <p className="font-['Archivo:Medium',sans-serif] font-medium text-[13px] text-red-400">
-              {error}
-            </p>
-          </div>
-        )}
-
-        <div className="space-y-3 mb-4 max-h-80 overflow-y-auto">
-          {requests.map((request) => (
-            <div key={request.ownerId} className="rounded-[8px] border border-[rgba(255,255,255,0.16)] px-3 py-3">
-              <p className="font-['Archivo:SemiBold',sans-serif] font-semibold text-[15px] text-white mb-1">
-                {request.ownerName}
-              </p>
-              <p className="font-['Archivo:Medium',sans-serif] font-medium text-[13px] text-[rgba(255,255,255,0.6)] mb-3">
-                Commission: {request.adminCut ?? 0}%
-              </p>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => handleAccept(request.ownerId)}
-                  disabled={accepting === request.ownerId || rejecting === request.ownerId}
-                  className="flex-1 px-3 py-2 rounded-[6px] bg-[#928dd3] text-black font-semibold text-[13px] hover:bg-[#7f7ab8] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                  {accepting === request.ownerId ? "Accepting..." : "Accept"}
-                </button>
-                <button
-                  onClick={() => handleReject(request.ownerId)}
-                  disabled={rejecting === request.ownerId || accepting === request.ownerId}
-                  className="flex-1 px-3 py-2 rounded-[6px] border border-red-500/50 text-red-400 font-semibold text-[13px] hover:bg-red-500/10 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                  {rejecting === request.ownerId ? "Rejecting..." : "Reject"}
-                </button>
-              </div>
-            </div>
-          ))}
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+      <div className="bg-[#0a0a0f] border border-white/10 rounded-[16px] shadow-[0_8px_30px_rgba(0,0,0,0.8)] max-w-md w-full relative overflow-hidden flex flex-col max-h-[85vh]">
+        {/* Header */}
+        <div className="p-6 pb-5 border-b border-white/10 flex items-center justify-between bg-[#0a0a0f] shrink-0">
+          <h2 className="font-['Chivo:Black',sans-serif] font-black text-xl text-white">Pending Requests</h2>
+          <button
+            onClick={onClose}
+            className="p-2 text-white/60 bg-white/5 rounded-full transition-colors hover:text-white hover:bg-white/10 shadow-sm"
+          >
+            <X size={16} />
+          </button>
         </div>
 
-        <button
-          onClick={onClose}
-          className="w-full px-4 py-2 rounded-[8px] border border-[rgba(255,255,255,0.16)] text-white font-semibold hover:border-gray-400 transition-colors"
-        >
-          Close
-        </button>
+        <div className="p-6 overflow-y-auto">
+          {requests.length === 0 && (
+            <div className="text-center py-8">
+              <p className="font-['Archivo:Medium',sans-serif] font-medium text-[14px] text-white/50">
+                No pending owner requests at the moment.
+              </p>
+            </div>
+          )}
+
+          {error && (
+            <div className="mb-5 p-3.5 rounded-[8px] bg-[#ff6b6b]/10 border border-[#ff6b6b]/30 animate-in fade-in">
+              <p className="font-['Archivo:Medium',sans-serif] font-medium text-[13px] text-[#ff6b6b]">
+                {error}
+              </p>
+            </div>
+          )}
+
+          <div className="space-y-4">
+            {requests.map((request) => (
+              <div key={request.ownerId} className="bg-white/[0.02] rounded-[12px] border border-white/10 p-5 hover:border-white/20 hover:bg-white/[0.04] transition-all duration-300 group">
+                <div className="mb-4">
+                  <p className="font-['Archivo:SemiBold',sans-serif] font-semibold text-[16px] text-white">
+                    {request.ownerName}
+                  </p>
+                  <p className="font-['Archivo:Medium',sans-serif] font-medium text-[13px] text-white/50 mt-1">
+                    Offered Commission: <span className="text-[#928dd3] font-semibold">{request.adminCut ?? 0}%</span>
+                  </p>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => handleAccept(request.ownerId)}
+                    disabled={accepting === request.ownerId || rejecting === request.ownerId}
+                    className="flex-1 px-3 py-2 rounded-[8px] bg-[#0DC44A]/10 border border-[#0DC44A]/30 text-[#0DC44A] font-['Archivo:SemiBold',sans-serif] font-semibold text-[13px] hover:bg-[#0DC44A] hover:text-black transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none"
+                  >
+                    {accepting === request.ownerId ? "Accepting..." : "Accept"}
+                  </button>
+                  <button
+                    onClick={() => handleReject(request.ownerId)}
+                    disabled={rejecting === request.ownerId || accepting === request.ownerId}
+                    className="flex-1 px-3 py-2 rounded-[8px] bg-white/[0.03] border border-white/10 text-white/80 font-['Archivo:SemiBold',sans-serif] font-semibold text-[13px] hover:bg-[#ff6b6b]/10 hover:border-[#ff6b6b]/30 hover:text-[#ff6b6b] transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none"
+                  >
+                    {rejecting === request.ownerId ? "Rejecting..." : "Reject"}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -169,7 +176,11 @@ export function AdminRequestsMailbox() {
     <>
       <button
         onClick={() => setIsModalOpen(true)}
-        className="relative inline-flex items-center justify-center gap-3 rounded-full border border-red-500/35 bg-red-500/10 px-4 py-3 text-white shadow-[0_0_0_1px_rgba(239,68,68,0.12)] transition-all duration-200 hover:-translate-y-0.5 hover:border-red-400 hover:bg-red-500/15 hover:shadow-[0_10px_24px_rgba(239,68,68,0.18)]"
+        className={`relative inline-flex items-center justify-center rounded-full border px-3.5 py-3.5 transition-all duration-300 hover:-translate-y-0.5 ${
+          pendingRequests.length > 0 
+            ? "border-[#928dd3]/50 bg-[#928dd3]/20 shadow-[0_0_20px_rgba(146,141,211,0.3)] hover:border-[#928dd3]/80 hover:bg-[#928dd3]/30 hover:shadow-[0_0_30px_rgba(146,141,211,0.5)]" 
+            : "border-white/20 bg-white/10 hover:border-white/40 hover:bg-white/20 hover:shadow-[0_8px_20px_rgba(255,255,255,0.08)]"
+        }`}
         data-name="admin-mailbox"
         type="button"
       >
