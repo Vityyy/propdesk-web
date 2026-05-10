@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { X } from 'lucide-react';
 import type { Unit } from '../../types/index';
 import userService, { ApartmentRangeData } from '../../../services/userService';
 import { useOwner } from '../../context/OwnerContext';
@@ -169,19 +170,21 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-[#0f0f0f] border border-[rgba(255,255,255,0.16)] rounded-[16px] max-w-4xl w-full my-8">
-        <div className="p-6 border-b border-[rgba(255,255,255,0.16)] flex items-center justify-between sticky top-0 bg-[#0f0f0f] z-10 rounded-t-[16px]">
-          <h2 className="font-['Archivo:ExtraBold',sans-serif] font-extrabold text-[22px] text-white">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+      <div className="absolute inset-0" onClick={handleClose} />
+      <div className="bg-[#0a0a0f] border border-white/10 rounded-[24px] max-w-4xl w-full my-8 shadow-[0_8px_30px_rgba(0,0,0,0.8)] relative z-10">
+        <div className="p-6 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0a0a0f] z-10 rounded-t-[24px]">
+          <h2 className="font-['Chivo:Black',sans-serif] font-black text-[24px] text-white">
             Create property
           </h2>
           <button
+            type="button"
             onClick={handleClose}
             disabled={isSubmitting}
             aria-disabled={isSubmitting}
-            className={`text-[rgba(255,255,255,0.6)] transition-colors p-2 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:text-white'}`}
+            className={`p-2 text-white/60 bg-white/5 rounded-full transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:text-white hover:bg-white/10'}`}
           >
-            ✕
+            <X size={20} />
           </button>
         </div>
 
@@ -194,7 +197,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
+                <label className="block font-['Archivo:SemiBold',sans-serif] font-semibold text-white/70 text-[14px] mb-2 uppercase tracking-wider">
                   Property name <span className="text-[#ff6b6b]">*</span>
                 </label>
                 <input
@@ -202,13 +205,13 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   disabled={isSubmitting}
-                  className="w-full px-4 py-3 bg-[rgba(255,255,255,0.03)] focus:bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.16)] focus:border-[#928dd3] outline-none rounded-[8px] text-white placeholder-[rgba(255,255,255,0.3)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-3 bg-white/[0.03] border border-white/10 focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[12px] text-white placeholder-white/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   placeholder="e.g. Sunset Apartments"
                 />
               </div>
 
               <div>
-                <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
+                <label className="block font-['Archivo:SemiBold',sans-serif] font-semibold text-white/70 text-[14px] mb-2 uppercase tracking-wider">
                   Address <span className="text-[#ff6b6b]">*</span>
                 </label>
                 <input
@@ -216,14 +219,14 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   disabled={isSubmitting}
-                  className="w-full px-4 py-3 bg-[rgba(255,255,255,0.03)] focus:bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.16)] focus:border-[#928dd3] outline-none rounded-[8px] text-white placeholder-[rgba(255,255,255,0.3)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-3 bg-white/[0.03] border border-white/10 focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[12px] text-white placeholder-white/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   placeholder="e.g. 123 Main St, City, State"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
+              <label className="block font-['Archivo:SemiBold',sans-serif] font-semibold text-white/70 text-[14px] mb-2 uppercase tracking-wider">
                 Cover image URL (optional)
               </label>
               <input
@@ -231,7 +234,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                 value={formData.imageUrl}
                 onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
                 disabled={isSubmitting}
-                className="w-full px-4 py-3 bg-[rgba(255,255,255,0.03)] focus:bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.16)] focus:border-[#928dd3] outline-none rounded-[8px] text-white placeholder-[rgba(255,255,255,0.3)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-3 bg-white/[0.03] border border-white/10 focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[12px] text-white placeholder-white/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="https://..."
               />
             </div>
@@ -250,22 +253,22 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
 
             <div className="space-y-4">
               {rules.map((rule, idx) => (
-                <div key={rule.id} className="relative bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.1)] rounded-[12px] p-5 pt-6 transition-all hover:border-[rgba(255,255,255,0.2)]">
+                <div key={rule.id} className="relative bg-white/[0.02] border border-white/10 rounded-[16px] p-5 pt-6 transition-all hover:border-white/20">
                   {rules.length > 1 && (
                     <button
                       type="button"
                       onClick={() => handleRemoveRule(rule.id)}
                       disabled={isSubmitting}
-                      className={`absolute top-3 right-3 text-[rgba(255,255,255,0.4)] transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:text-[#ff6b6b]'}`}
+                      className={`absolute top-3 right-3 text-white/40 transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:text-[#ff6b6b]'}`}
                       title="Remove rule"
                     >
-                      ✕
+                      <X size={18} />
                     </button>
                   )}
 
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div className="md:col-span-2">
-                      <label className="block text-[rgba(255,255,255,0.7)] text-xs uppercase tracking-wider mb-2 font-semibold">
+                      <label className="block text-white/70 text-xs uppercase tracking-wider mb-2 font-semibold">
                         Floors (range) <span className="text-[#928dd3] ml-1">#</span>
                       </label>
                       <input
@@ -273,13 +276,13 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                         value={rule.floorRanges}
                         onChange={(e) => updateRule(rule.id, 'floorRanges', e.target.value)}
                         disabled={isSubmitting}
-                        className="w-full px-3 py-2 bg-[rgba(0,0,0,0.3)] border border-[rgba(255,255,255,0.12)] focus:border-[#928dd3] outline-none rounded-[6px] text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full px-4 py-2 bg-black/40 border border-white/10 focus:border-[#928dd3] focus:bg-white/[0.03] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[8px] text-white text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                         placeholder="e.g. 1-5, 9, 11"
                       />
                     </div>
 
                     <div className="md:col-span-2">
-                      <label className="block text-[rgba(255,255,255,0.7)] text-xs uppercase tracking-wider mb-2 font-semibold">
+                      <label className="block text-white/70 text-xs uppercase tracking-wider mb-2 font-semibold">
                         Apartments (range) <span className="text-[#928dd3] ml-1">#</span>
                       </label>
                       <input
@@ -287,13 +290,13 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                         value={rule.apartmentNumberRanges}
                         onChange={(e) => updateRule(rule.id, 'apartmentNumberRanges', e.target.value)}
                         disabled={isSubmitting}
-                        className="w-full px-3 py-2 bg-[rgba(0,0,0,0.3)] border border-[rgba(255,255,255,0.12)] focus:border-[#928dd3] outline-none rounded-[6px] text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full px-4 py-2 bg-black/40 border border-white/10 focus:border-[#928dd3] focus:bg-white/[0.03] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[8px] text-white text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                         placeholder="e.g. 1-4, 8, 10"
                       />
                     </div>
 
                     <div className="md:col-span-2">
-                      <label className="block text-[rgba(255,255,255,0.7)] text-xs uppercase tracking-wider mb-2 font-semibold">
+                      <label className="block text-white/70 text-xs uppercase tracking-wider mb-2 font-semibold">
                         Square meters (m²)
                       </label>
                       <input
@@ -302,13 +305,13 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                         onChange={(e) => updateRule(rule.id, 'squareMeters', e.target.value)}
                         min="1"
                         disabled={isSubmitting}
-                        className="w-full px-3 py-2 bg-[rgba(0,0,0,0.3)] border border-[rgba(255,255,255,0.12)] focus:border-[#928dd3] outline-none rounded-[6px] text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full px-4 py-2 bg-black/40 border border-white/10 focus:border-[#928dd3] focus:bg-white/[0.03] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[8px] text-white text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                         placeholder="e.g. 45"
                       />
                     </div>
 
                     <div className="md:col-span-2">
-                      <label className="block text-[rgba(255,255,255,0.7)] text-xs uppercase tracking-wider mb-2 font-semibold">
+                      <label className="block text-white/70 text-xs uppercase tracking-wider mb-2 font-semibold">
                         Rent amount ($)
                       </label>
                       <input
@@ -317,7 +320,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                         onChange={(e) => updateRule(rule.id, 'rentValue', e.target.value)}
                         min="0"
                         disabled={isSubmitting}
-                        className="w-full px-3 py-2 bg-[rgba(0,0,0,0.3)] border border-[rgba(255,255,255,0.12)] focus:border-[#928dd3] outline-none rounded-[6px] text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full px-4 py-2 bg-black/40 border border-white/10 focus:border-[#928dd3] focus:bg-white/[0.03] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[8px] text-white text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                         placeholder="e.g. 1500"
                       />
                     </div>
@@ -330,7 +333,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
               type="button"
               onClick={handleAddRule}
               disabled={isSubmitting}
-              className={`w-full flex items-center justify-center gap-2 px-4 py-3 border border-dashed border-[rgba(255,255,255,0.3)] text-[rgba(255,255,255,0.7)] font-medium rounded-[12px] transition-all ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:border-[#928dd3] hover:text-[#928dd3] hover:bg-[rgba(146,141,211,0.05)]'}`}
+              className={`w-full flex items-center justify-center gap-2 px-4 py-3 border border-dashed border-white/20 text-white/70 font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] rounded-[16px] transition-all ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:border-[#928dd3] hover:text-[#928dd3] hover:bg-[#928dd3]/5'}`}
             >
               <span>+</span> Add rule
             </button>
@@ -352,23 +355,23 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
           )}
 
           {/* Actions */}
-          <div className="flex gap-4 pt-6 border-t border-[rgba(255,255,255,0.16)]">
+          <div className="flex gap-3 pt-6 border-t border-white/5 mt-8 justify-end">
             <button
               type="button"
               onClick={handleClose}
               disabled={isSubmitting}
-              className={`flex-1 px-6 py-3 border border-[rgba(255,255,255,0.16)] text-white font-medium rounded-[12px] transition-all ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[rgba(255,255,255,0.05)]'}`}
+              className={`px-6 py-3 bg-transparent border border-white/10 text-white font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] rounded-[12px] transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/5'}`}
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting || !!formError || parsedRanges.length === 0}
-              className={`flex-1 px-6 py-3 bg-[#928dd3] text-black font-bold rounded-[12px] transition-all ${isSubmitting || !!formError || parsedRanges.length === 0 ? 'opacity-50 cursor-not-allowed hover:shadow-none' : 'hover:bg-[#a89be6] hover:shadow-[0_0_15px_rgba(146,141,211,0.4)]'}`}
+              className={`px-6 py-3 bg-gradient-to-r from-[#928dd3] to-[#a89be6] text-black font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] rounded-[12px] transition-all duration-300 ${isSubmitting || !!formError || parsedRanges.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-100 shadow-[0_0_15px_rgba(146,141,211,0.4)] hover:shadow-[0_0_25px_rgba(146,141,211,0.7)] active:scale-95'}`}
             >
               {isSubmitting ? (
                 <div className="flex items-center justify-center gap-2">
-                  <div className="w-4 h-4 border-2 border-[rgba(0,0,0,0)] border-t-black rounded-full animate-spin" style={{ borderTopColor: 'black' }} />
+                  <div className="w-4 h-4 border-2 border-[rgba(0,0,0,0)] border-t-black rounded-full animate-spin" />
                   <span>Creating...</span>
                 </div>
               ) : (
