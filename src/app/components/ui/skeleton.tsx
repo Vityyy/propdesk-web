@@ -1,3 +1,16 @@
+import type { ComponentProps } from "react";
+import { cn } from "./utils";
+
+export function Skeleton({ className, ...props }: ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="skeleton"
+      className={cn("animate-pulse rounded-md bg-[rgba(255,255,255,0.08)]", className)}
+      {...props}
+    />
+  );
+}
+
 // PropertySkeleton.tsx
 export function PropertySkeleton() {
   return (

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { useOwner } from '../context/OwnerContext';
 import { summaryService, SummaryResponse } from '../../services/summaryService';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
@@ -68,6 +69,7 @@ function MetricCard({ title, value, subtitle, trend }: MetricCardProps) {
 
 export function Summary() {
   const { currentOwner } = useOwner();
+  const navigate = useNavigate();
   const [summary, setSummary] = useState<SummaryResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -117,7 +119,11 @@ export function Summary() {
               Financial overview for {currentOwner?.name}
             </p>
           </div>
-          <button className="bg-[#928dd3] content-stretch flex items-center justify-center px-[16px] py-[8px] relative rounded-[8px] shrink-0 hover:bg-[#7f7ab8] transition-colors">
+          <button
+            type="button"
+            onClick={() => navigate('/reports')}
+            className="bg-[#928dd3] content-stretch flex items-center justify-center px-[16px] py-[8px] relative rounded-[8px] shrink-0 hover:bg-[#7f7ab8] transition-colors"
+          >
             <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] relative shrink-0 text-[15px] text-black whitespace-nowrap" style={{ fontVariationSettings: "'wdth' 100" }}>
               Export Report
             </p>
