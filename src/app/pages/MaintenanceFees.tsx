@@ -9,6 +9,7 @@ import userService, {
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface FeeWithContext extends MaintenanceFeeResponse {
+  apartmentId: string;
   apartmentNumber: number;
   propertyId: string;
 }
@@ -66,7 +67,28 @@ function SummaryCard({ summary, total }: { summary: CategorySummary; total: numb
   );
 }
 
-function FeeRow({ fee, aptNumber }: { fee: FeeWithContext; aptNumber: number }) {
+function TrashIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 6h18" />
+      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+      <line x1="10" y1="11" x2="10" y2="17" />
+      <line x1="14" y1="11" x2="14" y2="17" />
+    </svg>
+  );
+}
+
+function FeeRow({
+  fee,
+  aptNumber,
+  deleting,
+  onDelete,
+}: {
+  fee: FeeWithContext;
+  aptNumber: number;
+  deleting: boolean;
+  onDelete: (fee: FeeWithContext) => void;
+}) {
   const style = categoryStyle(fee.category);
   return (
     <div className="flex items-center justify-between py-4 px-6 border-b border-white/8 hover:bg-white/[0.02] transition-colors">
@@ -86,6 +108,17 @@ function FeeRow({ fee, aptNumber }: { fee: FeeWithContext; aptNumber: number }) 
         <p className="text-lg font-black text-white tracking-tight" style={{ fontFamily: "'Chivo', sans-serif" }}>
           {formatCurrency(fee.amount)}<span className="text-white/40 text-xs font-normal">/mo</span>
         </p>
+      </div>
+      <div className="w-16 flex justify-end">
+        <button
+          type="button"
+          onClick={() => onDelete(fee)}
+          disabled={deleting}
+          className="p-2 rounded-lg text-red-400 hover:bg-red-500/20 transition-colors disabled:opacity-40"
+          title="Delete maintenance fee"
+        >
+          {deleting ? '...' : <TrashIcon />}
+        </button>
       </div>
     </div>
   );
@@ -120,6 +153,7 @@ function FeeRowSkeleton() {
       <div className="flex-[1_0_0]">
         <div className="h-5 w-28 rounded bg-white/10 animate-pulse" />
       </div>
+      <div className="w-16" />
     </div>
   );
 }
@@ -145,6 +179,8 @@ export function MaintenanceFees() {
   const [loading, setLoading] = useState(true);
   const [allFees, setAllFees] = useState<FeeWithContext[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [deletingFeeId, setDeletingFeeId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!currentOwner?.id) return;
@@ -159,7 +195,7 @@ export function MaintenanceFees() {
           Object.values(floorMap).forEach((aptMap) => {
             Object.values(aptMap as Record<number, ApartmentGridResponse>).forEach((apt) => {
               (apt.maintenanceFees ?? []).forEach((fee) => {
-                fees.push({ ...fee, apartmentNumber: apt.number, propertyId });
+                fees.push({ ...fee, apartmentId: apt.id, apartmentNumber: apt.number, propertyId });
               });
             });
           });
@@ -196,6 +232,21 @@ export function MaintenanceFees() {
     selectedCategory === 'All'
       ? allFees
       : allFees.filter((f) => f.category.toUpperCase() === selectedCategory);
+
+  const handleDeleteFee = async (fee: FeeWithContext) => {
+    setDeleteError(null);
+    setDeletingFeeId(fee.id);
+
+    try {
+      await userService.deleteMaintenanceFee(fee.apartmentId, fee.id);
+      setAllFees(currentFees => currentFees.filter(currentFee => currentFee.id !== fee.id));
+      userService.invalidatePropertyApartmentsGrid(fee.propertyId);
+    } catch (err: any) {
+      setDeleteError(err?.message || 'Failed to delete maintenance fee');
+    } finally {
+      setDeletingFeeId(null);
+    }
+  };
 
   // ─── Render ────────────────────────────────────────────────────────────────
 
@@ -248,6 +299,7 @@ export function MaintenanceFees() {
               <div className="h-3 w-20 rounded bg-white/10 animate-pulse" />
               <div className="flex-[2_0_0]" />
               <div className="h-3 w-28 rounded bg-white/10 animate-pulse" />
+              <div className="w-16" />
             </div>
 
             <FeeRowSkeleton />
@@ -301,18 +353,31 @@ export function MaintenanceFees() {
 
           {/* Fee rows table */}
           <div className="mx-12 mb-12 rounded-2xl relative" style={{ border: '1px solid rgba(255,255,255,0.12)' }}>
+            {deleteError && (
+              <div className="mx-6 mt-4 p-3 rounded-lg bg-red-500/10 border border-red-500/40 text-red-400 text-sm">
+                {deleteError}
+              </div>
+            )}
+
             {/* Table header */}
             <div className="flex items-center py-3 px-6 border-b border-white/10">
               <p className="flex-[1_0_0] text-xs font-bold uppercase tracking-widest text-white/40">Category</p>
               <p className="flex-[2_0_0] text-xs font-bold uppercase tracking-widest text-white/40">Description / Apartment</p>
               <p className="flex-[1_0_0] text-xs font-bold uppercase tracking-widest text-white/40">Monthly Cost</p>
+              <p className="w-16 text-right text-xs font-bold uppercase tracking-widest text-white/40">Actions</p>
             </div>
 
             {displayedFees.length === 0 ? (
               <div className="py-12 text-center text-white/30 text-sm">No fees in this category.</div>
             ) : (
               displayedFees.map((fee) => (
-                <FeeRow key={fee.id} fee={fee} aptNumber={fee.apartmentNumber} />
+                <FeeRow
+                  key={fee.id}
+                  fee={fee}
+                  aptNumber={fee.apartmentNumber}
+                  deleting={deletingFeeId === fee.id}
+                  onDelete={handleDeleteFee}
+                />
               ))
             )}
 
