@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { X, Mail, Phone, Unlink } from 'lucide-react';
 import type { Tenant } from '../../types/index';
 import { useOwner } from '../../context/OwnerContext';
 import userService from '../../../services/userService';
@@ -87,28 +88,56 @@ export function TenantDetailsDialog({ isOpen, tenant, onClose }: TenantDetailsDi
     }
   };
 
+  const getInitials = (name: string) => {
+    if (!name) return '??';
+    const parts = name.split(' ').filter(Boolean);
+    if (parts.length === 0) return '??';
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  };
+
+  const getBadgeStyles = (status: string) => {
+    if (status === 'PAID') {
+      return { color: '#4ade80', text: 'Paid', bg: 'bg-[#4ade80]/15', border: 'border-[#4ade80]/40' };
+    } else if (status === 'PENDING') {
+      return { color: '#f59e0b', text: 'Pending', bg: 'bg-[#f59e0b]/15', border: 'border-[#f59e0b]/40' };
+    }
+    return { color: '#928dd3', text: 'Unknown', bg: 'bg-[#928dd3]/15', border: 'border-[#928dd3]/40' };
+  };
+
   if (!isOpen || !tenant) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-black border border-[rgba(255,255,255,0.16)] rounded-[16px] max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-        <div className="p-6 border-b border-[rgba(255,255,255,0.16)] flex items-center justify-between sticky top-0 bg-black">
-          <div>
-            <h2 className="font-['Archivo:ExtraBold',sans-serif] font-extrabold text-[20px] text-white">
-              {tenant.name}
-            </h2>
-            <p className="text-[rgba(255,255,255,0.6)] text-sm mt-1">
-              {tenant.email && tenant.email}
-            </p>
-            <p className="text-[rgba(255,255,255,0.6)] text-sm">
-              {tenant.phone}
-            </p>
+    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+      <div className="bg-[#0a0a0f] border border-white/10 rounded-[16px] max-w-lg w-full max-h-[80vh] overflow-y-auto shadow-[0_8px_30px_rgba(0,0,0,0.8)] relative z-10">
+        <div className="p-6 pb-5 border-b border-white/10 flex items-start justify-between sticky top-0 bg-[#0a0a0f] z-10">
+          <div className="flex gap-4 items-center">
+            <div className="w-12 h-12 rounded-full bg-[#928dd3]/20 text-[#928dd3] flex items-center justify-center text-lg font-bold font-['Chivo:Black',sans-serif] shrink-0">
+              {getInitials(tenant.name)}
+            </div>
+            <div>
+              <h2 className="font-['Chivo:Black',sans-serif] font-black text-lg text-white mb-1">
+                {tenant.name}
+              </h2>
+              {tenant.email && (
+                <div className="flex items-center text-[rgba(255,255,255,0.5)] hover:text-[#928dd3] transition-colors cursor-pointer text-xs mb-1 gap-2 font-['Archivo:Medium',sans-serif]">
+                  <Mail size={12} />
+                  <span>{tenant.email}</span>
+                </div>
+              )}
+              {tenant.phone && (
+                <div className="flex items-center text-[rgba(255,255,255,0.5)] hover:text-[#928dd3] transition-colors cursor-pointer text-xs gap-2 font-['Archivo:Medium',sans-serif]">
+                  <Phone size={12} />
+                  <span>{tenant.phone}</span>
+                </div>
+              )}
+            </div>
           </div>
           <button
             onClick={onClose}
-            className="text-[rgba(255,255,255,0.6)] hover:text-white transition-colors"
+            className="p-2 text-white/60 bg-white/5 rounded-full transition-colors hover:text-white hover:bg-white/10 shadow-sm"
           >
-            ✕
+            <X size={16} />
           </button>
         </div>
 
@@ -124,20 +153,21 @@ export function TenantDetailsDialog({ isOpen, tenant, onClose }: TenantDetailsDi
           ) : (
             <div className="space-y-4">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-['Archivo:SemiBold',sans-serif] font-semibold text-white">
+                <h3 className="font-['Archivo:SemiBold',sans-serif] font-semibold text-white text-sm">
                   Assigned Apartments ({apartments.length})
                 </h3>
                 <button
                   onClick={handleUnlinkAllProperties}
-                  className="rounded-[8px] border border-[#ff6b6b]/50 bg-[#ff6b6b]/10 px-3 py-2 text-sm font-semibold text-[#ff6b6b] transition-colors hover:bg-[#ff6b6b]/20 hover:text-white"
+                  className="rounded-[8px] border border-[#ff6b6b]/50 bg-transparent px-3 py-1.5 text-xs font-semibold text-[#ff6b6b] transition-colors hover:bg-[#ff6b6b]/10 flex items-center gap-1.5"
                 >
-                  Unlink from all apartments
+                  <Unlink size={12} />
+                  Unlink from all
                 </button>
               </div>
               {apartments.map((apt, idx) => (
                 <div
                   key={idx}
-                  className="bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] rounded-[8px] p-4"
+                  className="bg-white/[0.03] border border-white/10 rounded-[16px] p-4 hover:border-white/20 transition-colors"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div>
@@ -148,7 +178,10 @@ export function TenantDetailsDialog({ isOpen, tenant, onClose }: TenantDetailsDi
                         Apt. {apt.apartmentNumber} • Floor {apt.floor}
                       </p>
                     </div>
-                    <StatusBadge status={apt.paymentStatus.toLowerCase() as any} />
+                    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${getBadgeStyles(apt.paymentStatus).bg} ${getBadgeStyles(apt.paymentStatus).border}`} style={{ color: getBadgeStyles(apt.paymentStatus).color }}>
+                      <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: getBadgeStyles(apt.paymentStatus).color }} />
+                      {getBadgeStyles(apt.paymentStatus).text}
+                    </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
@@ -165,11 +198,11 @@ export function TenantDetailsDialog({ isOpen, tenant, onClose }: TenantDetailsDi
             </div>
           )}
         </div>
-        <div className="p-6 border-t border-[rgba(255,255,255,0.06)]">
+        <div className="p-4 flex justify-end">
           <button
             type="button"
             onClick={onClose}
-            className="w-full py-2.5 border border-white/15 text-white rounded-xl hover:bg-white/5 transition-colors text-sm font-semibold"
+            className="px-6 py-2 bg-[rgba(255,255,255,0.03)] border border-white/10 text-white font-['Archivo:SemiBold',sans-serif] font-semibold text-sm rounded-[8px] transition-colors hover:bg-white/5"
           >
             Close
           </button>
