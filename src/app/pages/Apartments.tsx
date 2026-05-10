@@ -195,6 +195,19 @@ export function Apartments() {
     setIsAddDialogOpen(true);
   };
 
+  const getNextAvailableApartmentNumber = (floor: number, apartmentNumbers: number[]) => {
+    const usedNumbers = new Set(apartmentNumbers);
+    const floorBasedStart = floor * 100 + 1;
+    const usesFloorBasedNumbers = apartmentNumbers.some(num => num >= floorBasedStart && num < floorBasedStart + 100);
+    let candidate = usesFloorBasedNumbers ? floorBasedStart : 1;
+
+    while (usedNumbers.has(candidate)) {
+      candidate += 1;
+    }
+
+    return candidate;
+  };
+
   const patchApartmentInGrid = (apartmentId: string, changes: Partial<ApartmentGridResponse>): boolean => {
     if (!gridData) return false;
 
@@ -425,12 +438,9 @@ export function Apartments() {
                     const isPaid = apt.paymentStatus === 'PAID';
                     const isOverdue = !!apt.dueDate && apt.dueDate < todayIso;
                     const hasExpenses = apt.expenses && apt.expenses.length > 0;
-                    const hasFees = apt.maintenanceFees && apt.maintenanceFees.length > 0;
                     const expensesTotal = (apt.expenses || []).reduce((sum, expense) => sum + (expense.amount || 0), 0);
-                    const feesTotal = (apt.maintenanceFees || []).reduce((sum, fee) => sum + (fee.amount || 0), 0);
-                    const totalDeductions = expensesTotal + feesTotal;
-                    const hasDeductions = totalDeductions > 0;
-                    const rentGain = (apt.rent || 0) - totalDeductions;
+                    const hasExpenseDeductions = expensesTotal > 0;
+                    const rentGain = (apt.rent || 0) - expensesTotal;
                     const isStatusUpdating = statusUpdatingApartmentIds.has(apt.id);
 
                     // Card background color
@@ -444,8 +454,8 @@ export function Apartments() {
                     if (!isVacant) {
                       if (!isPaid) {
                         rentColor = '#f87171'; // red when unpaid
-                      } else if (hasDeductions) {
-                        rentColor = '#f59e0b'; // orange when there are expenses/fees
+                      } else if (hasExpenseDeductions) {
+                        rentColor = '#f59e0b'; // orange when there are expenses
                       } else {
                         rentColor = rentGain >= 0 ? '#4ade80' : '#f87171';
                       }
@@ -539,16 +549,16 @@ export function Apartments() {
                                   </span>
                                 </span>
                               )}
-                              {isPaid && hasDeductions && (
+                              {isPaid && hasExpenseDeductions && (
                                 <span
                                   className="relative group"
-                                  title={`${apt.expenses?.length || 0} expense(s), ${apt.maintenanceFees?.length || 0} fee(s). Changes due to deductions. See details`}
+                                  title={`${apt.expenses?.length || 0} expense(s). Changes due to expenses. Maintenance fees do not affect rent gain.`}
                                 >
                                   <button
                                     type="button"
                                     onClick={(e) => handleOpenExpenseDetails(e, apt)}
                                     className="p-0 m-0 bg-transparent border-0"
-                                    title="Changes due to expenses and fees. Click to see details"
+                                    title="Changes due to expenses. Click to see details"
                                   >
                                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="cursor-pointer">
                                       <circle cx="12" cy="12" r="10" />
@@ -580,8 +590,8 @@ export function Apartments() {
                   })}
 
                   {/* Add New Apartment Card */}
-                  <div
-                    onClick={() => handleAddClick(floorNum, sortedApartmentNumbers.length > 0 ? sortedApartmentNumbers[sortedApartmentNumbers.length - 1] + 1 : floorNum * 100 + 1)}
+                  <div 
+                    onClick={() => handleAddClick(floorNum, getNextAvailableApartmentNumber(floorNum, sortedApartmentNumbers))}
                     className="flex flex-col rounded-xl overflow-hidden border border-[#4ade80]/30 transition-all hover:scale-[1.02] bg-[#4ade80]/5 hover:bg-[#4ade80]/10 cursor-pointer min-h-[290px] items-center justify-center text-[#4ade80]"
                     title={`Add apartment to floor ${floorNum}`}
                   >
