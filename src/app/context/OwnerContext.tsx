@@ -106,7 +106,7 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
   const fetchBackendData = useCallback(async (forceRefresh = false) => {
     try {
       const isAdmin = authService.getCurrentUserRole() === 'ADMIN';
-      
+
       // If the user is an admin but the currentOwner hasn't been switched to a managed owner yet
       // (it still holds the admin's session ID from initial state), skip fetching.
       if (isAdmin && currentOwner.id === authService.getCurrentUserId()) {
@@ -135,7 +135,7 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
           name: p.name,
           address: p.address,
           ownerId: p.ownerId,
-          imageUrl: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400&q=80',
+          imageUrl: p.imageUrl ?? 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400&q=80',
           description: '',
           units: unitsForProp,
           totalUnits: unitsForProp.length,
@@ -149,7 +149,7 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
 
       // Extract unique tenants from apartments - fetch grid data for each property
       const uniqueTenants: Record<string, Tenant> = {};
-      
+
       for (const property of fetchedProperties) {
         try {
           const gridData = await userService.getPropertyApartmentsGrid(property.id, { forceRefresh });
@@ -172,7 +172,7 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
           console.error(`Failed to fetch grid data for property ${property.id}`, err);
         }
       }
-      
+
       setTenants(Object.values(uniqueTenants));
     } catch(e) {
       console.error('Failed to load backend properties and tenants', e);
@@ -183,7 +183,7 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!isAuthenticated) return;
-    
+
     const isAdmin = authService.getCurrentUserRole() === 'ADMIN';
     if (isAdmin) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -222,9 +222,9 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
   }, [currentOwner, ownersAvailable]);
 
   return (
-    <OwnerContext.Provider value={{ 
-      currentOwner, 
-      setCurrentOwner, 
+    <OwnerContext.Provider value={{
+      currentOwner,
+      setCurrentOwner,
       owners,
       properties,
       tenants,
