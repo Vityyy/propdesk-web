@@ -21,7 +21,7 @@ function MenuItem({ icon, label, to, isActive, isCollapsed }: MenuItemProps) {
       className={`group relative rounded-[12px] shrink-0 w-full mb-1 transition-all duration-300 overflow-hidden ${
         isActive 
           ? 'bg-[#928dd3]/15 shadow-[inset_4px_0_0_0_#928dd3]' 
-          : 'bg-transparent hover:bg-white/[0.04]'
+          : 'bg-transparent hover:bg-[var(--bg-subtle)]'
       }`}
       title={isCollapsed ? label : undefined}
     >
@@ -32,11 +32,11 @@ function MenuItem({ icon, label, to, isActive, isCollapsed }: MenuItemProps) {
         <div className="absolute inset-0 bg-gradient-to-r from-[#928dd3]/0 to-transparent group-hover:from-[#928dd3]/5 transition-all duration-300" />
       )}
       <div className={`flex items-center px-4 py-3 relative z-10 ${isCollapsed ? 'justify-center' : 'gap-4'}`}>
-        <div className={`transition-all duration-300 ${isActive ? 'text-[#928dd3]' : 'text-white/40 group-hover:text-[#928dd3] group-hover:scale-110'}`}>
+        <div className={`transition-all duration-300 ${isActive ? 'text-[#928dd3]' : 'text-[var(--text-tertiary)] group-hover:text-[#928dd3] group-hover:scale-110'}`}>
           {icon}
         </div>
         {!isCollapsed && (
-          <p className={`font-['Archivo:SemiBold',sans-serif] font-semibold text-[15px] whitespace-nowrap transition-colors duration-300 ${isActive ? 'text-[#928dd3]' : 'text-white/60 group-hover:text-white'}`}>
+          <p className={`font-['Archivo:SemiBold',sans-serif] font-semibold text-[15px] whitespace-nowrap transition-colors duration-300 ${isActive ? 'text-[#928dd3]' : 'text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]'}`}>
             {label}
           </p>
         )}
@@ -70,12 +70,12 @@ export function Sidebar({ isCollapsed, onToggle }: { isCollapsed: boolean; onTog
 
   return (
     <div className={`content-stretch flex flex-col isolate items-start overflow-clip relative shrink-0 transition-all duration-300 z-[2] ${isCollapsed ? 'w-[80px]' : 'w-[400px]'}`} data-name="Sidebar">
-      <div className="bg-[#030308]/80 backdrop-blur-xl border-r border-white/[0.04] content-stretch flex h-full flex-col items-start overflow-clip py-[24px] px-[24px] relative shrink-0 w-full z-[1]" data-name="Side Panel Menu">
+      <div className="bg-[var(--bg-deep)]/80 backdrop-blur-xl border-r border-[var(--glass-border)] content-stretch flex h-full flex-col items-start overflow-clip py-[24px] px-[24px] relative shrink-0 w-full z-[1]" data-name="Side Panel Menu">
         <div className="flex items-center w-full mb-[16px]">
           {!isCollapsed && userRole === 'ADMIN' && <OwnerSelector />}
           {!isCollapsed && userRole === 'OWNER' && (
             <p
-              className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] text-[14px] text-[rgba(255,255,255,0.65)] truncate max-w-[260px]"
+              className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] text-[14px] text-[var(--text-secondary)] truncate max-w-[260px]"
               style={{ fontVariationSettings: "'wdth' 100" }}
               title={currentOwner.name}
             >
@@ -84,7 +84,7 @@ export function Sidebar({ isCollapsed, onToggle }: { isCollapsed: boolean; onTog
           )}
           <button
             onClick={onToggle}
-            className="ml-auto text-white/50 hover:text-white hover:bg-white/10 transition-colors p-[8px] rounded-[8px]"
+            className="ml-auto text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-subtle)] transition-colors p-[8px] rounded-[8px]"
             title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             <Menu size={20} />

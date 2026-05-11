@@ -47,7 +47,7 @@ export function Login() {
   };
 
   return (
-    <div className="bg-[#050508] flex h-screen w-screen items-center justify-center px-[24px] relative overflow-hidden">
+    <div className="bg-deep flex h-screen w-screen items-center justify-center px-[24px] relative overflow-hidden">
       <div className="absolute inset-0 bg-grid-pattern pointer-events-none" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#928dd3]/8 blur-[150px] rounded-full pointer-events-none" />
       <div className="absolute bottom-20 right-20 w-[300px] h-[300px] bg-[#928dd3]/5 blur-[100px] rounded-full pointer-events-none" />

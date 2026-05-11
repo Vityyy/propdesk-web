@@ -61,13 +61,13 @@ function PendingRequestsModal({ isOpen, onClose, requests, onAccept, onReject }:
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-      <div className="bg-[#0a0a0f] border border-white/10 rounded-[16px] shadow-[0_8px_30px_rgba(0,0,0,0.8)] max-w-md w-full relative overflow-hidden flex flex-col max-h-[85vh]">
+      <div className="bg-subtle border border-[var(--glass-border)] rounded-[16px] shadow-[0_8px_30px_rgba(0,0,0,0.2)] max-w-md w-full relative overflow-hidden flex flex-col max-h-[85vh]">
         {/* Header */}
-        <div className="p-6 pb-5 border-b border-white/10 flex items-center justify-between bg-[#0a0a0f] shrink-0">
-          <h2 className="font-['Chivo:Black',sans-serif] font-black text-xl text-white">Pending Requests</h2>
+        <div className="p-6 pb-5 border-b border-[var(--glass-border)] flex items-center justify-between bg-subtle shrink-0">
+          <h2 className="font-['Chivo:Black',sans-serif] font-black text-xl text-primary">Pending Requests</h2>
           <button
             onClick={onClose}
-            className="p-2 text-white/60 bg-white/5 rounded-full transition-colors hover:text-white hover:bg-white/10 shadow-sm"
+            className="p-2 text-secondary bg-white/[0.05] rounded-full transition-colors hover:text-primary hover:bg-white/[0.1] shadow-sm"
           >
             <X size={16} />
           </button>
@@ -76,7 +76,7 @@ function PendingRequestsModal({ isOpen, onClose, requests, onAccept, onReject }:
         <div className="p-6 overflow-y-auto">
           {requests.length === 0 && (
             <div className="text-center py-8">
-              <p className="font-['Archivo:Medium',sans-serif] font-medium text-[14px] text-white/50">
+              <p className="font-['Archivo:Medium',sans-serif] font-medium text-[14px] text-tertiary">
                 No pending owner requests at the moment.
               </p>
             </div>
@@ -92,12 +92,12 @@ function PendingRequestsModal({ isOpen, onClose, requests, onAccept, onReject }:
 
           <div className="space-y-4">
             {requests.map((request) => (
-              <div key={request.ownerId} className="bg-white/[0.02] rounded-[12px] border border-white/10 p-5 hover:border-white/20 hover:bg-white/[0.04] transition-all duration-300 group">
+              <div key={request.ownerId} className="glass-card rounded-[12px] p-5 hover:border-[#928dd3]/30 transition-all duration-300 group">
                 <div className="mb-4">
-                  <p className="font-['Archivo:SemiBold',sans-serif] font-semibold text-[16px] text-white">
+                  <p className="font-['Archivo:SemiBold',sans-serif] font-semibold text-[16px] text-primary">
                     {request.ownerName}
                   </p>
-                  <p className="font-['Archivo:Medium',sans-serif] font-medium text-[13px] text-white/50 mt-1">
+                  <p className="font-['Archivo:Medium',sans-serif] font-medium text-[13px] text-secondary mt-1">
                     Offered Commission: <span className="text-[#928dd3] font-semibold">{request.adminCut ?? 0}%</span>
                   </p>
                 </div>
@@ -112,7 +112,7 @@ function PendingRequestsModal({ isOpen, onClose, requests, onAccept, onReject }:
                   <button
                     onClick={() => handleReject(request.ownerId)}
                     disabled={rejecting === request.ownerId || accepting === request.ownerId}
-                    className="flex-1 px-3 py-2 rounded-[8px] bg-white/[0.03] border border-white/10 text-white/80 font-['Archivo:SemiBold',sans-serif] font-semibold text-[13px] hover:bg-[#ff6b6b]/10 hover:border-[#ff6b6b]/30 hover:text-[#ff6b6b] transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none"
+                    className="flex-1 px-3 py-2 rounded-[8px] bg-white/[0.03] border border-[var(--glass-border)] text-secondary font-['Archivo:SemiBold',sans-serif] font-semibold text-[13px] hover:bg-[#ff6b6b]/10 hover:border-[#ff6b6b]/30 hover:text-[#ff6b6b] transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none"
                   >
                     {rejecting === request.ownerId ? "Rejecting..." : "Reject"}
                   </button>

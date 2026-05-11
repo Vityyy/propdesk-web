@@ -109,24 +109,24 @@ export function TenantDetailsDialog({ isOpen, tenant, onClose }: TenantDetailsDi
 
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-[#0a0a0f] border border-white/10 rounded-[16px] max-w-lg w-full max-h-[80vh] overflow-y-auto shadow-[0_8px_30px_rgba(0,0,0,0.8)] relative z-10">
-        <div className="p-6 pb-5 border-b border-white/10 flex items-start justify-between sticky top-0 bg-[#0a0a0f] z-10">
+      <div className="bg-[var(--bg-deep)] border border-[var(--glass-border)] rounded-[16px] max-w-lg w-full max-h-[80vh] overflow-y-auto shadow-[0_8px_30px_rgba(0,0,0,0.8)] relative z-10">
+        <div className="p-6 pb-5 border-b border-[var(--glass-border)] flex items-start justify-between sticky top-0 bg-[var(--bg-deep)] z-10">
           <div className="flex gap-4 items-center">
             <div className="w-12 h-12 rounded-full bg-[#928dd3]/20 text-[#928dd3] flex items-center justify-center text-lg font-bold font-['Chivo:Black',sans-serif] shrink-0">
               {getInitials(tenant.name)}
             </div>
             <div>
-              <h2 className="font-['Chivo:Black',sans-serif] font-black text-lg text-white mb-1">
+              <h2 className="font-['Chivo:Black',sans-serif] font-black text-lg text-[var(--text-primary)] mb-1">
                 {tenant.name}
               </h2>
               {tenant.email && (
-                <div className="flex items-center text-[rgba(255,255,255,0.5)] hover:text-[#928dd3] transition-colors cursor-pointer text-xs mb-1 gap-2 font-['Archivo:Medium',sans-serif]">
+                <div className="flex items-center text-[var(--text-secondary)] hover:text-[#928dd3] transition-colors cursor-pointer text-xs mb-1 gap-2 font-['Archivo:Medium',sans-serif]">
                   <Mail size={12} />
                   <span>{tenant.email}</span>
                 </div>
               )}
               {tenant.phone && (
-                <div className="flex items-center text-[rgba(255,255,255,0.5)] hover:text-[#928dd3] transition-colors cursor-pointer text-xs gap-2 font-['Archivo:Medium',sans-serif]">
+                <div className="flex items-center text-[var(--text-secondary)] hover:text-[#928dd3] transition-colors cursor-pointer text-xs gap-2 font-['Archivo:Medium',sans-serif]">
                   <Phone size={12} />
                   <span>{tenant.phone}</span>
                 </div>
@@ -135,7 +135,7 @@ export function TenantDetailsDialog({ isOpen, tenant, onClose }: TenantDetailsDi
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-white/60 bg-white/5 rounded-full transition-colors hover:text-white hover:bg-white/10 shadow-sm"
+            className="p-2 text-[var(--text-secondary)] bg-[var(--bg-subtle)] rounded-full transition-colors hover:text-[var(--text-primary)] hover:bg-[var(--glass-border)] shadow-sm"
           >
             <X size={16} />
           </button>
@@ -143,17 +143,17 @@ export function TenantDetailsDialog({ isOpen, tenant, onClose }: TenantDetailsDi
 
         <div className="p-6">
           {isLoading ? (
-            <div className="text-center text-[rgba(255,255,255,0.6)]">
+            <div className="text-center text-[var(--text-secondary)]">
               Loading apartments...
             </div>
           ) : apartments.length === 0 ? (
-            <div className="text-center text-[rgba(255,255,255,0.6)] py-8">
+            <div className="text-center text-[var(--text-secondary)] py-8">
               No apartments assigned to this tenant
             </div>
           ) : (
             <div className="space-y-4">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-['Archivo:SemiBold',sans-serif] font-semibold text-white text-sm">
+                <h3 className="font-['Archivo:SemiBold',sans-serif] font-semibold text-[var(--text-primary)] text-sm">
                   Assigned Apartments ({apartments.length})
                 </h3>
                 <button
@@ -167,14 +167,14 @@ export function TenantDetailsDialog({ isOpen, tenant, onClose }: TenantDetailsDi
               {apartments.map((apt, idx) => (
                 <div
                   key={idx}
-                  className="bg-white/[0.03] border border-white/10 rounded-[16px] p-4 hover:border-white/20 transition-colors"
+                  className="bg-[var(--bg-subtle)] border border-[var(--glass-border)] rounded-[16px] p-4 hover:border-[var(--glass-border-hover)] transition-colors"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <p className="font-['Archivo:SemiBold',sans-serif] font-semibold text-white">
+                      <p className="font-['Archivo:SemiBold',sans-serif] font-semibold text-[var(--text-primary)]">
                         {apt.propertyName}
                       </p>
-                      <p className="text-[rgba(255,255,255,0.6)] text-sm">
+                      <p className="text-[var(--text-secondary)] text-sm">
                         Apt. {apt.apartmentNumber} • Floor {apt.floor}
                       </p>
                     </div>
@@ -185,12 +185,12 @@ export function TenantDetailsDialog({ isOpen, tenant, onClose }: TenantDetailsDi
                   </div>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="text-[rgba(255,255,255,0.6)]">Monthly Rent</p>
-                      <p className="text-white font-semibold">${apt.rent.toLocaleString()}</p>
+                      <p className="text-[var(--text-secondary)]">Monthly Rent</p>
+                      <p className="text-[var(--text-primary)] font-semibold">${apt.rent.toLocaleString()}</p>
                     </div>
                     <div>
-                      <p className="text-[rgba(255,255,255,0.6)]">Due Date</p>
-                      <p className="text-white font-semibold">{apt.dueDate}</p>
+                      <p className="text-[var(--text-secondary)]">Due Date</p>
+                      <p className="text-[var(--text-primary)] font-semibold">{apt.dueDate}</p>
                     </div>
                   </div>
                 </div>
@@ -202,7 +202,7 @@ export function TenantDetailsDialog({ isOpen, tenant, onClose }: TenantDetailsDi
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-2 bg-[rgba(255,255,255,0.03)] border border-white/10 text-white font-['Archivo:SemiBold',sans-serif] font-semibold text-sm rounded-[8px] transition-colors hover:bg-white/5"
+            className="px-6 py-2 bg-[var(--bg-subtle)] border border-[var(--glass-border)] text-[var(--text-primary)] font-['Archivo:SemiBold',sans-serif] font-semibold text-sm rounded-[8px] transition-colors hover:bg-[var(--glass-border)]"
           >
             Close
           </button>

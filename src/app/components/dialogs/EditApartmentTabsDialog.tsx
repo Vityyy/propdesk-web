@@ -68,20 +68,20 @@ function Accordion({
   return (
     <div
       className="border rounded-xl overflow-hidden transition-all"
-      style={{ borderColor: open ? accentColor : 'rgba(255,255,255,0.1)' }}
+      style={{ borderColor: open ? accentColor : 'var(--glass-border)' }}
     >
       <button
         type="button"
         onClick={onToggle}
-        className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-white/5 transition-colors"
+        className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-[var(--bg-subtle)] transition-colors"
       >
         <span
           className="font-bold text-sm tracking-wide uppercase"
-          style={{ color: open ? accentColor : 'rgba(255,255,255,0.7)' }}
+          style={{ color: open ? accentColor : 'var(--text-secondary)' }}
         >
           {title}
         </span>
-        <span style={{ color: open ? accentColor : 'rgba(255,255,255,0.4)' }}>
+        <span style={{ color: open ? accentColor : 'var(--text-tertiary)' }}>
           <ChevronIcon open={open} />
         </span>
       </button>
@@ -157,32 +157,32 @@ function ApartmentDataSection({
         <div className="p-3 bg-red-500/10 border border-red-500/40 rounded-lg text-red-400 text-sm">{error}</div>
       )}
       <div>
-        <label className="block text-xs font-semibold uppercase tracking-wider text-white/50 mb-2">Rent Value ($)</label>
+        <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Rent Value ($)</label>
         <input
           type="number" step="0.01" value={rent}
           onChange={e => setRent(e.target.value)}
-          className="w-full px-4 py-3 bg-black border border-white/10 focus:border-[#928dd3] rounded-xl text-white placeholder-white/30 transition-colors focus:outline-none"
+          className="w-full px-4 py-3 bg-[var(--bg-subtle)] border border-[var(--glass-border)] focus:border-[#928dd3] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
           placeholder="e.g. 1500.00"
         />
       </div>
       <div>
-        <label className="block text-xs font-semibold uppercase tracking-wider text-white/50 mb-2">Area (m²)</label>
+        <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Area (m²)</label>
         <input
           type="number" step="0.01" value={sqm}
           onChange={e => setSqm(e.target.value)}
-          className="w-full px-4 py-3 bg-black border border-white/10 focus:border-[#928dd3] rounded-xl text-white placeholder-white/30 transition-colors focus:outline-none"
+          className="w-full px-4 py-3 bg-[var(--bg-subtle)] border border-[var(--glass-border)] focus:border-[#928dd3] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
           placeholder="e.g. 45.5"
         />
       </div>
       <div>
-        <label className="block text-xs font-semibold uppercase tracking-wider text-white/50 mb-2">
-          Due Date <span className="text-white/35 normal-case">(rent due day)</span>
+        <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">
+          Due Date <span className="text-[var(--text-tertiary)] normal-case">(rent due day)</span>
         </label>
         <input
           type="date"
           value={dueDate}
           onChange={e => setDueDate(e.target.value)}
-          className="w-full px-4 py-3 bg-black border border-white/10 focus:border-[#928dd3] rounded-xl text-white placeholder-white/30 transition-colors focus:outline-none [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-40 [&::-webkit-calendar-picker-indicator]:p-1 [&::-webkit-calendar-picker-indicator]:rounded-md [&::-webkit-calendar-picker-indicator]:transition-all hover:[&::-webkit-calendar-picker-indicator]:opacity-100 hover:[&::-webkit-calendar-picker-indicator]:bg-white/10 hover:[&::-webkit-calendar-picker-indicator]:scale-110 hover:[&::-webkit-calendar-picker-indicator]:cursor-pointer"
+          className="w-full px-4 py-3 bg-[var(--bg-subtle)] border border-[var(--glass-border)] focus:border-[#928dd3] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-colors focus:outline-none [&::-webkit-calendar-picker-indicator]:opacity-40 [&::-webkit-calendar-picker-indicator]:p-1 [&::-webkit-calendar-picker-indicator]:rounded-md [&::-webkit-calendar-picker-indicator]:transition-all hover:[&::-webkit-calendar-picker-indicator]:opacity-100 hover:[&::-webkit-calendar-picker-indicator]:bg-[var(--bg-subtle)] hover:[&::-webkit-calendar-picker-indicator]:scale-110 hover:[&::-webkit-calendar-picker-indicator]:cursor-pointer"
         />
       </div>
       <button
@@ -427,76 +427,76 @@ function TenantSection({
       {formVisible && (
         <>
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-white/50 mb-2">Full Name *</label>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Full Name *</label>
             <input
               type="text" value={name} onChange={e => setName(e.target.value)}
-              className="w-full px-4 py-3 bg-black border border-white/10 focus:border-[#4ade80] rounded-xl text-white placeholder-white/30 transition-colors focus:outline-none"
+              className="w-full px-4 py-3 bg-[var(--bg-subtle)] border border-[var(--glass-border)] focus:border-[#4ade80] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
               placeholder="Tenant name"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-white/50 mb-2">Phone</label>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Phone</label>
               <input
                 type="tel" value={phone} onChange={e => setPhone(e.target.value)}
-                className="w-full px-4 py-3 bg-black border border-white/10 focus:border-[#4ade80] rounded-xl text-white placeholder-white/30 transition-colors focus:outline-none"
+                className="w-full px-4 py-3 bg-[var(--bg-subtle)] border border-[var(--glass-border)] focus:border-[#4ade80] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
                 placeholder="+54 11 ..."
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-white/50 mb-2">Email (optional)</label>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Email (optional)</label>
               <input
                 type="email" value={email} onChange={e => setEmail(e.target.value)}
-                className="w-full px-4 py-3 bg-black border border-white/10 focus:border-[#4ade80] rounded-xl text-white placeholder-white/30 transition-colors focus:outline-none"
+                className="w-full px-4 py-3 bg-[var(--bg-subtle)] border border-[var(--glass-border)] focus:border-[#4ade80] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
                 placeholder="email@example.com"
               />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-white/50 mb-2">
-              Due Date <span className="text-white/35 normal-case">(date tenant enters / monthly anchor)</span>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">
+              Due Date <span className="text-[var(--text-tertiary)] normal-case">(date tenant enters / monthly anchor)</span>
             </label>
             <input
               type="date"
               value={dueDate}
               onChange={e => setDueDate(e.target.value)}
-              className="w-full px-4 py-3 bg-black border border-white/10 focus:border-[#4ade80] rounded-xl text-white placeholder-white/30 transition-colors focus:outline-none [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-40 [&::-webkit-calendar-picker-indicator]:p-1 [&::-webkit-calendar-picker-indicator]:rounded-md [&::-webkit-calendar-picker-indicator]:transition-all hover:[&::-webkit-calendar-picker-indicator]:opacity-100 hover:[&::-webkit-calendar-picker-indicator]:bg-white/10 hover:[&::-webkit-calendar-picker-indicator]:scale-110 hover:[&::-webkit-calendar-picker-indicator]:cursor-pointer"
+              className="w-full px-4 py-3 bg-[var(--bg-subtle)] border border-[var(--glass-border)] focus:border-[#4ade80] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-colors focus:outline-none [&::-webkit-calendar-picker-indicator]:opacity-40 [&::-webkit-calendar-picker-indicator]:p-1 [&::-webkit-calendar-picker-indicator]:rounded-md [&::-webkit-calendar-picker-indicator]:transition-all hover:[&::-webkit-calendar-picker-indicator]:opacity-100 hover:[&::-webkit-calendar-picker-indicator]:bg-[var(--bg-subtle)] hover:[&::-webkit-calendar-picker-indicator]:scale-110 hover:[&::-webkit-calendar-picker-indicator]:cursor-pointer"
             />
           </div>
 
           {/* Special modifications ─────────────────────────────────────── */}
           <div className="mt-2">
             <div className="flex items-center gap-3 my-3">
-              <div className="flex-1 h-px bg-white/10" />
-              <span className="text-xs font-semibold uppercase tracking-widest text-white/35">Special Modifications</span>
-              <div className="flex-1 h-px bg-white/10" />
+              <div className="flex-1 h-px bg-[var(--glass-border)]" />
+              <span className="text-xs font-semibold uppercase tracking-widest text-[var(--text-tertiary)]">Special Modifications</span>
+              <div className="flex-1 h-px bg-[var(--glass-border)]" />
             </div>
-            <p className="text-xs text-white/40 mb-3">
+            <p className="text-xs text-[var(--text-tertiary)] mb-3">
               If this tenant rents a block of units (e.g. a company), define floors and apartments using parsed ranges.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-white/40 mb-1">Floors (Range)</label>
+                <label className="block text-xs text-[var(--text-tertiary)] mb-1">Floors (Range)</label>
                 <input
                   type="text"
                   value={floorRanges}
                   onChange={(e) => setFloorRanges(e.target.value)}
-                  className="w-full px-3 py-2 bg-black border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-white/30"
+                  className="w-full px-3 py-2 bg-[var(--bg-subtle)] border border-[var(--glass-border)] rounded-lg text-[var(--text-primary)] text-sm focus:outline-none focus:border-[var(--glass-border-hover)]"
                   placeholder="1-5, 9"
                 />
               </div>
               <div>
-                <label className="block text-xs text-white/40 mb-1">Apartments (Range)</label>
+                <label className="block text-xs text-[var(--text-tertiary)] mb-1">Apartments (Range)</label>
                 <input
                   type="text"
                   value={apartmentRanges}
                   onChange={(e) => setApartmentRanges(e.target.value)}
-                  className="w-full px-3 py-2 bg-black border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-white/30"
+                  className="w-full px-3 py-2 bg-[var(--bg-subtle)] border border-[var(--glass-border)] rounded-lg text-[var(--text-primary)] text-sm focus:outline-none focus:border-[var(--glass-border-hover)]"
                   placeholder="1-4, 8, 10"
                 />
               </div>
             </div>
-            <p className="text-[11px] text-white/35 mt-2">Format example: `1-5, 9`</p>
+            <p className="text-[11px] text-[var(--text-tertiary)] mt-2">Format example: `1-5, 9`</p>
             {specialModsError && (
               <p className="text-xs text-red-400 mt-2">{specialModsError}</p>
             )}
@@ -515,7 +515,7 @@ function TenantSection({
       )}
 
       {hasTenant && (
-        <div className="pt-2 border-t border-white/5 mt-2">
+        <div className="pt-2 border-t border-[var(--glass-border)] mt-2">
           <button
             type="button" onClick={() => setIsVacateDialogOpen(true)} disabled={vacating}
             className="w-full py-2.5 rounded-xl font-bold text-sm bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 transition-colors disabled:opacity-50"
@@ -596,16 +596,16 @@ function ExpensesSection({
 
       {/* Expense list */}
       {expenses.length === 0 ? (
-        <p className="text-sm text-white/35 italic text-center py-3">No expenses for this apartment</p>
+        <p className="text-sm text-[var(--text-tertiary)] italic text-center py-3">No expenses for this apartment</p>
       ) : (
         <ul className="space-y-2">
           {expenses.map(exp => (
             <li
               key={exp.id}
-              className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10"
+              className="flex items-center justify-between p-3 rounded-lg bg-[var(--bg-subtle)] border border-[var(--glass-border)]"
             >
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-white truncate">{exp.description}</p>
+                <p className="text-sm text-[var(--text-primary)] truncate">{exp.description}</p>
                 <p className="text-xs text-[#f59e0b] font-bold">${exp.amount}</p>
               </div>
               <button
@@ -624,25 +624,25 @@ function ExpensesSection({
 
       {/* Add expense form */}
       <div className="flex items-center gap-3 mt-4 mb-1">
-        <div className="flex-1 h-px bg-white/10" />
-        <span className="text-xs font-semibold uppercase tracking-widest text-white/35">Add Expense</span>
-        <div className="flex-1 h-px bg-white/10" />
+        <div className="flex-1 h-px bg-[var(--glass-border)]" />
+        <span className="text-xs font-semibold uppercase tracking-widest text-[var(--text-tertiary)]">Add Expense</span>
+        <div className="flex-1 h-px bg-[var(--glass-border)]" />
       </div>
 
       <div className="grid grid-cols-3 gap-3">
         <div>
-          <label className="block text-xs text-white/40 mb-1">Amount ($)</label>
+          <label className="block text-xs text-[var(--text-tertiary)] mb-1">Amount ($)</label>
           <input
             type="number" step="0.01" value={amount} onChange={e => setAmount(e.target.value)}
-            className="w-full px-3 py-2.5 bg-black border border-white/10 focus:border-[#f59e0b] rounded-lg text-white text-sm placeholder-white/30 transition-colors focus:outline-none"
+            className="w-full px-3 py-2.5 bg-[var(--bg-subtle)] border border-[var(--glass-border)] focus:border-[#f59e0b] rounded-lg text-[var(--text-primary)] text-sm placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
             placeholder="0.00"
           />
         </div>
         <div className="col-span-2">
-          <label className="block text-xs text-white/40 mb-1">Description</label>
+          <label className="block text-xs text-[var(--text-tertiary)] mb-1">Description</label>
           <input
             type="text" value={description} onChange={e => setDescription(e.target.value)}
-            className="w-full px-3 py-2.5 bg-black border border-white/10 focus:border-[#f59e0b] rounded-lg text-white text-sm placeholder-white/30 transition-colors focus:outline-none"
+            className="w-full px-3 py-2.5 bg-[var(--bg-subtle)] border border-[var(--glass-border)] focus:border-[#f59e0b] rounded-lg text-[var(--text-primary)] text-sm placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
             placeholder="e.g. Plumbing repair"
           />
         </div>
@@ -728,22 +728,22 @@ function MaintenanceFeesSection({
 
       {/* Fee list */}
       {loadingFees ? (
-        <p className="text-sm text-white/35 italic text-center py-3">Loading fees…</p>
+        <p className="text-sm text-[var(--text-tertiary)] italic text-center py-3">Loading fees…</p>
       ) : fees.length === 0 ? (
-        <p className="text-sm text-white/35 italic text-center py-3">No maintenance fees assigned</p>
+        <p className="text-sm text-[var(--text-tertiary)] italic text-center py-3">No maintenance fees assigned</p>
       ) : (
         <ul className="space-y-2">
           {fees.map(fee => (
             <li
               key={fee.id}
-              className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10"
+              className="flex items-center justify-between p-3 rounded-lg bg-[var(--bg-subtle)] border border-[var(--glass-border)]"
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#38bdf8]/20 text-[#38bdf8] uppercase">
                     {fee.category}
                   </span>
-                  <p className="text-sm text-white truncate">{fee.description}</p>
+                  <p className="text-sm text-[var(--text-primary)] truncate">{fee.description}</p>
                 </div>
                 <p className="text-xs text-[#38bdf8] font-bold mt-0.5">${fee.amount}/mo</p>
               </div>
@@ -763,17 +763,17 @@ function MaintenanceFeesSection({
 
       {/* Add fee form */}
       <div className="flex items-center gap-3 mt-4 mb-1">
-        <div className="flex-1 h-px bg-white/10" />
-        <span className="text-xs font-semibold uppercase tracking-widest text-white/35">Assign Fee</span>
-        <div className="flex-1 h-px bg-white/10" />
+        <div className="flex-1 h-px bg-[var(--glass-border)]" />
+        <span className="text-xs font-semibold uppercase tracking-widest text-[var(--text-tertiary)]">Assign Fee</span>
+        <div className="flex-1 h-px bg-[var(--glass-border)]" />
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs text-white/40 mb-1">Category</label>
+          <label className="block text-xs text-[var(--text-tertiary)] mb-1">Category</label>
           <select
             value={category} onChange={e => setCategory(e.target.value)}
-            className="w-full px-3 py-2.5 bg-black border border-white/10 focus:border-[#38bdf8] rounded-lg text-white text-sm transition-colors focus:outline-none"
+            className="w-full px-3 py-2.5 bg-[var(--bg-subtle)] border border-[var(--glass-border)] focus:border-[#38bdf8] rounded-lg text-[var(--text-primary)] text-sm transition-colors focus:outline-none"
           >
             <option value="GENERAL">General</option>
             <option value="CLEANING">Cleaning</option>
@@ -782,19 +782,19 @@ function MaintenanceFeesSection({
           </select>
         </div>
         <div>
-          <label className="block text-xs text-white/40 mb-1">Monthly Amount ($)</label>
+          <label className="block text-xs text-[var(--text-tertiary)] mb-1">Monthly Amount ($)</label>
           <input
             type="number" step="0.01" value={amount} onChange={e => setAmount(e.target.value)}
-            className="w-full px-3 py-2.5 bg-black border border-white/10 focus:border-[#38bdf8] rounded-lg text-white text-sm placeholder-white/30 transition-colors focus:outline-none"
+            className="w-full px-3 py-2.5 bg-[var(--bg-subtle)] border border-[var(--glass-border)] focus:border-[#38bdf8] rounded-lg text-[var(--text-primary)] text-sm placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
             placeholder="0.00"
           />
         </div>
       </div>
       <div>
-        <label className="block text-xs text-white/40 mb-1">Description</label>
+        <label className="block text-xs text-[var(--text-tertiary)] mb-1">Description</label>
         <input
           type="text" value={description} onChange={e => setDescription(e.target.value)}
-          className="w-full px-3 py-2.5 bg-black border border-white/10 focus:border-[#38bdf8] rounded-lg text-white text-sm placeholder-white/30 transition-colors focus:outline-none"
+          className="w-full px-3 py-2.5 bg-[var(--bg-subtle)] border border-[var(--glass-border)] focus:border-[#38bdf8] rounded-lg text-[var(--text-primary)] text-sm placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
           placeholder="e.g. Monthly hallway cleaning"
         />
       </div>
@@ -834,18 +834,18 @@ export function EditApartmentTabsDialog({
 
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-[#0a0a0f] border border-white/10 rounded-[24px] w-full max-w-lg shadow-[0_8px_30px_rgba(0,0,0,0.8)] flex flex-col max-h-[90vh] relative z-10">
+      <div className="bg-[var(--bg-deep)] border border-[var(--glass-border)] rounded-[24px] w-full max-w-lg shadow-[0_8px_30px_rgba(0,0,0,0.8)] flex flex-col max-h-[90vh] relative z-10">
         {/* Header */}
-        <div className="p-6 border-b border-white/10 flex items-center justify-between shrink-0">
+        <div className="p-6 border-b border-[var(--glass-border)] flex items-center justify-between shrink-0">
           <div>
-            <h2 className="font-black text-2xl text-white" style={{ fontFamily: "'Chivo', sans-serif" }}>
+            <h2 className="font-black text-2xl text-[var(--text-primary)]" style={{ fontFamily: "'Chivo', sans-serif" }}>
               Edit Apartment
             </h2>
-            <p className="text-sm text-white/50 mt-0.5">APT {apartment.number}</p>
+            <p className="text-sm text-[var(--text-secondary)] mt-0.5">APT {apartment.number}</p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-white/60 bg-white/5 rounded-full transition-colors hover:text-white hover:bg-white/10 shadow-sm"
+            className="p-2 text-[var(--text-secondary)] bg-[var(--bg-subtle)] rounded-full transition-colors hover:text-[var(--text-primary)] hover:bg-[var(--glass-border)] shadow-sm"
           >
             <X size={20} />
           </button>
@@ -891,11 +891,11 @@ export function EditApartmentTabsDialog({
         </div>
 
         {/* Footer */}
-        <div className="p-5 border-t border-white/10 shrink-0">
+        <div className="p-5 border-t border-[var(--glass-border)] shrink-0">
           <button
             type="button"
             onClick={onClose}
-            className="w-full py-2.5 border border-white/15 text-white rounded-xl hover:bg-white/5 transition-colors text-sm font-semibold"
+            className="w-full py-2.5 border border-[var(--glass-border)] text-[var(--text-primary)] rounded-xl hover:bg-[var(--bg-subtle)] transition-colors text-sm font-semibold"
           >
             Close
           </button>

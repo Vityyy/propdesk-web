@@ -35,7 +35,7 @@ export function ConfirmDeleteDialog({
 
   return (
     <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-[#111] border border-[#ff6b6b]/30 rounded-2xl max-w-sm w-full shadow-2xl overflow-hidden">
+      <div className="bg-subtle border border-[#ff6b6b]/30 rounded-2xl max-w-sm w-full shadow-2xl overflow-hidden">
         <div className="p-6 pb-0 flex flex-col items-center text-center">
           <div className="w-16 h-16 rounded-full bg-[#ff6b6b]/10 flex items-center justify-center mb-4 text-[#ff6b6b]">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -45,10 +45,10 @@ export function ConfirmDeleteDialog({
               <line x1="14" y1="11" x2="14" y2="17"></line>
             </svg>
           </div>
-          <h2 className="font-['Chivo:Black',sans-serif] font-black text-xl text-white mb-2">
+          <h2 className="font-['Chivo:Black',sans-serif] font-black text-xl text-primary mb-2">
             {title}
           </h2>
-          <p className="text-sm text-[rgba(255,255,255,0.7)]">
+          <p className="text-sm text-secondary">
             {description}
           </p>
         </div>
@@ -58,7 +58,7 @@ export function ConfirmDeleteDialog({
             type="button"
             onClick={onClose}
             disabled={isDeleting}
-            className="flex-1 px-4 py-3 border border-[rgba(255,255,255,0.1)] text-white rounded-xl hover:bg-[rgba(255,255,255,0.05)] transition-colors disabled:opacity-50 font-semibold"
+            className="flex-1 px-4 py-3 border border-[var(--glass-border)] text-secondary rounded-xl hover:bg-white/[0.05] transition-colors disabled:opacity-50 font-semibold"
           >
             {cancelText}
           </button>

@@ -6,6 +6,8 @@ import authService from "../../services/authService";
 import userService from "../../services/userService";
 import { AdminRequestsMailbox } from "./AdminRequestsMailbox";
 import { HireAdminDialog } from "./dialogs/HireAdminDialog";
+import { useTheme } from "../context/ThemeContext";
+import { Sun, Moon } from "lucide-react";
 
 function Logo() {
   return (
@@ -122,6 +124,20 @@ function HireAdminButton() {
   );
 }
 
+function ThemeToggle() {
+  const { theme, toggleTheme } = useTheme();
+  
+  return (
+    <button
+      onClick={toggleTheme}
+      className="p-2 rounded-lg transition-all duration-300 hover:bg-white/10 dark:hover:bg-white/10 text-secondary hover:text-primary"
+      title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+    >
+      {theme === 'dark' ? <Moon size={20} /> : <Sun size={20} />}
+    </button>
+  );
+}
+
 function Header() {
   const role = authService.getCurrentUserRole();
   const isOwner = role === 'OWNER';
@@ -129,9 +145,10 @@ function Header() {
 
   return (
     <div
-      className="content-stretch flex gap-[24px] items-center justify-end relative shrink-0"
+      className="content-stretch flex gap-[16px] items-center justify-end relative shrink-0"
       data-name="Header"
     >
+      <ThemeToggle />
       {isOwner && <HireAdminButton />}
       {isAdmin && <AdminRequestsMailbox />}
       <Profile />
@@ -142,7 +159,7 @@ function Header() {
 export function Navbar() {
   return (
     <div
-      className="bg-[#030308]/80 backdrop-blur-xl border-b border-white/[0.04] content-stretch flex items-center justify-between py-[12px] px-[24px] relative shrink-0 w-full z-[3]"
+      className="bg-deep/80 backdrop-blur-xl border-b border-[var(--glass-border)] content-stretch flex items-center justify-between py-[12px] px-[24px] relative shrink-0 w-full z-[3]"
       data-name="Web App Nav Bar"
     >
       <Container />

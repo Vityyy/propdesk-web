@@ -84,7 +84,7 @@ export function Summary() {
 
   if (loading || !summary) {
     return (
-      <div className="bg-black min-h-full w-full flex items-center justify-center">
+      <div className="bg-deep min-h-full w-full flex items-center justify-center">
         <LoadingSpinner label="Loading Summary..." size="lg" />
       </div>
     );

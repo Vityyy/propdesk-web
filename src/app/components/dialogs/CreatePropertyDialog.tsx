@@ -172,9 +172,9 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
       <div className="absolute inset-0" onClick={handleClose} />
-      <div className="bg-[#0a0a0f] border border-white/10 rounded-[24px] max-w-4xl w-full my-8 shadow-[0_8px_30px_rgba(0,0,0,0.8)] relative z-10">
-        <div className="p-6 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0a0a0f] z-10 rounded-t-[24px]">
-          <h2 className="font-['Chivo:Black',sans-serif] font-black text-[24px] text-white">
+      <div className="bg-subtle border border-[var(--glass-border)] rounded-[24px] max-w-4xl w-full my-8 shadow-[0_8px_30px_rgba(0,0,0,0.2)] relative z-10">
+        <div className="p-6 border-b border-[var(--glass-border)] flex items-center justify-between sticky top-0 bg-subtle z-10 rounded-t-[24px]">
+          <h2 className="font-['Chivo:Black',sans-serif] font-black text-[24px] text-primary">
             Create property
           </h2>
           <button
@@ -182,7 +182,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
             onClick={handleClose}
             disabled={isSubmitting}
             aria-disabled={isSubmitting}
-            className={`p-2 text-white/60 bg-white/5 rounded-full transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:text-white hover:bg-white/10'}`}
+            className={`p-2 text-secondary bg-white/[0.05] rounded-full transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:text-primary hover:bg-white/[0.1]'}`}
           >
             <X size={20} />
           </button>
@@ -191,13 +191,13 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
         <form onSubmit={handleSubmit} className="p-6 space-y-8">
           {/* General Property Information */}
           <div className="space-y-4">
-            <h3 className="font-['Archivo:SemiBold',sans-serif] font-semibold text-white/90 text-lg border-l-4 border-[#928dd3] pl-3">
+            <h3 className="font-['Archivo:SemiBold',sans-serif] font-semibold text-primary text-lg border-l-4 border-[#928dd3] pl-3">
               General information
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block font-['Archivo:SemiBold',sans-serif] font-semibold text-white/70 text-[14px] mb-2 uppercase tracking-wider">
+                <label className="block font-['Archivo:SemiBold',sans-serif] font-semibold text-secondary text-[14px] mb-2 uppercase tracking-wider">
                   Property name <span className="text-[#ff6b6b]">*</span>
                 </label>
                 <input
@@ -205,13 +205,13 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   disabled={isSubmitting}
-                  className="w-full px-4 py-3 bg-white/[0.03] border border-white/10 focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[12px] text-white placeholder-white/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-3 bg-white/[0.03] border border-[var(--glass-border)] focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[12px] text-primary placeholder:text-tertiary transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   placeholder="e.g. Sunset Apartments"
                 />
               </div>
 
               <div>
-                <label className="block font-['Archivo:SemiBold',sans-serif] font-semibold text-white/70 text-[14px] mb-2 uppercase tracking-wider">
+                <label className="block font-['Archivo:SemiBold',sans-serif] font-semibold text-secondary text-[14px] mb-2 uppercase tracking-wider">
                   Address <span className="text-[#ff6b6b]">*</span>
                 </label>
                 <input
@@ -219,14 +219,14 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   disabled={isSubmitting}
-                  className="w-full px-4 py-3 bg-white/[0.03] border border-white/10 focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[12px] text-white placeholder-white/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-3 bg-white/[0.03] border border-[var(--glass-border)] focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[12px] text-primary placeholder:text-tertiary transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   placeholder="e.g. 123 Main St, City, State"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block font-['Archivo:SemiBold',sans-serif] font-semibold text-white/70 text-[14px] mb-2 uppercase tracking-wider">
+              <label className="block font-['Archivo:SemiBold',sans-serif] font-semibold text-secondary text-[14px] mb-2 uppercase tracking-wider">
                 Cover image URL (optional)
               </label>
               <input
@@ -234,7 +234,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                 value={formData.imageUrl}
                 onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
                 disabled={isSubmitting}
-                className="w-full px-4 py-3 bg-white/[0.03] border border-white/10 focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[12px] text-white placeholder-white/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-3 bg-white/[0.03] border border-[var(--glass-border)] focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[12px] text-primary placeholder:text-tertiary transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="https://..."
               />
             </div>
@@ -243,23 +243,23 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
           {/* Rules Configuration */}
           <div className="space-y-4">
             <div className="flex justify-between items-center border-l-4 border-[#928dd3] pl-3">
-              <h3 className="font-['Archivo:SemiBold',sans-serif] font-semibold text-white/90 text-lg">
+              <h3 className="font-['Archivo:SemiBold',sans-serif] font-semibold text-primary text-lg">
                 Apartment generation rules
               </h3>
-              <p className="text-sm text-[rgba(255,255,255,0.5)]">
+              <p className="text-sm text-tertiary">
                 Range example: 1-5, 9, 11
               </p>
             </div>
 
             <div className="space-y-4">
               {rules.map((rule, idx) => (
-                <div key={rule.id} className="relative bg-white/[0.02] border border-white/10 rounded-[16px] p-5 pt-6 transition-all hover:border-white/20">
+                <div key={rule.id} className="relative glass-card rounded-[16px] p-5 pt-6 transition-all hover:border-[#928dd3]/30">
                   {rules.length > 1 && (
                     <button
                       type="button"
                       onClick={() => handleRemoveRule(rule.id)}
                       disabled={isSubmitting}
-                      className={`absolute top-3 right-3 text-white/40 transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:text-[#ff6b6b]'}`}
+                      className={`absolute top-3 right-3 text-tertiary transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:text-[#ff6b6b]'}`}
                       title="Remove rule"
                     >
                       <X size={18} />
@@ -268,7 +268,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
 
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div className="md:col-span-2">
-                      <label className="block text-white/70 text-xs uppercase tracking-wider mb-2 font-semibold">
+                      <label className="block text-secondary text-xs uppercase tracking-wider mb-2 font-semibold">
                         Floors (range) <span className="text-[#928dd3] ml-1">#</span>
                       </label>
                       <input
@@ -276,13 +276,13 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                         value={rule.floorRanges}
                         onChange={(e) => updateRule(rule.id, 'floorRanges', e.target.value)}
                         disabled={isSubmitting}
-                        className="w-full px-4 py-2 bg-black/40 border border-white/10 focus:border-[#928dd3] focus:bg-white/[0.03] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[8px] text-white text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full px-4 py-2 bg-white/[0.03] border border-[var(--glass-border)] focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[8px] text-primary text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                         placeholder="e.g. 1-5, 9, 11"
                       />
                     </div>
 
                     <div className="md:col-span-2">
-                      <label className="block text-white/70 text-xs uppercase tracking-wider mb-2 font-semibold">
+                      <label className="block text-secondary text-xs uppercase tracking-wider mb-2 font-semibold">
                         Apartments (range) <span className="text-[#928dd3] ml-1">#</span>
                       </label>
                       <input
@@ -290,13 +290,13 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                         value={rule.apartmentNumberRanges}
                         onChange={(e) => updateRule(rule.id, 'apartmentNumberRanges', e.target.value)}
                         disabled={isSubmitting}
-                        className="w-full px-4 py-2 bg-black/40 border border-white/10 focus:border-[#928dd3] focus:bg-white/[0.03] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[8px] text-white text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full px-4 py-2 bg-white/[0.03] border border-[var(--glass-border)] focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[8px] text-primary text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                         placeholder="e.g. 1-4, 8, 10"
                       />
                     </div>
 
                     <div className="md:col-span-2">
-                      <label className="block text-white/70 text-xs uppercase tracking-wider mb-2 font-semibold">
+                      <label className="block text-secondary text-xs uppercase tracking-wider mb-2 font-semibold">
                         Square meters (m²)
                       </label>
                       <input
@@ -305,13 +305,13 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                         onChange={(e) => updateRule(rule.id, 'squareMeters', e.target.value)}
                         min="1"
                         disabled={isSubmitting}
-                        className="w-full px-4 py-2 bg-black/40 border border-white/10 focus:border-[#928dd3] focus:bg-white/[0.03] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[8px] text-white text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full px-4 py-2 bg-white/[0.03] border border-[var(--glass-border)] focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[8px] text-primary text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                         placeholder="e.g. 45"
                       />
                     </div>
 
                     <div className="md:col-span-2">
-                      <label className="block text-white/70 text-xs uppercase tracking-wider mb-2 font-semibold">
+                      <label className="block text-secondary text-xs uppercase tracking-wider mb-2 font-semibold">
                         Rent amount ($)
                       </label>
                       <input
@@ -320,7 +320,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                         onChange={(e) => updateRule(rule.id, 'rentValue', e.target.value)}
                         min="0"
                         disabled={isSubmitting}
-                        className="w-full px-4 py-2 bg-black/40 border border-white/10 focus:border-[#928dd3] focus:bg-white/[0.03] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[8px] text-white text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full px-4 py-2 bg-white/[0.03] border border-[var(--glass-border)] focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[8px] text-primary text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                         placeholder="e.g. 1500"
                       />
                     </div>
@@ -333,7 +333,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
               type="button"
               onClick={handleAddRule}
               disabled={isSubmitting}
-              className={`w-full flex items-center justify-center gap-2 px-4 py-3 border border-dashed border-white/20 text-white/70 font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] rounded-[16px] transition-all ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:border-[#928dd3] hover:text-[#928dd3] hover:bg-[#928dd3]/5'}`}
+              className={`w-full flex items-center justify-center gap-2 px-4 py-3 border border-dashed border-[var(--glass-border)] text-secondary font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] rounded-[16px] transition-all ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:border-[#928dd3] hover:text-[#928dd3] hover:bg-[#928dd3]/5'}`}
             >
               <span>+</span> Add rule
             </button>
@@ -348,19 +348,19 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
           )}
 
           {!formError && parsedRanges.length > 0 && (
-            <div className="bg-[rgba(146,141,211,0.1)] border border-[#928dd3]/30 rounded-[12px] p-4 text-[#a89be6] text-sm">
+            <div className="bg-[#928dd3]/10 border border-[#928dd3]/30 rounded-[12px] p-4 text-[#928dd3] text-sm">
               <strong>OK: </strong>
               This will create <strong>{parsedRanges.length}</strong> valid apartment range block(s).
             </div>
           )}
 
           {/* Actions */}
-          <div className="flex gap-3 pt-6 border-t border-white/5 mt-8 justify-end">
+          <div className="flex gap-3 pt-6 border-t border-[var(--glass-border)] mt-8 justify-end">
             <button
               type="button"
               onClick={handleClose}
               disabled={isSubmitting}
-              className={`px-6 py-3 bg-transparent border border-white/10 text-white font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] rounded-[12px] transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/5'}`}
+              className={`px-6 py-3 bg-transparent border border-[var(--glass-border)] text-secondary font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] rounded-[12px] transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/[0.05]'}`}
             >
               Cancel
             </button>
@@ -371,7 +371,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
             >
               {isSubmitting ? (
                 <div className="flex items-center justify-center gap-2">
-                  <div className="w-4 h-4 border-2 border-[rgba(0,0,0,0)] border-t-black rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-transparent border-t-black rounded-full animate-spin" />
                   <span>Creating...</span>
                 </div>
               ) : (
