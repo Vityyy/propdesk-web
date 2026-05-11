@@ -486,11 +486,11 @@ export function Apartments() {
                           <button
                             onClick={(e) => handleTogglePaymentStatus(e, apt)}
                             disabled={isStatusUpdating || isVacant}
-className={`absolute top-11 left-3 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold tracking-wide flex items-center gap-1 border transition-colors ${isVacant
+                            className={`absolute top-11 left-3 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold tracking-wide flex items-center gap-1 border transition-colors ${isVacant
                               ? 'bg-white/10 border-white/20 text-tertiary'
                               : isPaid
-                                ? 'dark:bg-[#4ade80]/15 light:bg-[#22c55e]/20 dark:border-[#4ade80]/40 light:border-[#22c55e]/50 dark:text-[#4ade80] light:text-[#16a34a] hover:dark:bg-[#4ade80]/25 hover:light:bg-[#22c55e]/30'
-                                : 'dark:bg-[#f59e0b]/15 light:bg-[#d97706]/20 dark:border-[#f59e0b]/40 light:border-[#d97706]/50 dark:text-[#f59e0b] light:text-[#b45309] hover:dark:bg-[#f59e0b]/25 hover:light:bg-[#d97706]/30'
+                                ? 'bg-[#4ade80]/15 border-[#4ade80]/40 text-[#4ade80] hover:bg-[#4ade80]/25'
+                                : 'bg-[#f59e0b]/15 border-[#f59e0b]/40 text-[#f59e0b] hover:bg-[#f59e0b]/25'
                             } disabled:opacity-50 disabled:cursor-not-allowed`}
                             title={
                               isVacant
@@ -517,7 +517,7 @@ className={`absolute top-11 left-3 backdrop-blur-sm px-2 py-1 rounded text-xs fo
                             {/* Delete button */}
                             <button
                               onClick={(e) => handleDeleteClick(e, apt)}
-                              className="dark:bg-black/40 light:bg-black/20 hover:bg-[#ff6b6b]/80 backdrop-blur-sm p-1.5 rounded transition-colors text-[#ff6b6b] hover:text-primary"
+                              className="bg-black/40 hover:bg-[#ff6b6b]/80 backdrop-blur-sm p-1.5 rounded transition-colors text-[#ff6b6b] hover:text-primary"
                               title="Delete apartment"
                             >
                               <TrashIcon />
@@ -526,10 +526,10 @@ className={`absolute top-11 left-3 backdrop-blur-sm px-2 py-1 rounded text-xs fo
                         </div>
 
                         {/* Lower half: Details */}
-                        <div className="p-4 flex flex-col gap-3 flex-1 dark:bg-[#1a1a1a] light:bg-gray-200 rounded-b-xl overflow-visible">
+                        <div className="p-4 flex flex-col gap-3 flex-1 bg-[#1a1a1a] rounded-b-xl overflow-visible text-[#eaeaea]">
                           <div className="flex justify-between items-center border-b border-[rgba(255,255,255,0.05)] pb-2">
                             <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Tenant</span>
-                            <span className="text-sm text-primary font-medium truncate max-w-[140px]" title={apt.tenant?.name || 'Vacant'}>
+                            <span className="text-sm text-[#eaeaea] font-medium truncate max-w-[140px]" title={apt.tenant?.name || 'Vacant'}>
                               {apt.tenant ? apt.tenant.name : <span className="text-[rgba(255,255,255,0.3)] italic">Vacant</span>}
                             </span>
                           </div>
@@ -546,7 +546,7 @@ className={`absolute top-11 left-3 backdrop-blur-sm px-2 py-1 rounded text-xs fo
                                     <line x1="12" y1="16" x2="12.01" y2="16" />
                                   </svg>
                                   {/* Tooltip */}
-                                  <span className="absolute bottom-full right-0 mb-1.5 hidden group-hover:block dark:bg-[#1a1a1a] light:bg-gray-200 dark:border-[#f87171]/30 light:border-[#ef4444]/40 dark:text-[#f87171] light:text-[#dc2626] text-xs px-2 py-1 rounded-lg whitespace-nowrap shadow-xl z-50 pointer-events-none">
+                                  <span className="absolute bottom-full right-0 mb-1.5 hidden group-hover:block bg-[#1a1a1a] border-[#f87171]/30 text-[#f87171] text-xs px-2 py-1 rounded-lg whitespace-nowrap shadow-xl z-50 pointer-events-none">
                                     Unpaid rent — payment is pending
                                   </span>
                                 </span>
@@ -569,7 +569,7 @@ className={`absolute top-11 left-3 backdrop-blur-sm px-2 py-1 rounded text-xs fo
                                     </svg>
                                   </button>
                                   {/* Tooltip */}
-                                  <span className="absolute bottom-full right-0 mb-1.5 hidden group-hover:block dark:bg-[#1a1a1a] light:bg-gray-200 dark:border-[#f59e0b]/30 light:border-[#d97706]/40 dark:text-[#f59e0b] light:text-[#b45309] text-xs px-2 py-1 rounded-lg whitespace-nowrap shadow-xl z-50 pointer-events-none">
+                                  <span className="absolute bottom-full right-0 mb-1.5 hidden group-hover:block bg-[#1a1a1a] border-[#f59e0b]/30 text-[#f59e0b] text-xs px-2 py-1 rounded-lg whitespace-nowrap shadow-xl z-50 pointer-events-none">
                                     Changes due to expenses. See details
                                   </span>
                                 </span>
@@ -579,12 +579,12 @@ className={`absolute top-11 left-3 backdrop-blur-sm px-2 py-1 rounded text-xs fo
 
                           <div className="flex justify-between items-center">
                             <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Area</span>
-                            <span className="text-sm text-primary">{apt.squareMeters} m²</span>
+                            <span className="text-sm text-[#eaeaea]">{apt.squareMeters} m²</span>
                           </div>
 
                           <div className="flex justify-between items-center mt-auto pt-2">
                             <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Due</span>
-                            <span className="text-sm text-primary">{apt.dueDate || '-'}</span>
+                            <span className="text-sm text-[#eaeaea]">{apt.dueDate || '-'}</span>
                           </div>
                         </div>
                       </div>
