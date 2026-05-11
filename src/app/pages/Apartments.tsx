@@ -342,19 +342,21 @@ export function Apartments() {
 
   if (loading) {
     return (
-      <div className="bg-black min-h-full w-full flex items-center justify-center">
-        <p className="text-white">Loading apartments...</p>
+      <div className="min-h-full w-full flex items-center justify-center relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#928dd3]/3 to-transparent pointer-events-none" />
+        <p className="text-white/50">Loading apartments...</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-black min-h-full w-full">
+    <div className="min-h-full w-full relative">
+      <div className="absolute inset-0 bg-gradient-to-b from-[#928dd3]/3 to-transparent pointer-events-none" />
       <div className="content-stretch flex flex-col gap-[24px] items-start py-[24px] px-[48px] relative shrink-0 w-full">
         <div className="flex flex-col gap-[12px] w-full">
           <button
             onClick={() => navigate('/properties')}
-            className="text-[rgba(255,255,255,0.6)] hover:text-white transition-colors self-start mb-4"
+            className="text-white/40 hover:text-white/70 transition-colors self-start mb-4"
           >
             ← Back to Properties
           </button>
@@ -364,24 +366,24 @@ export function Apartments() {
               <p className="font-['Chivo:Black',sans-serif] font-black leading-[40px] text-[34px] text-white tracking-[-0.34px]">
                 Apartments
               </p>
-              <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] text-[15px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
+              <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] text-[15px] text-white/50" style={{ fontVariationSettings: "'wdth' 100" }}>
                 {property ? `Managing ${property.name}` : 'Loading property data...'}
               </p>
             </div>
 
             <div className="flex items-center gap-2">
-              <label className="text-white/60 text-sm font-semibold">Floor:</label>
+              <label className="text-white/40 text-sm font-semibold">Floor:</label>
               <input
                 type="number"
                 placeholder="Search floor..."
                 value={floorSearch}
                 onChange={e => setFloorSearch(e.target.value)}
-                className="bg-black border border-[rgba(255,255,255,0.2)] rounded-lg px-3 py-1.5 text-white placeholder-white/30 text-sm focus:outline-none focus:border-[#928dd3] transition-colors w-32"
+                className="bg-white/[0.02] border border-white/[0.1] rounded-lg px-3 py-1.5 text-white placeholder-white/25 text-sm focus:outline-none focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]/30 transition-colors w-32"
               />
             </div>
           </div>
 
-          <div className="bg-[#928dd3]/10 border border-[#928dd3]/30 rounded-lg p-3 w-fit text-[#928dd3] text-sm flex gap-4 mt-2">
+          <div className="bg-[#928dd3]/5 border border-[#928dd3]/20 rounded-lg p-3 w-fit text-[#928dd3]/80 text-sm flex gap-4 mt-2">
             <p><strong className="font-bold">Click:</strong> Select one</p>
             <p><strong className="font-bold">Ctrl + Click:</strong> Select multiple</p>
             <p><strong className="font-bold">Shift + Click:</strong> Select range</p>
@@ -391,20 +393,20 @@ export function Apartments() {
 
       <div className="px-[48px] pb-[48px] flex flex-col gap-12 relative">
         {selectedApartments.size > 0 && (
-          <div className="sticky top-[24px] z-40 bg-[#111] border border-[#928dd3] rounded-xl p-4 shadow-2xl flex items-center justify-between animate-in fade-in slide-in-from-top-4">
-            <span className="text-white font-semibold">
+          <div className="sticky top-[24px] z-40 glass-card border border-[#928dd3]/30 rounded-xl p-4 shadow-2xl flex items-center justify-between animate-in fade-in slide-in-from-top-4">
+            <span className="text-white/90 font-semibold">
               {selectedApartments.size} apartment{selectedApartments.size !== 1 ? 's' : ''} selected
             </span>
             <div className="flex gap-3">
               <button
                 onClick={() => setSelectedApartments(new Set())}
-                className="px-4 py-2 border border-[rgba(255,255,255,0.2)] text-white hover:bg-[rgba(255,255,255,0.1)] rounded-lg transition-colors text-sm font-semibold"
+                className="px-4 py-2 border border-white/[0.1] text-white/70 hover:bg-white/[0.05] hover:text-white rounded-lg transition-colors text-sm font-semibold"
               >
                 Cancel
               </button>
               <button
                 onClick={handleBulkEditClick}
-                className="px-4 py-2 bg-[#928dd3] text-black hover:bg-[#a89be6] rounded-lg transition-colors text-sm font-bold"
+                className="px-4 py-2 bg-gradient-to-r from-[#928dd3] to-[#a89be6] text-black hover:opacity-90 rounded-lg transition-colors text-sm font-bold shadow-[0_0_15px_rgba(146,141,211,0.3)]"
               >
                 Edit Selection
               </button>
@@ -413,11 +415,11 @@ export function Apartments() {
         )}
         {sortedFloors.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-[rgba(255,255,255,0.6)]">No floors or apartments registered for this property.</p>
+            <p className="text-white/40">No floors or apartments registered for this property.</p>
           </div>
         ) : filteredFloors.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-[rgba(255,255,255,0.6)]">No floors match your search.</p>
+            <p className="text-white/40">No floors match your search.</p>
           </div>
         ) : (
           filteredFloors.map(floorNum => {
@@ -427,7 +429,7 @@ export function Apartments() {
 
             return (
               <div key={floorNum} className="flex flex-col gap-6">
-                <h3 className="font-['Chivo:Black',sans-serif] font-black text-2xl text-white">
+                <h3 className="font-['Chivo:Black',sans-serif] font-black text-2xl text-white/80">
                   Floor {floorNum}
                 </h3>
 

@@ -41,23 +41,23 @@ function TenantRow({ tenant, email, phone, paymentStatus, onEdit, onClick }: Ten
 
   return (
     <div 
-      className="content-stretch grid grid-cols-[minmax(140px,1.5fr)_minmax(180px,2fr)_minmax(140px,1.5fr)_120px_80px] items-center gap-4 py-[16px] px-[24px] relative shrink-0 w-full border-b border-white/10 hover:bg-white/[0.04] transition-colors cursor-pointer"
+      className="content-stretch grid grid-cols-[minmax(140px,1.5fr)_minmax(180px,2fr)_minmax(140px,1.5fr)_120px_80px] items-center gap-4 py-[16px] px-[24px] relative shrink-0 w-full border-b border-white/[0.06] hover:bg-white/[0.03] transition-colors cursor-pointer"
       onClick={onClick}
     >
       <div className="min-w-0">
-        <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white truncate" style={{ fontVariationSettings: "'wdth' 100" }}>
+        <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white/90 truncate" style={{ fontVariationSettings: "'wdth' 100" }}>
           {tenant}
         </p>
       </div>
       
       <div className="min-w-0 text-center">
-        <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)] truncate" style={{ fontVariationSettings: "'wdth' 100" }}>
+        <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-white/50 truncate" style={{ fontVariationSettings: "'wdth' 100" }}>
           {displayEmail}
         </p>
       </div>
       
       <div className="min-w-0 text-center">
-        <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)] truncate" style={{ fontVariationSettings: "'wdth' 100" }}>
+        <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-white/50 truncate" style={{ fontVariationSettings: "'wdth' 100" }}>
           {displayPhone}
         </p>
       </div>
@@ -86,16 +86,17 @@ function TenantRow({ tenant, email, phone, paymentStatus, onEdit, onClick }: Ten
 
 function SummaryCard({ title, value, subtitle, isLoading }: { title: string; value: string; subtitle: string; isLoading?: boolean }) {
   return (
-    <div className="bg-white/[0.02] backdrop-blur-md border border-white/10 hover:border-white/20 shadow-lg hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(255,255,255,0.04)] transition-all duration-300 flex-[1_0_0] min-w-[200px] relative rounded-[16px]">
-      <div className="overflow-hidden rounded-[inherit] size-full">
+    <div className="glass-card border border-white/[0.06] hover:border-white/[0.12] shadow-lg hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.2)] transition-all duration-300 flex-[1_0_0] min-w-[200px] relative rounded-[16px]">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#928dd3]/5 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-[16px]" />
+      <div className="overflow-hidden rounded-[inherit] size-full relative">
         <div className="content-stretch flex flex-col gap-[8px] items-start p-[24px] relative w-full">
-          <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] text-[17px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
+          <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] text-[17px] text-white/80" style={{ fontVariationSettings: "'wdth' 100" }}>
             {title}
           </p>
           {isLoading ? (
             <>
-              <div className="h-8 w-24 bg-[rgba(255,255,255,0.06)] rounded mb-2 animate-pulse" />
-              <div className="h-3 w-40 bg-[rgba(146,141,211,0.08)] rounded animate-pulse" />
+              <div className="h-8 w-24 bg-white/[0.06] rounded mb-2 animate-pulse" />
+              <div className="h-3 w-40 bg-[#928dd3]/10 rounded animate-pulse" />
             </>
           ) : (
             <>
@@ -228,15 +229,16 @@ export function Tenants() {
   };
 
   return (
-    <div className="bg-black min-h-full w-full">
+    <div className="min-h-full w-full relative">
+      <div className="absolute inset-0 bg-gradient-to-b from-[#928dd3]/3 to-transparent pointer-events-none" />
       {/* Header */}
-      <div className="flex items-center justify-between py-8 px-12">
+      <div className="flex items-center justify-between py-8 px-12 relative">
         <div>
           <h1 className="font-black text-4xl text-white tracking-tight flex items-center gap-3" style={{ fontFamily: "'Chivo', sans-serif" }}>
             <Users className="text-[#928dd3]" size={36} />
             Tenants
           </h1>
-          <p className="text-white/50 text-sm mt-2 font-['Archivo:Medium',sans-serif]">
+          <p className="text-white/40 text-sm mt-2 font-['Archivo:Medium',sans-serif]">
             Manage {tenants.length} tenants for {currentOwner.name}
           </p>
         </div>
@@ -248,43 +250,43 @@ export function Tenants() {
       </div>
 
       <div className="content-stretch flex gap-[24px] items-start px-[48px] pb-[24px] relative w-full">
-        <div className="flex items-center gap-3 bg-white/[0.03] border border-white/10 focus-within:border-[#928dd3] focus-within:bg-white/[0.05] focus-within:ring-1 focus-within:ring-[#928dd3] rounded-[12px] px-4 py-3 text-white transition-all duration-300">
-          <Search size={18} className="text-white/40" />
+        <div className="flex items-center gap-3 bg-white/[0.02] border border-white/[0.08] focus-within:border-[#928dd3] focus-within:bg-white/[0.05] focus-within:ring-1 focus-within:ring-[#928dd3]/30 rounded-[12px] px-4 py-3 text-white transition-all duration-300">
+          <Search size={18} className="text-white/30" />
           <input
             type="text"
             placeholder="Search tenants by name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="bg-transparent text-white placeholder-white/30 text-sm focus:outline-none w-64"
+            className="bg-transparent text-white placeholder-white/25 text-sm focus:outline-none w-64"
           />
         </div>
       </div>
 
-      <div className="bg-white/[0.02] backdrop-blur-md border border-white/10 shadow-lg mx-[48px] mb-[48px] rounded-[16px] relative overflow-hidden">
+      <div className="glass-card shadow-lg mx-[48px] mb-[48px] rounded-[16px] relative overflow-hidden">
         <div className="overflow-visible rounded-[inherit] size-full">
-           <div className="content-stretch grid grid-cols-[minmax(140px,1.5fr)_minmax(180px,2fr)_minmax(140px,1.5fr)_120px_80px] items-center gap-4 py-[16px] px-[24px] relative shrink-0 w-full border-b border-white/10 bg-white/[0.02]">
-             <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
-               Name
-             </p>
-             <p className="text-center font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
-               Email
-             </p>
-             <p className="text-center font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
-               Phone
-             </p>
-             <p className="text-center font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
-               Status
-             </p>
-             <p className="text-center font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
-               Actions
-             </p>
-           </div>
+<div className="content-stretch grid grid-cols-[minmax(140px,1.5fr)_minmax(180px,2fr)_minmax(140px,1.5fr)_120px_80px] items-center gap-4 py-[16px] px-[24px] relative shrink-0 w-full border-b border-white/[0.06] bg-white/[0.02]">
+              <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white/80" style={{ fontVariationSettings: "'wdth' 100" }}>
+                Name
+              </p>
+              <p className="text-center font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white/80" style={{ fontVariationSettings: "'wdth' 100" }}>
+                Email
+              </p>
+              <p className="text-center font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white/80" style={{ fontVariationSettings: "'wdth' 100" }}>
+                Phone
+              </p>
+              <p className="text-center font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white/80" style={{ fontVariationSettings: "'wdth' 100" }}>
+                Status
+              </p>
+              <p className="text-center font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white/80" style={{ fontVariationSettings: "'wdth' 100" }}>
+                Actions
+              </p>
+            </div>
            {isPageLoading ? (
                <TenantSkeleton />
            ) : tenantRows.length === 0 ? (
-             <div className="py-8 px-4 text-center text-[rgba(255,255,255,0.6)]">
-               No tenants yet. Create one to get started!
-             </div>
+<div className="py-8 px-4 text-center text-white/40">
+                No tenants yet. Create one to get started!
+              </div>
            ) : (
              tenantRows.map((row) => (
                <TenantRow
