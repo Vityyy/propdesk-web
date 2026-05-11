@@ -96,14 +96,14 @@ function PropertyCard({
             </button>
 
             {showMenu && (
-              <div className="absolute top-[calc(100%+8px)] right-0 bg-[#0a0a0f]/95 backdrop-blur-2xl border border-white/[0.08] rounded-[12px] shadow-[0_12px_40px_rgba(0,0,0,0.8)] min-w-[220px] z-[11] overflow-hidden py-2">
+              <div className="absolute top-[calc(100%+8px)] right-0 dark:bg-[#0a0a0f]/95 light:bg-white dark:border-white/[0.08] light:border-black/[0.1] backdrop-blur-2xl rounded-[12px] shadow-[0_12px_40px_rgba(0,0,0,0.5)] min-w-[220px] z-[11] overflow-hidden py-2">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowMenu(false);
                     onEdit?.(property);
                   }}
-                  className="w-full flex items-center gap-3 px-[16px] py-[10px] hover:bg-white/[0.06] transition-colors"
+                  className="w-full flex items-center gap-3 px-[16px] py-[10px] dark:hover:bg-white/[0.06] light:hover:bg-black/[0.05] transition-colors"
                 >
                   <Edit2 size={16} className="text-secondary" />
                   <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[14px] text-primary" style={{ fontVariationSettings: "'wdth' 100" }}>
@@ -116,7 +116,7 @@ function PropertyCard({
                     setShowMenu(false);
                     onViewDetails?.(property);
                   }}
-                  className="w-full flex items-center gap-3 px-[16px] py-[10px] hover:bg-white/[0.06] transition-colors"
+                  className="w-full flex items-center gap-3 px-[16px] py-[10px] dark:hover:bg-white/[0.06] light:hover:bg-black/[0.05] transition-colors"
                 >
                   <Eye size={16} className="text-secondary" />
                   <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[14px] text-primary" style={{ fontVariationSettings: "'wdth' 100" }}>
@@ -129,14 +129,14 @@ function PropertyCard({
                     setShowMenu(false);
                     onViewApartments?.(property);
                   }}
-                  className="w-full flex items-center gap-3 px-[16px] py-[10px] hover:bg-white/[0.06] transition-colors"
+                  className="w-full flex items-center gap-3 px-[16px] py-[10px] dark:hover:bg-white/[0.06] light:hover:bg-black/[0.05] transition-colors"
                 >
                   <Building2 size={16} className="text-secondary" />
                   <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[14px] text-primary" style={{ fontVariationSettings: "'wdth' 100" }}>
                     View Apartments
                   </p>
                 </button>
-                <div className="border-t border-white/10 my-2" />
+                <div className="border-t border-[var(--glass-border)] my-2" />
                 <button
                   onClick={(e) => {
                     e.stopPropagation();

@@ -1,7 +1,8 @@
 import { FormEvent, useMemo, useState } from "react";
 import { useNavigate, Link } from "react-router";
-import { Building2, Briefcase } from "lucide-react";
+import { Building2, Briefcase, Sun, Moon } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 import { ApiError } from "../../utils/httpUtils";
 
 type UserType = "admin" | "owner";
@@ -9,7 +10,18 @@ type UserType = "admin" | "owner";
 export function Register() {
   const navigate = useNavigate();
   const { signup } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [userType, setUserType] = useState<UserType>("owner");
+
+  const ThemeToggle = () => (
+    <button
+      onClick={toggleTheme}
+      className="absolute top-4 right-4 p-2 rounded-lg transition-all duration-300 hover:bg-white/10 dark:hover:bg-white/10 text-secondary hover:text-primary light:text-black light:hover:bg-black/5 z-20"
+      title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+    >
+      {theme === 'dark' ? <Moon size={20} /> : <Sun size={20} />}
+    </button>
+  );
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -61,6 +73,8 @@ export function Register() {
       <div className="absolute inset-0 bg-grid-pattern pointer-events-none" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#928dd3]/8 blur-[150px] rounded-full pointer-events-none" />
       <div className="absolute bottom-20 right-20 w-[300px] h-[300px] bg-[#928dd3]/5 blur-[100px] rounded-full pointer-events-none" />
+      
+      <ThemeToggle />
       
       <div className="dark:bg-[#0a0a0f]/95 light:bg-white dark:border-white/[0.08] light:border-black/[0.08] relative w-full max-w-[480px] rounded-[24px] shadow-[0_8px_40px_rgba(0,0,0,0.6)] backdrop-blur-xl z-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
         <div className="absolute inset-0 rounded-[24px] bg-gradient-to-br from-[#928dd3]/5 via-transparent to-transparent" />

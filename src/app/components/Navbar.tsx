@@ -106,8 +106,8 @@ function HireAdminButton() {
         }}
         className={`px-[16px] py-[8px] rounded-[8px] font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] transition-all duration-300 ${
           hasAssociatedAdmin
-            ? "bg-white/[0.03] border border-white/10 text-white/30 cursor-not-allowed"
-            : "bg-gradient-to-r from-[#928dd3] to-[#a89be6] text-black shadow-[0_0_15px_rgba(146,141,211,0.4)] hover:shadow-[0_0_25px_rgba(146,141,211,0.7)] ring-1 ring-white/20 hover:ring-white/50 hover:-translate-y-0.5 active:scale-95"
+            ? "dark:bg-white/[0.03] light:bg-black/[0.05] dark:border-white/10 light:border-black/10 dark:text-white/30 light:text-black/30 cursor-not-allowed"
+            : "bg-gradient-to-r from-[#928dd3] to-[#a89be6] text-black shadow-[0_0_15px_rgba(146,141,211,0.4)] hover:shadow-[0_0_25px_rgba(146,141,211,0.7)] ring-1 dark:ring-white/20 light:ring-black/10 dark:hover:ring-white/50 light:ring-black/30 hover:-translate-y-0.5 active:scale-95"
         }`}
         title={hasAssociatedAdmin ? "You already have an associated administrator" : "Hire Admin"}
       >

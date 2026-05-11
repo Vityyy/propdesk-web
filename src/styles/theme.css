@@ -111,8 +111,8 @@
   --success: #10b981;
   --warning: #f59e0b;
   --info: #3b82f6;
-  --background-deep: oklch(0.95 0 0);
-  --background-subtle: oklch(0.97 0 0);
+  --background-deep: oklch(0.94 0 0);
+  --background-subtle: oklch(0.96 0 0);
   --bg-deep: oklch(0.95 0 0);
   --bg-subtle: oklch(0.97 0 0);
 }
@@ -243,19 +243,19 @@
   }
   
   .dark .glass-card {
-    @apply bg-white/[0.02] border-white/[0.06];
+    @apply bg-white/[0.03] border-white/[0.08] shadow-[0_4px_20px_rgba(0,0,0,0.3)];
   }
   
   .dark .glass-card-hover {
-    @apply hover:bg-white/[0.04] hover:border-white/[0.12] hover:shadow-black/20;
+    @apply hover:bg-white/[0.06] hover:border-white/[0.15] hover:shadow-[0_8px_30px_rgba(0,0,0,0.4)];
   }
   
   .light .glass-card {
-    @apply bg-white/[0.6] border-black/[0.08];
+    @apply bg-white border border-black/[0.1] shadow-[0_4px_20px_rgba(0,0,0,0.08)];
   }
   
   .light .glass-card-hover {
-    @apply hover:bg-white/[0.8] hover:border-black/[0.15] hover:shadow-black/10;
+    @apply hover:bg-white hover:border-black/[0.2] hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)];
   }
 
   .glow-purple {
@@ -281,8 +281,8 @@
 
   .light .bg-grid-pattern {
     background-image: 
-      linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+      linear-gradient(rgba(0,0,0,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,0.08) 1px, transparent 1px);
   }
 
   .animate-fade-in-up {

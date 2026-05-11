@@ -378,12 +378,12 @@ export function Apartments() {
                 placeholder="Search floor..."
                 value={floorSearch}
                 onChange={e => setFloorSearch(e.target.value)}
-                className="bg-white/[0.02] border border-white/[0.1] rounded-lg px-3 py-1.5 text-primary placeholder-white/25 text-sm focus:outline-none focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]/30 transition-colors w-32"
+                className="dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] rounded-lg px-3 py-1.5 text-primary placeholder:text-[var(--text-tertiary)] text-sm focus:outline-none focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]/30 transition-colors w-32"
               />
             </div>
           </div>
 
-          <div className="bg-[#928dd3]/5 border border-[#928dd3]/20 rounded-lg p-3 w-fit text-[#928dd3]/80 text-sm flex gap-4 mt-2">
+          <div className="dark:bg-[#928dd3]/5 light:bg-[#928dd3]/10 dark:border-[#928dd3]/20 light:border-[#928dd3]/30 rounded-lg p-3 w-fit dark:text-[#928dd3] light:text-[#7c6bc7] text-sm flex gap-4 mt-2">
             <p><strong className="font-bold">Click:</strong> Select one</p>
             <p><strong className="font-bold">Ctrl + Click:</strong> Select multiple</p>
             <p><strong className="font-bold">Shift + Click:</strong> Select range</p>
@@ -469,7 +469,7 @@ export function Apartments() {
                       <div
                         key={apt.id}
                         onClick={(e) => handleCardClick(apt, e)}
-                        className={`flex flex-col rounded-xl border transition-all hover:scale-[1.02] bg-[#111] cursor-pointer select-none ${isSelected ? 'border-[#928dd3] ring-2 ring-[#928dd3]/50 transform scale-[1.02]' : 'border-[rgba(255,255,255,0.1)]'}`}
+                        className={`flex flex-col rounded-xl border transition-all hover:scale-[1.02] dark:bg-[#111] light:bg-gray-100 cursor-pointer select-none ${isSelected ? 'border-[#928dd3] ring-2 ring-[#928dd3]/50 transform scale-[1.02]' : 'dark:border-white/[0.1] light:border-black/[0.1]'}`}
                       >
                         {/* Upper half: Background color & Icon */}
                         <div className={`relative h-[140px] flex items-center justify-center overflow-hidden rounded-t-xl ${bgClass}`}>
@@ -486,12 +486,12 @@ export function Apartments() {
                           <button
                             onClick={(e) => handleTogglePaymentStatus(e, apt)}
                             disabled={isStatusUpdating || isVacant}
-                            className={`absolute top-11 left-3 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold tracking-wide flex items-center gap-1 border transition-colors ${isVacant
+className={`absolute top-11 left-3 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold tracking-wide flex items-center gap-1 border transition-colors ${isVacant
                               ? 'bg-white/10 border-white/20 text-tertiary'
                               : isPaid
-                                ? 'bg-[#4ade80]/15 border-[#4ade80]/40 text-[#4ade80] hover:bg-[#4ade80]/25'
-                                : 'bg-[#f59e0b]/15 border-[#f59e0b]/40 text-[#f59e0b] hover:bg-[#f59e0b]/25'
-                              } disabled:opacity-50 disabled:cursor-not-allowed`}
+                                ? 'dark:bg-[#4ade80]/15 light:bg-[#22c55e]/20 dark:border-[#4ade80]/40 light:border-[#22c55e]/50 dark:text-[#4ade80] light:text-[#16a34a] hover:dark:bg-[#4ade80]/25 hover:light:bg-[#22c55e]/30'
+                                : 'dark:bg-[#f59e0b]/15 light:bg-[#d97706]/20 dark:border-[#f59e0b]/40 light:border-[#d97706]/50 dark:text-[#f59e0b] light:text-[#b45309] hover:dark:bg-[#f59e0b]/25 hover:light:bg-[#d97706]/30'
+                            } disabled:opacity-50 disabled:cursor-not-allowed`}
                             title={
                               isVacant
                                 ? 'No tenant assigned (no rent due yet)'

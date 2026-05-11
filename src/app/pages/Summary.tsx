@@ -25,7 +25,7 @@ interface MetricCardProps {
 
 function MetricCard({ title, value, subtitle, trend }: MetricCardProps) {
   return (
-    <div className="glass-card flex-[1_0_0] min-w-[250px] relative rounded-[16px] hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.3)] transition-all duration-300 group hover:border-white/[0.1]">
+    <div className="glass-card flex-[1_0_0] min-w-[250px] relative rounded-[16px] hover:-translate-y-1 transition-all duration-300 group dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)] light:hover:shadow-[0_12px_40px_rgba(0,0,0,0.15)]">
       <div className="absolute inset-0 bg-gradient-to-br from-[#928dd3]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-[16px]" />
       <div className="overflow-clip rounded-[inherit] size-full relative">
         <div className="content-stretch flex flex-col gap-[16px] items-start p-[24px] relative w-full h-full">
@@ -52,7 +52,7 @@ function MetricCard({ title, value, subtitle, trend }: MetricCardProps) {
           </div>
         </div>
       </div>
-      <div aria-hidden="true" className="absolute border border-white/[0.06] group-hover:border-white/[0.15] transition-colors inset-0 pointer-events-none rounded-[16px]" />
+      <div aria-hidden="true" className="absolute border border-[var(--glass-border)] group-hover:border-[var(--glass-border-hover)] transition-colors inset-0 pointer-events-none rounded-[16px]" />
     </div>
   );
 }
@@ -155,12 +155,12 @@ export function Summary() {
               <div className="relative w-full h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                    <XAxis dataKey="month" stroke="rgba(255,255,255,0.4)" tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12 }} />
-                    <YAxis stroke="rgba(255,255,255,0.4)" tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12 }} tickFormatter={(val) => `$${val}`} />
+                    <CartesianGrid strokeDasharray="3 3" className="dark:stroke-white/[0.06] light:stroke-black/[0.08]" />
+                    <XAxis dataKey="month" className="dark:stroke-white/[0.4] light:stroke-black/[0.3]" tick={{ fill: 'currentColor', fontSize: 12 }} />
+                    <YAxis className="dark:stroke-white/[0.4] light:stroke-black/[0.3]" tick={{ fill: 'currentColor', fontSize: 12 }} tickFormatter={(val) => `$${val}`} />
                     <Tooltip 
-                      contentStyle={{ backgroundColor: 'rgba(3,3,8,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', backdropFilter: 'blur(10px)' }}
-                      itemStyle={{ color: '#fff' }}
+                      contentStyle={{ backgroundColor: 'var(--bg-deep)', border: '1px solid var(--glass-border)', borderRadius: '12px', backdropFilter: 'blur(10px)', color: 'var(--text-primary)' }}
+                      itemStyle={{ color: 'var(--text-primary)' }}
                       formatter={(value: any) => [formatCurrency(value as number), '']}
                     />
                     <Legend wrapperStyle={{ paddingTop: '20px' }} />
