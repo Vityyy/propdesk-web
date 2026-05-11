@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useMemo, useState, useRef } from "react";
 import { useNavigate, Link } from "react-router";
 import { Building2, Briefcase, Sun, Moon } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
@@ -29,6 +29,21 @@ export function Register() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const nameRef = useRef<HTMLInputElement | null>(null);
+  const passwordRef = useRef<HTMLInputElement | null>(null);
+  const confirmRef = useRef<HTMLInputElement | null>(null);
+
+  const handleEnterToNext = (
+    event: React.KeyboardEvent<HTMLInputElement>,
+    nextRef?: React.RefObject<HTMLInputElement | null>,
+  ) => {
+    if (event.key !== "Enter" || !nextRef?.current) {
+      return;
+    }
+
+    event.preventDefault();
+    nextRef.current.focus();
+  };
 
   const canSubmit = useMemo(() => {
     if (isSubmitting) return false;
@@ -97,10 +112,10 @@ export function Register() {
                 <button
                   type="button"
                   onClick={() => setUserType("owner")}
-                  className={`flex-1 p-3 rounded-[12px] border transition-all duration-300 flex items-center justify-center gap-2 ${
+                  className={`flex-1 p-3 rounded-[12px] border transition-all duration-300 flex items-center justify-center gap-2 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(146,141,211,0.15)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#928dd3]/40 ${
                     userType === "owner" 
-                      ? "bg-[#928dd3]/10 border-[#928dd3]/50 text-[#928dd3] shadow-[0_0_15px_rgba(146,141,211,0.15)]" 
-                      : "bg-white/[0.02] border-white/[0.08] text-tertiary hover:border-white/20 hover:bg-white/[0.04]"
+                      ? "bg-[#928dd3]/10 border-[#928dd3]/50 text-[#928dd3] light:text-[#6b5cb8] shadow-[0_0_15px_rgba(146,141,211,0.15)]" 
+                      : "bg-white/[0.02] border-white/[0.08] text-tertiary hover:border-white/20 hover:bg-white/[0.04] light:bg-black/5 light:border-black/10 light:text-[#4b5563] light:hover:bg-black/10"
                   }`}
                 >
                   <Building2 size={18} />
@@ -109,10 +124,10 @@ export function Register() {
                 <button
                   type="button"
                   onClick={() => setUserType("admin")}
-                  className={`flex-1 p-3 rounded-[12px] border transition-all duration-300 flex items-center justify-center gap-2 ${
+                  className={`flex-1 p-3 rounded-[12px] border transition-all duration-300 flex items-center justify-center gap-2 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(146,141,211,0.15)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#928dd3]/40 ${
                     userType === "admin" 
-                      ? "bg-[#928dd3]/10 border-[#928dd3]/50 text-[#928dd3] shadow-[0_0_15px_rgba(146,141,211,0.15)]" 
-                      : "bg-white/[0.02] border-white/[0.08] text-tertiary hover:border-white/20 hover:bg-white/[0.04]"
+                      ? "bg-[#928dd3]/10 border-[#928dd3]/50 text-[#928dd3] light:text-[#6b5cb8] shadow-[0_0_15px_rgba(146,141,211,0.15)]" 
+                      : "bg-white/[0.02] border-white/[0.08] text-tertiary hover:border-white/20 hover:bg-white/[0.04] light:bg-black/5 light:border-black/10 light:text-[#4b5563] light:hover:bg-black/10"
                   }`}
                 >
                   <Briefcase size={18} />
@@ -131,8 +146,10 @@ export function Register() {
                 autoComplete="username"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
+                onKeyDown={(event) => handleEnterToNext(event, passwordRef)}
+                ref={nameRef}
                 placeholder="Choose a username"
-                className="h-[48px] rounded-[12px] border border-[var(--glass-border)] dark:bg-[#151520] light:bg-gray-50 px-[16px] text-primary placeholder:text-[var(--text-tertiary)] outline-none focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]/30 transition-all duration-300"
+                className="h-[48px] rounded-[12px] border border-[var(--glass-border)] dark:bg-[#151520] light:bg-white light:border-black/10 px-[16px] text-primary light:text-[#111827] placeholder:text-[var(--text-tertiary)] light:placeholder:text-[#9ca3af] outline-none transition-all duration-300 hover:border-[#928dd3]/40 hover:shadow-[0_0_0_3px_rgba(146,141,211,0.12)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]/30"
               />
             </label>
 
@@ -147,13 +164,15 @@ export function Register() {
                   autoComplete="new-password"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
+                  onKeyDown={(event) => handleEnterToNext(event, confirmRef)}
+                  ref={passwordRef}
                   placeholder="Choose a password"
-                  className="h-[48px] w-full rounded-[12px] border border-white/[0.08] bg-white/[0.02] px-[16px] pr-[90px] text-primary placeholder-white/25 outline-none focus:border-[#928dd3] focus:bg-white/[0.05] focus:shadow-[0_0_0_3px_rgba(146,141,211,0.15)] transition-all duration-300"
+                  className="h-[48px] w-full rounded-[12px] border border-white/[0.08] bg-white/[0.02] px-[16px] pr-[90px] text-primary placeholder-white/25 outline-none transition-all duration-300 dark:focus:border-[#928dd3] dark:focus:bg-white/[0.05] dark:focus:shadow-[0_0_0_3px_rgba(146,141,211,0.15)] light:bg-white light:border-black/10 light:text-[#111827] light:placeholder:text-[#9ca3af] light:hover:border-[#928dd3]/40 light:focus:border-[#928dd3] light:focus:shadow-[0_0_0_3px_rgba(146,141,211,0.12)]"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((current) => !current)}
-                  className="absolute right-[10px] top-1/2 -translate-y-1/2 text-[13px] text-[#928dd3]/80 hover:text-[#928dd3] transition-colors"
+                  className="absolute right-[10px] top-1/2 -translate-y-1/2 text-[13px] text-[#928dd3]/80 hover:text-[#928dd3] transition-colors light:text-[#6b5cb8]"
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
@@ -171,13 +190,14 @@ export function Register() {
                   autoComplete="new-password"
                   value={confirmPassword}
                   onChange={(event) => setConfirmPassword(event.target.value)}
+                  ref={confirmRef}
                   placeholder="Re-enter your password"
-                  className="h-[48px] w-full rounded-[12px] border border-white/[0.08] bg-white/[0.02] px-[16px] pr-[90px] text-primary placeholder-white/25 outline-none focus:border-[#928dd3] focus:bg-white/[0.05] focus:shadow-[0_0_0_3px_rgba(146,141,211,0.15)] transition-all duration-300"
+                  className="h-[48px] w-full rounded-[12px] border border-white/[0.08] bg-white/[0.02] px-[16px] pr-[90px] text-primary placeholder-white/25 outline-none transition-all duration-300 dark:focus:border-[#928dd3] dark:focus:bg-white/[0.05] dark:focus:shadow-[0_0_0_3px_rgba(146,141,211,0.15)] light:bg-white light:border-black/10 light:text-[#111827] light:placeholder:text-[#9ca3af] light:hover:border-[#928dd3]/40 light:focus:border-[#928dd3] light:focus:shadow-[0_0_0_3px_rgba(146,141,211,0.12)]"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword((current) => !current)}
-                  className="absolute right-[10px] top-1/2 -translate-y-1/2 text-[13px] text-[#928dd3]/80 hover:text-[#928dd3] transition-colors"
+                  className="absolute right-[10px] top-1/2 -translate-y-1/2 text-[13px] text-[#928dd3]/80 hover:text-[#928dd3] transition-colors light:text-[#6b5cb8]"
                 >
                   {showConfirmPassword ? "Hide" : "Show"}
                 </button>
@@ -203,7 +223,7 @@ export function Register() {
             <button
               type="submit"
               disabled={!canSubmit}
-              className="mt-[8px] h-[48px] rounded-[12px] bg-gradient-to-r from-[#928dd3] to-[#a89be6] font-['Archivo:SemiBold',sans-serif] font-semibold text-[15px] leading-[20px] text-black transition-all duration-300 hover:opacity-90 shadow-[0_0_20px_rgba(146,141,211,0.3)] hover:shadow-[0_0_30px_rgba(146,141,211,0.5)] hover:-translate-y-0.5 active:scale-95 disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed disabled:transform-none"
+              className="mt-[8px] h-[48px] rounded-[12px] bg-gradient-to-r from-[#928dd3] to-[#a89be6] font-['Archivo:SemiBold',sans-serif] font-semibold text-[15px] leading-[20px] text-black transition-all duration-300 hover:opacity-90 shadow-[0_0_20px_rgba(146,141,211,0.3)] hover:shadow-[0_0_30px_rgba(146,141,211,0.5)] hover:-translate-y-0.5 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#928dd3]/40 disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed disabled:transform-none"
               style={{ fontVariationSettings: "'wdth' 100" }}
             >
               {isSubmitting ? "Creating account…" : "Create account"}

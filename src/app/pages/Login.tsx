@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useMemo, useState, useRef } from "react";
 import { useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
@@ -25,6 +25,20 @@ export function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const nameRef = useRef<HTMLInputElement | null>(null);
+  const passwordRef = useRef<HTMLInputElement | null>(null);
+
+  const handleEnterToNext = (
+    event: React.KeyboardEvent<HTMLInputElement>,
+    nextRef?: React.RefObject<HTMLInputElement | null>,
+  ) => {
+    if (event.key !== "Enter" || !nextRef?.current) {
+      return;
+    }
+
+    event.preventDefault();
+    nextRef.current.focus();
+  };
 
   const canSubmit = useMemo(
     () => name.trim().length > 0 && password.trim().length > 0 && !isSubmitting,
@@ -91,8 +105,10 @@ export function Login() {
                 autoComplete="username"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
+                onKeyDown={(event) => handleEnterToNext(event, passwordRef)}
+                ref={nameRef}
                 placeholder="Enter your username"
-                className="h-[48px] rounded-[12px] border border-[var(--glass-border)] dark:bg-[#151520] light:bg-gray-50 px-[16px] text-primary placeholder:text-[var(--text-tertiary)] outline-none focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]/30 transition-all duration-300"
+                className="h-[48px] rounded-[12px] border border-[var(--glass-border)] dark:bg-[#151520] light:bg-white light:border-black/10 px-[16px] text-primary light:text-[#111827] placeholder:text-[var(--text-tertiary)] light:placeholder:text-[#9ca3af] outline-none transition-all duration-300 hover:border-[#928dd3]/40 hover:shadow-[0_0_0_3px_rgba(146,141,211,0.12)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]/30"
               />
             </label>
 
@@ -107,13 +123,14 @@ export function Login() {
                   autoComplete="current-password"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
+                  ref={passwordRef}
                   placeholder="Enter your password"
-                  className="h-[48px] w-full rounded-[12px] border border-[var(--glass-border)] dark:bg-[#151520] light:bg-gray-50 px-[16px] pr-[90px] text-primary placeholder:text-[var(--text-tertiary)] outline-none focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]/30 transition-all duration-300"
+                  className="h-[48px] w-full rounded-[12px] border border-[var(--glass-border)] dark:bg-[#151520] light:bg-white light:border-black/10 px-[16px] pr-[90px] text-primary light:text-[#111827] placeholder:text-[var(--text-tertiary)] light:placeholder:text-[#9ca3af] outline-none transition-all duration-300 hover:border-[#928dd3]/40 hover:shadow-[0_0_0_3px_rgba(146,141,211,0.12)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]/30"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((current) => !current)}
-                  className="absolute right-[10px] top-1/2 -translate-y-1/2 text-[13px] text-[#928dd3]/80 hover:text-[#928dd3] transition-colors"
+                  className="absolute right-[10px] top-1/2 -translate-y-1/2 text-[13px] text-[#928dd3]/80 hover:text-[#928dd3] transition-colors light:text-[#6b5cb8]"
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
@@ -131,7 +148,7 @@ export function Login() {
             <button
               type="submit"
               disabled={!canSubmit}
-              className="mt-[8px] h-[48px] rounded-[12px] bg-gradient-to-r from-[#928dd3] to-[#a89be6] font-['Archivo:SemiBold',sans-serif] font-semibold text-[15px] leading-[20px] text-black transition-all duration-300 hover:opacity-90 shadow-[0_0_20px_rgba(146,141,211,0.3)] hover:shadow-[0_0_30px_rgba(146,141,211,0.5)] hover:-translate-y-0.5 active:scale-95 disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed disabled:transform-none"
+              className="mt-[8px] h-[48px] rounded-[12px] bg-gradient-to-r from-[#928dd3] to-[#a89be6] font-['Archivo:SemiBold',sans-serif] font-semibold text-[15px] leading-[20px] text-black transition-all duration-300 hover:opacity-90 shadow-[0_0_20px_rgba(146,141,211,0.3)] hover:shadow-[0_0_30px_rgba(146,141,211,0.5)] hover:-translate-y-0.5 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#928dd3]/40 disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed disabled:transform-none"
               style={{ fontVariationSettings: "'wdth' 100" }}
             >
               {isSubmitting ? "Signing in…" : "Sign in"}
@@ -149,4 +166,3 @@ export function Login() {
     </div>
   );
 }
-
