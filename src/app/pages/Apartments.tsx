@@ -473,7 +473,12 @@ export function Apartments() {
                       >
                         {/* Upper half: Background color & Icon */}
                         <div className={`relative h-[140px] flex items-center justify-center overflow-hidden rounded-t-xl ${bgClass}`}>
-                          <div className={`text-primary dark:text-primary light:text-[#374151] opacity-90 drop-shadow-md ${isVacant ? 'opacity-50' : ''}`}>
+                          <div
+                            className={`opacity-90 drop-shadow-md ${isVacant
+                              ? 'text-white/70 light:text-white/70'
+                              : 'text-primary dark:text-primary light:text-[#374151]'
+                            }`}
+                          >
                             <UserIcon />
                           </div>
 
@@ -535,7 +540,7 @@ export function Apartments() {
                           </div>
 
                           <div className="flex justify-between items-center">
-                            <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Rent Gain</span>
+                            <span className="text-[12px] text-[rgba(255,255,255,0.5)] light:text-[#6b7280] font-semibold uppercase tracking-wider">Rent Gain</span>
                             <div className="flex items-center gap-1.5">
                               <span className="text-sm font-bold" style={{ color: rentColor }}>${rentGain}</span>
                               {!isVacant && !isPaid && (
