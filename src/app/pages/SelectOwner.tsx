@@ -63,13 +63,13 @@ export function SelectOwner() {
                 </div>
               </div>
               
-              <h1 className="font-['Chivo:Black',sans-serif] font-black text-2xl text-white mb-3">
+              <h1 className="font-['Chivo:Black',sans-serif] font-black text-2xl text-primary mb-3">
                 Pending Invitations
               </h1>
               <p className="font-['Archivo:Medium',sans-serif] font-medium text-[15px] text-[#ff6b6b] mb-6">
                 You do not have any associated owners yet
               </p>
-              <p className="font-['Archivo:Medium',sans-serif] font-medium text-[14px] text-white/40 mb-8 px-4">
+              <p className="font-['Archivo:Medium',sans-serif] font-medium text-[14px] text-tertiary mb-8 px-4">
                 Use the mailbox below to review pending owner invitations. When an owner hires you, their request will appear here.
               </p>
               
@@ -83,7 +83,7 @@ export function SelectOwner() {
                     logout();
                     navigate('/login', { replace: true });
                   }}
-                  className="w-full px-4 py-3 rounded-[12px] bg-white/[0.02] border border-white/[0.08] text-white/70 font-['Archivo:SemiBold',sans-serif] font-semibold flex items-center justify-center gap-2 transition-all duration-300 hover:bg-[#ff6b6b]/10 hover:border-[#ff6b6b]/30 hover:text-[#ff6b6b]"
+                  className="w-full px-4 py-3 rounded-[12px] bg-white/[0.02] border border-white/[0.08] text-secondary font-['Archivo:SemiBold',sans-serif] font-semibold flex items-center justify-center gap-2 transition-all duration-300 hover:bg-[#ff6b6b]/10 hover:border-[#ff6b6b]/30 hover:text-[#ff6b6b]"
                 >
                   <LogOut size={18} />
                   Log Out
@@ -111,10 +111,10 @@ export function SelectOwner() {
             </div>
           </div>
 
-          <h1 className="font-['Chivo:Black',sans-serif] font-black text-[28px] text-white mb-2 text-center tracking-tight">
+          <h1 className="font-['Chivo:Black',sans-serif] font-black text-[28px] text-primary mb-2 text-center tracking-tight">
             Select Workspace
           </h1>
-          <p className="font-['Archivo:Medium',sans-serif] font-medium text-[15px] text-white/40 text-center mb-8">
+          <p className="font-['Archivo:Medium',sans-serif] font-medium text-[15px] text-tertiary text-center mb-8">
             Choose the owner workspace you want to manage
           </p>
 
@@ -133,17 +133,17 @@ export function SelectOwner() {
                 >
                   <div className="flex items-center gap-4">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
-                      isSelected ? 'bg-[#928dd3]/20 text-[#928dd3]' : 'bg-white/[0.05] text-white/40 group-hover:text-[#928dd3]'
+                      isSelected ? 'bg-[#928dd3]/20 text-[#928dd3]' : 'bg-white/[0.05] text-tertiary group-hover:text-[#928dd3]'
                     }`}>
                       <User size={18} />
                     </div>
                     <div className="text-left">
                       <span className={`block font-['Archivo:SemiBold',sans-serif] font-semibold text-[16px] transition-colors ${
-                        isSelected ? 'text-[#928dd3]' : 'text-white/90 group-hover:text-white'
+                        isSelected ? 'text-[#928dd3]' : 'text-primary group-hover:text-primary'
                       }`}>
                         {owner.name}
                       </span>
-                      <span className="block font-['Archivo:Medium',sans-serif] font-medium text-[13px] text-white/30 mt-0.5">
+                      <span className="block font-['Archivo:Medium',sans-serif] font-medium text-[13px] text-tertiary mt-0.5">
                         Property Owner
                       </span>
                     </div>
@@ -162,7 +162,7 @@ export function SelectOwner() {
                 logout();
                 navigate('/login', { replace: true });
               }}
-              className="px-4 py-2 rounded-[8px] bg-transparent text-white/40 font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] flex items-center gap-2 transition-all duration-300 hover:bg-white/[0.05] hover:text-white/70"
+              className="px-4 py-2 rounded-[8px] bg-transparent text-tertiary font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] flex items-center gap-2 transition-all duration-300 hover:bg-white/[0.05] hover:text-secondary"
             >
               <LogOut size={16} />
               Log Out

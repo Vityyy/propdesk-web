@@ -77,10 +77,10 @@ function PropertyCard({
       <div className="p-[24px]">
         <div className="flex items-start justify-between mb-[12px]">
           <div className="flex-1">
-            <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] text-[17px] text-white/90 mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
+            <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] text-[17px] text-primary mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
               {property.name}
             </p>
-            <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-white/50" style={{ fontVariationSettings: "'wdth' 100" }}>
+            <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-tertiary" style={{ fontVariationSettings: "'wdth' 100" }}>
               {property.address}
             </p>
           </div>
@@ -90,23 +90,23 @@ function PropertyCard({
                 e.stopPropagation();
                 setShowMenu(!showMenu);
               }}
-              className="p-[4px] text-white/40 hover:text-white transition-colors"
+              className="p-[4px] text-tertiary hover:text-primary transition-colors"
             >
               <MoreHorizontal size={20} />
             </button>
 
             {showMenu && (
-              <div className="absolute top-[calc(100%+8px)] right-0 bg-[#0a0a0f]/95 backdrop-blur-2xl border border-white/[0.08] rounded-[12px] shadow-[0_12px_40px_rgba(0,0,0,0.8)] min-w-[220px] z-[11] overflow-hidden py-2">
+              <div className="absolute top-[calc(100%+8px)] right-0 dark:bg-[#0a0a0f]/95 light:bg-white dark:border-white/[0.08] light:border-black/[0.1] backdrop-blur-2xl rounded-[12px] shadow-[0_12px_40px_rgba(0,0,0,0.5)] min-w-[220px] z-[11] overflow-hidden py-2">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowMenu(false);
                     onEdit?.(property);
                   }}
-                  className="w-full flex items-center gap-3 px-[16px] py-[10px] hover:bg-white/[0.06] transition-colors"
+                  className="w-full flex items-center gap-3 px-[16px] py-[10px] dark:hover:bg-white/[0.06] light:hover:bg-black/[0.05] transition-colors"
                 >
-                  <Edit2 size={16} className="text-white/60" />
-                  <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[14px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
+                  <Edit2 size={16} className="text-secondary" />
+                  <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[14px] text-primary" style={{ fontVariationSettings: "'wdth' 100" }}>
                     Edit Property
                   </p>
                 </button>
@@ -116,10 +116,10 @@ function PropertyCard({
                     setShowMenu(false);
                     onViewDetails?.(property);
                   }}
-                  className="w-full flex items-center gap-3 px-[16px] py-[10px] hover:bg-white/[0.06] transition-colors"
+                  className="w-full flex items-center gap-3 px-[16px] py-[10px] dark:hover:bg-white/[0.06] light:hover:bg-black/[0.05] transition-colors"
                 >
-                  <Eye size={16} className="text-white/60" />
-                  <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[14px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
+                  <Eye size={16} className="text-secondary" />
+                  <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[14px] text-primary" style={{ fontVariationSettings: "'wdth' 100" }}>
                     View Details
                   </p>
                 </button>
@@ -129,14 +129,14 @@ function PropertyCard({
                     setShowMenu(false);
                     onViewApartments?.(property);
                   }}
-                  className="w-full flex items-center gap-3 px-[16px] py-[10px] hover:bg-white/[0.06] transition-colors"
+                  className="w-full flex items-center gap-3 px-[16px] py-[10px] dark:hover:bg-white/[0.06] light:hover:bg-black/[0.05] transition-colors"
                 >
-                  <Building2 size={16} className="text-white/60" />
-                  <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[14px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
+                  <Building2 size={16} className="text-secondary" />
+                  <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[14px] text-primary" style={{ fontVariationSettings: "'wdth' 100" }}>
                     View Apartments
                   </p>
                 </button>
-                <div className="border-t border-white/10 my-2" />
+                <div className="border-t border-[var(--glass-border)] my-2" />
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -156,7 +156,7 @@ function PropertyCard({
         </div>
 
         <div className="mb-[16px]">
-          <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[16px] text-[13px] text-white/50 mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
+          <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[16px] text-[13px] text-tertiary mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
             Monthly Revenue
           </p>
           <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] text-[24px] text-[#928dd3] tracking-[-0.24px]">
@@ -169,18 +169,18 @@ function PropertyCard({
           <div className="pt-[16px] border-t border-white/[0.08]">
             <div className="flex gap-[24px]">
               <div>
-                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[16px] text-[13px] text-white/50 mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
+                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[16px] text-[13px] text-tertiary mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
                   Units
                 </p>
-                <p className="font-['Chivo:Black',sans-serif] font-black leading-[24px] text-[20px] text-white/90 tracking-[-0.2px]">
+                <p className="font-['Chivo:Black',sans-serif] font-black leading-[24px] text-[20px] text-primary tracking-[-0.2px]">
                   {totalUnits}
                 </p>
               </div>
               <div>
-                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[16px] text-[13px] text-white/50 mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
+                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[16px] text-[13px] text-tertiary mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
                   Occupancy
                 </p>
-                <p className="font-['Chivo:Black',sans-serif] font-black leading-[24px] text-[20px] text-white/90 tracking-[-0.2px]">
+                <p className="font-['Chivo:Black',sans-serif] font-black leading-[24px] text-[20px] text-primary tracking-[-0.2px]">
                   {occupancyPercentage}%
                 </p>
               </div>
@@ -296,11 +296,11 @@ export function Properties() {
       {/* Header */}
       <div className="flex items-center justify-between py-8 px-12 relative">
         <div>
-          <h1 className="font-black text-4xl text-white tracking-tight flex items-center gap-3" style={{ fontFamily: "'Chivo', sans-serif" }}>
+          <h1 className="font-black text-4xl text-primary tracking-tight flex items-center gap-3" style={{ fontFamily: "'Chivo', sans-serif" }}>
             <Building2 className="text-[#928dd3]" size={36} />
             Properties
           </h1>
-          <p className="text-white/40 text-sm mt-2 font-['Archivo:Medium',sans-serif]">
+          <p className="text-tertiary text-sm mt-2 font-['Archivo:Medium',sans-serif]">
             Managing {properties.length} properties for {currentOwner.name}
           </p>
         </div>
@@ -326,7 +326,7 @@ export function Properties() {
           ))
         ) : properties.length === 0 ? (
           <div className="col-span-3 text-center py-12">
-            <p className="text-white/40 mb-4">No properties created yet</p>
+            <p className="text-tertiary mb-4">No properties created yet</p>
             <button
               onClick={() => setShowCreateDialog(true)}
               className="text-[#928dd3] hover:text-[#a89be6] transition-colors"

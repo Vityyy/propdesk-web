@@ -25,34 +25,34 @@ interface MetricCardProps {
 
 function MetricCard({ title, value, subtitle, trend }: MetricCardProps) {
   return (
-    <div className="glass-card flex-[1_0_0] min-w-[250px] relative rounded-[16px] hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.3)] transition-all duration-300 group hover:border-white/[0.1]">
+    <div className="glass-card flex-[1_0_0] min-w-[250px] relative rounded-[16px] hover:-translate-y-1 transition-all duration-300 group dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)] light:hover:shadow-[0_12px_40px_rgba(0,0,0,0.15)]">
       <div className="absolute inset-0 bg-gradient-to-br from-[#928dd3]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-[16px]" />
       <div className="overflow-clip rounded-[inherit] size-full relative">
         <div className="content-stretch flex flex-col gap-[16px] items-start p-[24px] relative w-full h-full">
           <div className="content-stretch flex items-center justify-between relative shrink-0 w-full">
-            <p className="flex-[1_0_0] font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] min-h-px min-w-px overflow-hidden relative text-[17px] text-ellipsis text-white/80 whitespace-nowrap" style={{ fontVariationSettings: "'wdth' 100" }}>
+            <p className="flex-[1_0_0] font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] min-h-px min-w-px overflow-hidden relative text-[17px] text-ellipsis text-secondary whitespace-nowrap" style={{ fontVariationSettings: "'wdth' 100" }}>
               {title}
             </p>
-            <button className="text-white/30 hover:text-white/70 transition-colors">
+            <button className="text-tertiary hover:text-primary/70 transition-colors">
               <MoreHorizontal size={20} />
             </button>
           </div>
           <div className="content-stretch flex flex-col gap-[4px] items-start relative shrink-0 w-full">
-            <p className="font-['Chivo:Black',sans-serif] font-black leading-[40px] overflow-hidden relative shrink-0 text-[34px] text-ellipsis text-white tracking-[-0.34px] w-full whitespace-nowrap">{value}</p>
+            <p className="font-['Chivo:Black',sans-serif] font-black leading-[40px] overflow-hidden relative shrink-0 text-[34px] text-ellipsis text-primary tracking-[-0.34px] w-full whitespace-nowrap">{value}</p>
             {subtitle && (
               <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[16px] relative shrink-0 text-[#928dd3] text-[13px] w-full" style={{ fontVariationSettings: "'wdth' 100" }}>
                 {subtitle}
               </p>
             )}
             {trend && (
-              <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] relative shrink-0 text-white/50 text-[13px] w-full" style={{ fontVariationSettings: "'wdth' 100" }}>
+              <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] relative shrink-0 text-tertiary text-[13px] w-full" style={{ fontVariationSettings: "'wdth' 100" }}>
                 {trend}
               </p>
             )}
           </div>
         </div>
       </div>
-      <div aria-hidden="true" className="absolute border border-white/[0.06] group-hover:border-white/[0.15] transition-colors inset-0 pointer-events-none rounded-[16px]" />
+      <div aria-hidden="true" className="absolute border border-[var(--glass-border)] group-hover:border-[var(--glass-border-hover)] transition-colors inset-0 pointer-events-none rounded-[16px]" />
     </div>
   );
 }
@@ -84,7 +84,7 @@ export function Summary() {
 
   if (loading || !summary) {
     return (
-      <div className="bg-black min-h-full w-full flex items-center justify-center">
+      <div className="bg-deep min-h-full w-full flex items-center justify-center">
         <LoadingSpinner label="Loading Summary..." size="lg" />
       </div>
     );
@@ -102,11 +102,11 @@ export function Summary() {
       {/* Header */}
       <div className="flex items-center justify-between py-8 px-12 relative">
         <div>
-          <h1 className="font-black text-4xl text-white tracking-tight flex items-center gap-3" style={{ fontFamily: "'Chivo', sans-serif" }}>
+          <h1 className="font-black text-4xl text-primary tracking-tight flex items-center gap-3" style={{ fontFamily: "'Chivo', sans-serif" }}>
             <LineChartIcon className="text-[#928dd3]" size={36} />
             Summary
           </h1>
-          <p className="text-white/40 text-sm mt-2 font-['Archivo:Medium',sans-serif]">
+          <p className="text-tertiary text-sm mt-2 font-['Archivo:Medium',sans-serif]">
             Financial overview for {currentOwner?.name}
           </p>
         </div>
@@ -144,10 +144,10 @@ export function Summary() {
             <div className="content-stretch flex flex-col gap-[24px] items-start p-[24px] relative w-full">
               <div className="content-stretch flex items-center justify-between relative shrink-0 w-full">
                 <div>
-                  <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] relative shrink-0 text-[17px] text-white/80 whitespace-nowrap mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
+                  <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] relative shrink-0 text-[17px] text-secondary whitespace-nowrap mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
                     Total Revenue vs Net Profit
                   </p>
-                  <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-white/50" style={{ fontVariationSettings: "'wdth' 100" }}>
+                  <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-tertiary" style={{ fontVariationSettings: "'wdth' 100" }}>
                     Monthly comparison over time
                   </p>
                 </div>
@@ -155,12 +155,12 @@ export function Summary() {
               <div className="relative w-full h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                    <XAxis dataKey="month" stroke="rgba(255,255,255,0.4)" tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12 }} />
-                    <YAxis stroke="rgba(255,255,255,0.4)" tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12 }} tickFormatter={(val) => `$${val}`} />
+                    <CartesianGrid strokeDasharray="3 3" className="dark:stroke-white/[0.06] light:stroke-black/[0.08]" />
+                    <XAxis dataKey="month" className="dark:stroke-white/[0.4] light:stroke-black/[0.3]" tick={{ fill: 'currentColor', fontSize: 12 }} />
+                    <YAxis className="dark:stroke-white/[0.4] light:stroke-black/[0.3]" tick={{ fill: 'currentColor', fontSize: 12 }} tickFormatter={(val) => `$${val}`} />
                     <Tooltip 
-                      contentStyle={{ backgroundColor: 'rgba(3,3,8,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', backdropFilter: 'blur(10px)' }}
-                      itemStyle={{ color: '#fff' }}
+                      contentStyle={{ backgroundColor: 'var(--bg-deep)', border: '1px solid var(--glass-border)', borderRadius: '12px', backdropFilter: 'blur(10px)', color: 'var(--text-primary)' }}
+                      itemStyle={{ color: 'var(--text-primary)' }}
                       formatter={(value: any) => [formatCurrency(value as number), '']}
                     />
                     <Legend wrapperStyle={{ paddingTop: '20px' }} />
@@ -176,7 +176,7 @@ export function Summary() {
       </div>
 
       <div className="px-[48px] pb-[48px]">
-        <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] mb-[16px] text-[24px] text-white/80 tracking-[-0.24px]">
+        <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] mb-[16px] text-[24px] text-secondary tracking-[-0.24px]">
           Monthly Breakdown
         </p>
         <div className="flex gap-[24px] flex-wrap">
@@ -184,10 +184,10 @@ export function Summary() {
             <div className="absolute inset-0 bg-gradient-to-br from-[#928dd3]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-[16px]" />
             <div className="overflow-clip rounded-[inherit] size-full relative">
               <div className="content-stretch flex flex-col gap-[8px] items-start p-[24px] relative w-full">
-                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white/50" style={{ fontVariationSettings: "'wdth' 100" }}>
+                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-tertiary" style={{ fontVariationSettings: "'wdth' 100" }}>
                   Gross Revenue
                 </p>
-                <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] text-[24px] text-white tracking-[-0.24px]">
+                <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] text-[24px] text-primary tracking-[-0.24px]">
                   {formatCurrency(summary.monthlyBreakdown.grossRevenue)}
                 </p>
               </div>
@@ -199,10 +199,10 @@ export function Summary() {
             <div className="absolute inset-0 bg-gradient-to-br from-[#ff6b6b]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-[16px]" />
             <div className="overflow-clip rounded-[inherit] size-full relative">
               <div className="content-stretch flex flex-col gap-[8px] items-start p-[24px] relative w-full">
-                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white/50" style={{ fontVariationSettings: "'wdth' 100" }}>
+                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-tertiary" style={{ fontVariationSettings: "'wdth' 100" }}>
                   Expenses & Fees
                 </p>
-                <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] text-[24px] text-white tracking-[-0.24px]">
+                <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] text-[24px] text-primary tracking-[-0.24px]">
                   {formatCurrency(summary.monthlyBreakdown.totalExpenses)}
                 </p>
               </div>
@@ -214,10 +214,10 @@ export function Summary() {
             <div className="absolute inset-0 bg-gradient-to-br from-[#f59e0b]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-[16px]" />
             <div className="overflow-clip rounded-[inherit] size-full relative">
               <div className="content-stretch flex flex-col gap-[8px] items-start p-[24px] relative w-full">
-                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white/50" style={{ fontVariationSettings: "'wdth' 100" }}>
+                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-tertiary" style={{ fontVariationSettings: "'wdth' 100" }}>
                   Admin Commission {summary.monthlyBreakdown.grossRevenue > 0 ? `(${Math.round((summary.monthlyBreakdown.adminCommission / summary.monthlyBreakdown.grossRevenue) * 100)}%)` : ''}
                 </p>
-                <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] text-[24px] text-white tracking-[-0.24px]">
+                <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] text-[24px] text-primary tracking-[-0.24px]">
                   {formatCurrency(summary.monthlyBreakdown.adminCommission)}
                 </p>
               </div>

@@ -85,20 +85,20 @@ export function ApartmentFormDialog({
 
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-[#0a0a0f] border border-white/10 rounded-[24px] max-w-md w-full shadow-[0_8px_30px_rgba(0,0,0,0.8)] relative z-10">
-        <div className="p-6 border-b border-white/10 flex items-center justify-between">
+      <div className="dark:bg-[#0a0a0f] light:bg-white border border-[var(--glass-border)] rounded-[24px] max-w-md w-full shadow-[0_8px_30px_rgba(0,0,0,0.8)] relative z-10">
+        <div className="p-6 border-b border-[var(--glass-border)] flex items-center justify-between">
           <div>
-            <h2 className="font-['Chivo:Black',sans-serif] font-black text-2xl text-white">
+            <h2 className="font-['Chivo:Black',sans-serif] font-black text-2xl text-[var(--text-primary)]">
               {title}
             </h2>
-            <p className="text-sm text-[rgba(255,255,255,0.6)] mt-1">
+            <p className="text-sm text-[var(--text-secondary)] mt-1">
               {description}
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-white/60 bg-white/5 rounded-full transition-colors hover:text-white hover:bg-white/10 shadow-sm"
+            className="p-2 text-[var(--text-secondary)] dark:bg-[#151520] light:bg-gray-100 rounded-full transition-colors hover:text-[var(--text-primary)] light:hover:bg-gray-200 dark:hover:bg-[#252530] shadow-sm"
           >
             <X size={20} />
           </button>
@@ -118,7 +118,7 @@ export function ApartmentFormDialog({
           )}
 
           <div>
-            <label className="block text-[rgba(255,255,255,0.7)] text-sm font-semibold mb-2">
+            <label className="block text-[var(--text-secondary)] text-sm font-semibold mb-2">
               Rent Value ($) {isAddMode && '*'}
             </label>
             <input
@@ -127,13 +127,13 @@ export function ApartmentFormDialog({
               required={isAddMode}
               value={formData.rent}
               onChange={(e) => setFormData({ ...formData, rent: e.target.value })}
-              className="w-full px-4 py-3 bg-white/[0.03] border border-white/10 hover:border-white/20 focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[12px] text-white placeholder-white/30 transition-all duration-300"
+              className="w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] hover:border-[var(--glass-border-hover)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[12px] text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-all duration-300"
               placeholder={isBulk ? 'Leave blank to keep unchanged' : 'e.g., 1500.00'}
             />
           </div>
 
           <div>
-            <label className="block text-[rgba(255,255,255,0.7)] text-sm font-semibold mb-2">
+            <label className="block text-[var(--text-secondary)] text-sm font-semibold mb-2">
               Area (m²) {isAddMode && '*'}
             </label>
             <input
@@ -142,17 +142,17 @@ export function ApartmentFormDialog({
               required={isAddMode}
               value={formData.squareMeters}
               onChange={(e) => setFormData({ ...formData, squareMeters: e.target.value })}
-              className="w-full px-4 py-3 bg-white/[0.03] border border-white/10 hover:border-white/20 focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[12px] text-white placeholder-white/30 transition-all duration-300"
+              className="w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] hover:border-[var(--glass-border-hover)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[12px] text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-all duration-300"
               placeholder={isBulk ? 'Leave blank to keep unchanged' : 'e.g., 45.5'}
             />
           </div>
 
-          <div className="flex gap-3 pt-6 border-t border-white/5 mt-6">
+          <div className="flex gap-3 pt-6 border-t border-[var(--glass-border)] mt-6">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className={`flex-1 px-4 py-3 bg-transparent border border-white/10 text-white font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] rounded-[12px] transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/5'}`}
+              className={`flex-1 px-4 py-3 bg-transparent border border-[var(--glass-border)] text-[var(--text-primary)] font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] rounded-[12px] transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[var(--bg-subtle)]'}`}
             >
               Cancel
             </button>

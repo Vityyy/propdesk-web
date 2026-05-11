@@ -2,14 +2,15 @@ import { RouterProvider } from 'react-router';
 import { router } from './routes';
 import { OwnerProvider } from './context/OwnerContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 function AppRouter() {
   const { isBootstrapping } = useAuth();
 
   if (isBootstrapping) {
     return (
-      <div className="bg-black flex h-screen w-screen items-center justify-center">
-        <p className="font-['Archivo:SemiBold',sans-serif] text-[15px] text-white">Loading session…</p>
+      <div className="bg-deep flex h-screen w-screen items-center justify-center">
+        <p className="font-['Archivo:SemiBold',sans-serif] text-[15px] text-secondary">Loading session…</p>
       </div>
     );
   }
@@ -19,10 +20,12 @@ function AppRouter() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <OwnerProvider>
-        <AppRouter />
-      </OwnerProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <OwnerProvider>
+          <AppRouter />
+        </OwnerProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

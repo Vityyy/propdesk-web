@@ -12,24 +12,24 @@ function ReportCard({ title, description, lastGenerated }: { title: string; desc
               <div className="p-2 bg-[#928dd3]/10 rounded-lg group-hover:bg-[#928dd3]/20 transition-colors">
                 <FileText size={20} className="text-[#928dd3]" />
               </div>
-              <p className="flex-[1_0_0] font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] min-h-px min-w-px overflow-hidden relative text-[17px] text-ellipsis text-white/90 whitespace-nowrap" style={{ fontVariationSettings: "'wdth' 100" }}>
+              <p className="flex-[1_0_0] font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] min-h-px min-w-px overflow-hidden relative text-[17px] text-ellipsis text-primary whitespace-nowrap" style={{ fontVariationSettings: "'wdth' 100" }}>
                 {title}
               </p>
             </div>
-            <button className="text-white/30 hover:text-white/70 transition-colors">
+            <button className="text-tertiary hover:text-secondary transition-colors">
               <MoreHorizontal size={20} />
             </button>
           </div>
-          <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] text-[14px] text-white/50" style={{ fontVariationSettings: "'wdth' 100" }}>
+          <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] text-[14px] text-tertiary" style={{ fontVariationSettings: "'wdth' 100" }}>
             {description}
           </p>
           <div className="w-full pt-[8px] mt-auto">
-            <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[12px] text-white/30 mb-[12px]" style={{ fontVariationSettings: "'wdth' 100" }}>
+            <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[12px] text-tertiary mb-[12px]" style={{ fontVariationSettings: "'wdth' 100" }}>
               Last generated: {lastGenerated}
             </p>
             <button className="bg-white/[0.02] border border-white/[0.08] hover:border-[#928dd3]/40 content-stretch flex gap-2 items-center justify-center px-[16px] py-[10px] relative rounded-[8px] w-full hover:bg-[#928dd3]/10 transition-all duration-300 group/btn">
-              <Download size={16} className="text-white/50 group-hover/btn:text-[#928dd3] transition-colors" />
-              <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] relative shrink-0 text-[14px] text-white/70 group-hover/btn:text-white whitespace-nowrap transition-colors" style={{ fontVariationSettings: "'wdth' 100" }}>
+              <Download size={16} className="text-tertiary group-hover/btn:text-[#928dd3] transition-colors" />
+              <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] relative shrink-0 text-[14px] text-secondary group-hover/btn:text-primary whitespace-nowrap transition-colors" style={{ fontVariationSettings: "'wdth' 100" }}>
                 Generate Report
               </p>
             </button>
@@ -44,10 +44,10 @@ function PerformanceChart() {
   return (
     <div className="glass-card rounded-[16px] p-[24px] w-full relative hover:shadow-[0_8px_30px_rgba(0,0,0,0.2)] transition-all duration-300">
       <div className="content-stretch flex items-center justify-between mb-[24px]">
-        <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] text-[17px] text-white/80" style={{ fontVariationSettings: "'wdth' 100" }}>
+        <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] text-[17px] text-secondary" style={{ fontVariationSettings: "'wdth' 100" }}>
           Revenue Performance
         </p>
-        <button className="text-white/30 hover:text-white/70 transition-colors">
+        <button className="text-tertiary hover:text-secondary transition-colors">
           <MoreHorizontal size={20} />
         </button>
       </div>
@@ -65,10 +65,10 @@ function MetricCard({ label, value, change }: { label: string; value: string; ch
       <div className="absolute inset-0 bg-gradient-to-br from-[#928dd3]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-[16px]" />
       <div className="overflow-clip rounded-[inherit] size-full relative">
         <div className="content-stretch flex flex-col gap-[8px] items-start p-[24px] relative w-full">
-          <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[16px] text-[13px] text-white/50" style={{ fontVariationSettings: "'wdth' 100" }}>
+          <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[16px] text-[13px] text-tertiary" style={{ fontVariationSettings: "'wdth' 100" }}>
             {label}
           </p>
-          <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] text-[28px] text-white tracking-[-0.24px] my-1">
+          <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] text-[28px] text-primary tracking-[-0.24px] my-1">
             {value}
           </p>
           <p className={`font-['Archivo:SemiBold',sans-serif] font-semibold leading-[16px] text-[13px] px-2 py-1 rounded-md ${isPositive ? 'text-[#0DC44A] bg-[#0DC44A]/10' : 'text-[#ff6b6b] bg-[#ff6b6b]/10'}`} style={{ fontVariationSettings: "'wdth' 100" }}>
@@ -120,11 +120,11 @@ export function Reports() {
       {/* Header */}
       <div className="flex items-center justify-between py-8 px-12 relative">
         <div>
-          <h1 className="font-black text-4xl text-white tracking-tight flex items-center gap-3" style={{ fontFamily: "'Chivo', sans-serif" }}>
+          <h1 className="font-black text-4xl text-primary tracking-tight flex items-center gap-3" style={{ fontFamily: "'Chivo', sans-serif" }}>
             <PieChart className="text-[#928dd3]" size={36} />
             Reports
           </h1>
-          <p className="text-white/40 text-sm mt-2 font-['Archivo:Medium',sans-serif]">
+          <p className="text-primary/40 text-sm mt-2 font-['Archivo:Medium',sans-serif]">
             Generate and analyze comprehensive property management reports
           </p>
         </div>
@@ -148,7 +148,7 @@ export function Reports() {
       </div>
 
       <div className="px-[48px] pb-[48px]">
-        <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] mb-[16px] text-[24px] text-white/80 tracking-[-0.24px]">
+        <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] mb-[16px] text-[24px] text-secondary tracking-[-0.24px]">
           Available Reports
         </p>
         <div className="content-stretch flex flex-wrap gap-[24px] items-start w-full">

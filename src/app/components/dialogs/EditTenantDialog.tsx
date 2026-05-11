@@ -129,13 +129,13 @@ export function EditTenantDialog({ isOpen, tenant, onClose, onSuccess }: EditTen
 
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-[#0a0a0f] border border-white/10 rounded-[24px] max-w-md w-full shadow-[0_8px_30px_rgba(0,0,0,0.8)] relative z-10 overflow-hidden">
-        <div className="p-6 border-b border-white/10 flex items-center justify-between">
-          <h2 className="font-['Chivo:Black',sans-serif] font-black text-[24px] text-white">Edit Tenant</h2>
+      <div className="dark:bg-[#0a0a0f] light:bg-white border border-[var(--glass-border)] rounded-[24px] max-w-md w-full shadow-[0_8px_30px_rgba(0,0,0,0.8)] relative z-10 overflow-hidden">
+        <div className="p-6 border-b border-[var(--glass-border)] flex items-center justify-between">
+          <h2 className="font-['Chivo:Black',sans-serif] font-black text-[24px] text-[var(--text-primary)]">Edit Tenant</h2>
           <button
             type="button"
             onClick={handleClose}
-            className="p-2 text-white/60 bg-white/5 rounded-full transition-colors hover:text-white hover:bg-white/10 shadow-sm"
+            className="p-2 text-[var(--text-secondary)] dark:bg-[#151520] light:bg-gray-100 rounded-full transition-colors hover:text-[var(--text-primary)] light:hover:bg-gray-200 dark:hover:bg-[#252530] shadow-sm"
           >
             <X size={20} />
           </button>
@@ -143,15 +143,15 @@ export function EditTenantDialog({ isOpen, tenant, onClose, onSuccess }: EditTen
         
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           <div>
-            <label className="block text-[rgba(255,255,255,0.7)] text-sm font-semibold mb-2 uppercase tracking-wider">Full Name</label>
+            <label className="block text-[var(--text-secondary)] text-sm font-semibold mb-2 uppercase tracking-wider">Full Name</label>
             <input
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className={`w-full px-4 py-3 bg-white/[0.03] border rounded-[12px] text-white placeholder-white/30 focus:outline-none transition-all duration-300 hover:border-white/20 ${
+              className={`w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border rounded-[12px] text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none transition-all duration-300 hover:border-[var(--glass-border)] ${
                 validationErrors.name
                   ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500'
-                  : 'border-white/10 focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3]'
+                  : 'border-[var(--glass-border)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]'
               }`}
               disabled={loading}
             />
@@ -161,15 +161,15 @@ export function EditTenantDialog({ isOpen, tenant, onClose, onSuccess }: EditTen
           </div>
 
           <div>
-            <label className="block text-[rgba(255,255,255,0.7)] text-sm font-semibold mb-2 uppercase tracking-wider">Email</label>
+            <label className="block text-[var(--text-secondary)] text-sm font-semibold mb-2 uppercase tracking-wider">Email</label>
             <input
               type="email"
               value={formData.email || ''}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className={`w-full px-4 py-3 bg-white/[0.03] border rounded-[12px] text-white placeholder-white/30 focus:outline-none transition-all duration-300 hover:border-white/20 ${
+              className={`w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border rounded-[12px] text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none transition-all duration-300 hover:border-[var(--glass-border)] ${
                 validationErrors.email
                   ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500'
-                  : 'border-white/10 focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3]'
+                  : 'border-[var(--glass-border)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]'
               }`}
               disabled={loading}
             />
@@ -179,15 +179,15 @@ export function EditTenantDialog({ isOpen, tenant, onClose, onSuccess }: EditTen
           </div>
 
           <div>
-            <label className="block text-[rgba(255,255,255,0.7)] text-sm font-semibold mb-2 uppercase tracking-wider">Phone</label>
+            <label className="block text-[var(--text-secondary)] text-sm font-semibold mb-2 uppercase tracking-wider">Phone</label>
             <input
               type="tel"
               value={formData.phone || ''}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              className={`w-full px-4 py-3 bg-white/[0.03] border rounded-[12px] text-white placeholder-white/30 focus:outline-none transition-all duration-300 hover:border-white/20 ${
+              className={`w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border rounded-[12px] text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none transition-all duration-300 hover:border-[var(--glass-border)] ${
                 validationErrors.phone
                   ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500'
-                  : 'border-white/10 focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3]'
+                  : 'border-[var(--glass-border)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]'
               }`}
               disabled={loading}
             />
@@ -196,11 +196,11 @@ export function EditTenantDialog({ isOpen, tenant, onClose, onSuccess }: EditTen
             )}
           </div>
 
-          <div className="flex gap-3 pt-6 border-t border-white/10 mt-6">
+          <div className="flex gap-3 pt-6 border-t border-[var(--glass-border)] mt-6">
             <button
               type="button"
               onClick={handleClose}
-              className="flex-1 px-4 py-3 bg-transparent border border-white/10 text-white font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] rounded-[12px] transition-colors hover:bg-white/5 disabled:opacity-50"
+              className="flex-1 px-4 py-3 bg-transparent border border-[var(--glass-border)] text-[var(--text-primary)] font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] rounded-[12px] transition-colors hover:bg-[var(--bg-subtle)] disabled:opacity-50"
               disabled={loading}
             >
               Cancel

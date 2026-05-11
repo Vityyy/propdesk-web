@@ -101,13 +101,13 @@ export function HireAdminDialog({ isOpen, onClose, onSuccess }: HireAdminDialogP
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-      <div className="bg-[#0a0a0f] border border-white/10 rounded-[16px] shadow-[0_8px_30px_rgba(0,0,0,0.8)] max-w-md w-full relative overflow-hidden">
+      <div className="dark:bg-[#0a0a0f] light:bg-white border border-[var(--glass-border)] rounded-[16px] shadow-[0_8px_30px_rgba(0,0,0,0.8)] max-w-md w-full relative overflow-hidden">
         {/* Header */}
-        <div className="p-6 pb-5 border-b border-white/10 flex items-center justify-between bg-[#0a0a0f]">
-          <h2 className="font-['Chivo:Black',sans-serif] font-black text-xl text-white">Hire Administrator</h2>
+        <div className="p-6 pb-5 border-b border-[var(--glass-border)] flex items-center justify-between dark:bg-[#0a0a0f] light:bg-white">
+          <h2 className="font-['Chivo:Black',sans-serif] font-black text-xl text-[var(--text-primary)]">Hire Administrator</h2>
           <button
             onClick={handleClose}
-            className="p-2 text-white/60 bg-white/5 rounded-full transition-colors hover:text-white hover:bg-white/10 shadow-sm"
+            className="p-2 text-[var(--text-secondary)] dark:bg-[#151520] light:bg-gray-100 rounded-full transition-colors hover:text-[var(--text-primary)] light:hover:bg-gray-200 dark:hover:bg-[#252530] shadow-sm"
           >
             <X size={16} />
           </button>
@@ -116,7 +116,7 @@ export function HireAdminDialog({ isOpen, onClose, onSuccess }: HireAdminDialogP
         <div className="p-6">
           {/* Admin Username Input */}
           <div className="mb-5">
-            <label className="block font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] text-white/80 mb-2">
+            <label className="block font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] text-[var(--text-secondary)] mb-2">
               Admin Username
             </label>
             <input
@@ -124,9 +124,9 @@ export function HireAdminDialog({ isOpen, onClose, onSuccess }: HireAdminDialogP
               value={adminUsername}
               onChange={(e) => setAdminUsername(e.target.value)}
               placeholder="Enter admin username..."
-              className="w-full bg-white/[0.03] border border-white/10 rounded-[8px] px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-[#928dd3] focus:bg-white/[0.05] transition-all duration-300 font-['Archivo:Medium',sans-serif]"
+              className="w-full dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] rounded-[8px] px-4 py-2.5 text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none focus:border-[#928dd3] transition-all duration-300 font-['Archivo:Medium',sans-serif]"
             />
-            <p className="font-['Archivo:Medium',sans-serif] font-medium text-[12px] text-white/50 mt-2">
+            <p className="font-['Archivo:Medium',sans-serif] font-medium text-[12px] text-[var(--text-tertiary)] mt-2">
               Type the exact username of the admin you want to hire
             </p>
           </div>
@@ -134,7 +134,7 @@ export function HireAdminDialog({ isOpen, onClose, onSuccess }: HireAdminDialogP
           {/* Admin Cut */}
           {adminUsername.trim() && (
             <div className="mb-5 animate-in fade-in slide-in-from-top-2 duration-300">
-              <label className="block font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] text-white/80 mb-2">
+              <label className="block font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] text-[var(--text-secondary)] mb-2">
                 Admin Commission (%)
               </label>
               <input
@@ -143,9 +143,9 @@ export function HireAdminDialog({ isOpen, onClose, onSuccess }: HireAdminDialogP
                 step="0.1"
                 value={adminCut}
                 onChange={(e) => setAdminCut(e.target.value)}
-                className="w-full bg-white/[0.03] border border-white/10 rounded-[8px] px-4 py-2.5 text-white focus:outline-none focus:border-[#928dd3] focus:bg-white/[0.05] transition-all duration-300 font-['Archivo:Medium',sans-serif]"
+                className="w-full dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] rounded-[8px] px-4 py-2.5 text-[var(--text-primary)] focus:outline-none focus:border-[#928dd3] transition-all duration-300 font-['Archivo:Medium',sans-serif]"
               />
-              <p className="font-['Archivo:Medium',sans-serif] font-medium text-[12px] text-white/50 mt-2">
+              <p className="font-['Archivo:Medium',sans-serif] font-medium text-[12px] text-[var(--text-tertiary)] mt-2">
                 Percentage you offer this admin for managing your properties
               </p>
             </div>
@@ -173,7 +173,7 @@ export function HireAdminDialog({ isOpen, onClose, onSuccess }: HireAdminDialogP
           <div className="flex gap-3 mt-6">
             <button
               onClick={handleClose}
-              className="flex-1 px-4 py-2.5 bg-white/[0.03] border border-white/10 text-white font-['Archivo:SemiBold',sans-serif] font-semibold text-sm rounded-[8px] transition-colors hover:bg-white/5"
+              className="flex-1 px-4 py-2.5 bg-[var(--bg-subtle)] border border-[var(--glass-border)] text-[var(--text-primary)] font-['Archivo:SemiBold',sans-serif] font-semibold text-sm rounded-[8px] transition-colors hover:bg-[var(--glass-border)]"
             >
               Cancel
             </button>

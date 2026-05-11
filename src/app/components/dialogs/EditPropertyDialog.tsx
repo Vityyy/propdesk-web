@@ -86,15 +86,15 @@ export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: Edi
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0" onClick={handleClose} />
-      <div className="bg-[#0a0a0f] border border-white/10 rounded-[24px] max-w-2xl w-full shadow-[0_8px_30px_rgba(0,0,0,0.8)] relative z-10">
-        <div className="p-6 border-b border-white/10 flex items-center justify-between">
-          <h2 className="font-['Chivo:Black',sans-serif] font-black text-[24px] text-white">
+      <div className="dark:bg-[#0a0a0f] light:bg-white border border-[var(--glass-border)] rounded-[24px] max-w-2xl w-full shadow-[0_8px_30px_rgba(0,0,0,0.2)] relative z-10">
+        <div className="p-6 border-b border-[var(--glass-border)] flex items-center justify-between">
+          <h2 className="font-['Chivo:Black',sans-serif] font-black text-[24px] text-primary">
             Edit Property
           </h2>
           <button
             type="button"
             onClick={handleClose}
-            className="p-2 text-white/60 hover:text-white bg-white/5 hover:bg-white/10 rounded-full transition-colors"
+            className="p-2 text-secondary dark:bg-[#151520] light:bg-gray-100 rounded-full transition-colors"
           >
             <X size={20} />
           </button>
@@ -102,7 +102,7 @@ export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: Edi
 
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
           <div>
-            <label className="block font-['Archivo:SemiBold',sans-serif] font-semibold text-white/70 text-[14px] mb-2 uppercase tracking-wider">
+            <label className="block font-['Archivo:SemiBold',sans-serif] font-semibold text-secondary text-[14px] mb-2 uppercase tracking-wider">
               Name *
             </label>
             <input
@@ -114,9 +114,9 @@ export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: Edi
                   setValidationErrors({ ...validationErrors, name: '' });
                 }
               }}
-              className={`w-full px-4 py-3 bg-white/[0.03] border rounded-[12px] text-white placeholder-white/30 transition-all duration-300 outline-none ${validationErrors.name
+              className={`w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border rounded-[12px] text-primary placeholder:text-tertiary transition-all duration-300 outline-none ${validationErrors.name
                   ? 'border-[#ff6b6b] focus:border-[#ff6b6b] focus:ring-1 focus:ring-[#ff6b6b]'
-                  : 'border-white/10 focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3]'
+                  : 'border-[var(--glass-border)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]'
                 }`}
               placeholder="Property Name"
             />
@@ -126,7 +126,7 @@ export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: Edi
           </div>
 
           <div>
-            <label className="block font-['Archivo:SemiBold',sans-serif] font-semibold text-white/70 text-[14px] mb-2 uppercase tracking-wider">
+            <label className="block font-['Archivo:SemiBold',sans-serif] font-semibold text-secondary text-[14px] mb-2 uppercase tracking-wider">
               Address *
             </label>
             <input
@@ -138,9 +138,9 @@ export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: Edi
                   setValidationErrors({ ...validationErrors, address: '' });
                 }
               }}
-              className={`w-full px-4 py-3 bg-white/[0.03] border rounded-[12px] text-white placeholder-white/30 transition-all duration-300 outline-none ${validationErrors.address
+              className={`w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border rounded-[12px] text-primary placeholder:text-tertiary transition-all duration-300 outline-none ${validationErrors.address
                   ? 'border-[#ff6b6b] focus:border-[#ff6b6b] focus:ring-1 focus:ring-[#ff6b6b]'
-                  : 'border-white/10 focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3]'
+                  : 'border-[var(--glass-border)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]'
                 }`}
               placeholder="Property Address"
             />
@@ -150,7 +150,7 @@ export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: Edi
           </div>
 
           <div>
-            <label className="block font-['Archivo:SemiBold',sans-serif] font-semibold text-white/70 text-[14px] mb-2 uppercase tracking-wider">
+            <label className="block font-['Archivo:SemiBold',sans-serif] font-semibold text-secondary text-[14px] mb-2 uppercase tracking-wider">
               Image Link *
             </label>
             <input
@@ -162,9 +162,9 @@ export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: Edi
                   setValidationErrors({ ...validationErrors, imageUrl: '' });
                 }
               }}
-              className={`w-full px-4 py-3 bg-white/[0.03] border rounded-[12px] text-white placeholder-white/30 transition-all duration-300 outline-none ${validationErrors.imageUrl
+              className={`w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border rounded-[12px] text-primary placeholder:text-tertiary transition-all duration-300 outline-none ${validationErrors.imageUrl
                   ? 'border-[#ff6b6b] focus:border-[#ff6b6b] focus:ring-1 focus:ring-[#ff6b6b]'
-                  : 'border-white/10 focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3]'
+                  : 'border-[var(--glass-border)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]'
                 }`}
               placeholder="https://example.com/property.jpg"
             />
@@ -173,12 +173,12 @@ export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: Edi
             )}
           </div>
 
-          <div className="flex justify-end gap-3 pt-6 border-t border-white/5 mt-8">
+          <div className="flex justify-end gap-3 pt-6 border-t border-[var(--glass-border)] mt-8">
             <button
               type="button"
               onClick={handleClose}
               disabled={isSubmitting}
-              className="px-6 py-3 bg-transparent border border-white/10 hover:bg-white/5 text-white font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] rounded-[12px] transition-colors disabled:opacity-50"
+              className="px-6 py-3 bg-transparent border border-[var(--glass-border)] hover:bg-white/[0.05] text-secondary font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] rounded-[12px] transition-colors disabled:opacity-50"
             >
               Cancel
             </button>

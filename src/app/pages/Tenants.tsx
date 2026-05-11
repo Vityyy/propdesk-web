@@ -45,19 +45,19 @@ function TenantRow({ tenant, email, phone, paymentStatus, onEdit, onClick }: Ten
       onClick={onClick}
     >
       <div className="min-w-0">
-        <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white/90 truncate" style={{ fontVariationSettings: "'wdth' 100" }}>
+        <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-primary truncate" style={{ fontVariationSettings: "'wdth' 100" }}>
           {tenant}
         </p>
       </div>
       
       <div className="min-w-0 text-center">
-        <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-white/50 truncate" style={{ fontVariationSettings: "'wdth' 100" }}>
+        <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-tertiary truncate" style={{ fontVariationSettings: "'wdth' 100" }}>
           {displayEmail}
         </p>
       </div>
       
       <div className="min-w-0 text-center">
-        <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-white/50 truncate" style={{ fontVariationSettings: "'wdth' 100" }}>
+        <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-tertiary truncate" style={{ fontVariationSettings: "'wdth' 100" }}>
           {displayPhone}
         </p>
       </div>
@@ -74,7 +74,7 @@ function TenantRow({ tenant, email, phone, paymentStatus, onEdit, onClick }: Ten
       <div className="flex items-center justify-center gap-3" onClick={(e) => e.stopPropagation()}>
         <button 
           onClick={onEdit}
-          className="bg-black/40 hover:bg-[#928dd3] backdrop-blur-md p-2 rounded-lg transition-all duration-200 text-white hover:text-black border border-white/5 hover:border-[#928dd3] hover:shadow-[0_0_15px_rgba(146,141,211,0.4)]"
+          className="bg-black/40 hover:bg-[#928dd3] backdrop-blur-md p-2 rounded-lg transition-all duration-200 text-primary hover:text-black border border-white/5 hover:border-[#928dd3] hover:shadow-[0_0_15px_rgba(146,141,211,0.4)]"
           title="Edit tenant"
         >
           <Pencil size={16} />
@@ -90,7 +90,7 @@ function SummaryCard({ title, value, subtitle, isLoading }: { title: string; val
       <div className="absolute inset-0 bg-gradient-to-br from-[#928dd3]/5 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-[16px]" />
       <div className="overflow-hidden rounded-[inherit] size-full relative">
         <div className="content-stretch flex flex-col gap-[8px] items-start p-[24px] relative w-full">
-          <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] text-[17px] text-white/80" style={{ fontVariationSettings: "'wdth' 100" }}>
+          <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] text-[17px] text-secondary" style={{ fontVariationSettings: "'wdth' 100" }}>
             {title}
           </p>
           {isLoading ? (
@@ -100,7 +100,7 @@ function SummaryCard({ title, value, subtitle, isLoading }: { title: string; val
             </>
           ) : (
             <>
-              <p className="font-['Chivo:Black',sans-serif] font-black leading-[40px] text-[34px] text-white tracking-[-0.34px]">
+              <p className="font-['Chivo:Black',sans-serif] font-black leading-[40px] text-[34px] text-primary tracking-[-0.34px]">
                 {value}
               </p>
               <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[16px] text-[13px] text-[#928dd3]" style={{ fontVariationSettings: "'wdth' 100" }}>
@@ -234,11 +234,11 @@ export function Tenants() {
       {/* Header */}
       <div className="flex items-center justify-between py-8 px-12 relative">
         <div>
-          <h1 className="font-black text-4xl text-white tracking-tight flex items-center gap-3" style={{ fontFamily: "'Chivo', sans-serif" }}>
+          <h1 className="font-black text-4xl text-primary tracking-tight flex items-center gap-3" style={{ fontFamily: "'Chivo', sans-serif" }}>
             <Users className="text-[#928dd3]" size={36} />
             Tenants
           </h1>
-          <p className="text-white/40 text-sm mt-2 font-['Archivo:Medium',sans-serif]">
+          <p className="text-tertiary text-sm mt-2 font-['Archivo:Medium',sans-serif]">
             Manage {tenants.length} tenants for {currentOwner.name}
           </p>
         </div>
@@ -250,14 +250,14 @@ export function Tenants() {
       </div>
 
       <div className="content-stretch flex gap-[24px] items-start px-[48px] pb-[24px] relative w-full">
-        <div className="flex items-center gap-3 bg-white/[0.02] border border-white/[0.08] focus-within:border-[#928dd3] focus-within:bg-white/[0.05] focus-within:ring-1 focus-within:ring-[#928dd3]/30 rounded-[12px] px-4 py-3 text-white transition-all duration-300">
-          <Search size={18} className="text-white/30" />
+        <div className="flex items-center gap-3 bg-white/[0.02] border border-white/[0.08] focus-within:border-[#928dd3] focus-within:bg-white/[0.05] focus-within:ring-1 focus-within:ring-[#928dd3]/30 rounded-[12px] px-4 py-3 text-primary transition-all duration-300">
+          <Search size={18} className="text-tertiary" />
           <input
             type="text"
             placeholder="Search tenants by name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="bg-transparent text-white placeholder-white/25 text-sm focus:outline-none w-64"
+            className="bg-transparent text-primary placeholder-white/25 text-sm focus:outline-none w-64"
           />
         </div>
       </div>
@@ -265,26 +265,26 @@ export function Tenants() {
       <div className="glass-card shadow-lg mx-[48px] mb-[48px] rounded-[16px] relative overflow-hidden">
         <div className="overflow-visible rounded-[inherit] size-full">
 <div className="content-stretch grid grid-cols-[minmax(140px,1.5fr)_minmax(180px,2fr)_minmax(140px,1.5fr)_120px_80px] items-center gap-4 py-[16px] px-[24px] relative shrink-0 w-full border-b border-white/[0.06] bg-white/[0.02]">
-              <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white/80" style={{ fontVariationSettings: "'wdth' 100" }}>
+              <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-secondary" style={{ fontVariationSettings: "'wdth' 100" }}>
                 Name
               </p>
-              <p className="text-center font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white/80" style={{ fontVariationSettings: "'wdth' 100" }}>
+              <p className="text-center font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-secondary" style={{ fontVariationSettings: "'wdth' 100" }}>
                 Email
               </p>
-              <p className="text-center font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white/80" style={{ fontVariationSettings: "'wdth' 100" }}>
+              <p className="text-center font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-secondary" style={{ fontVariationSettings: "'wdth' 100" }}>
                 Phone
               </p>
-              <p className="text-center font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white/80" style={{ fontVariationSettings: "'wdth' 100" }}>
+              <p className="text-center font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-secondary" style={{ fontVariationSettings: "'wdth' 100" }}>
                 Status
               </p>
-              <p className="text-center font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-white/80" style={{ fontVariationSettings: "'wdth' 100" }}>
+              <p className="text-center font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[20px] text-[15px] text-secondary" style={{ fontVariationSettings: "'wdth' 100" }}>
                 Actions
               </p>
             </div>
            {isPageLoading ? (
                <TenantSkeleton />
            ) : tenantRows.length === 0 ? (
-<div className="py-8 px-4 text-center text-white/40">
+<div className="py-8 px-4 text-center text-tertiary">
                 No tenants yet. Create one to get started!
               </div>
            ) : (
