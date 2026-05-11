@@ -20,20 +20,23 @@ function MenuItem({ icon, label, to, isActive, isCollapsed }: MenuItemProps) {
       to={to}
       className={`group relative rounded-[12px] shrink-0 w-full mb-1 transition-all duration-300 overflow-hidden ${
         isActive 
-          ? 'bg-[#928dd3]/10 shadow-[inset_4px_0_0_0_#928dd3]' 
+          ? 'bg-[#928dd3]/15 shadow-[inset_4px_0_0_0_#928dd3]' 
           : 'bg-transparent hover:bg-white/[0.04]'
       }`}
       title={isCollapsed ? label : undefined}
     >
+      {isActive && (
+        <div className="absolute inset-0 bg-gradient-to-r from-[#928dd3]/10 to-transparent" />
+      )}
       {!isActive && (
         <div className="absolute inset-0 bg-gradient-to-r from-[#928dd3]/0 to-transparent group-hover:from-[#928dd3]/5 transition-all duration-300" />
       )}
       <div className={`flex items-center px-4 py-3 relative z-10 ${isCollapsed ? 'justify-center' : 'gap-4'}`}>
-        <div className={`transition-all duration-300 ${isActive ? 'text-[#928dd3]' : 'text-white/50 group-hover:text-[#928dd3] group-hover:scale-110'}`}>
+        <div className={`transition-all duration-300 ${isActive ? 'text-[#928dd3]' : 'text-white/40 group-hover:text-[#928dd3] group-hover:scale-110'}`}>
           {icon}
         </div>
         {!isCollapsed && (
-          <p className={`font-['Archivo:SemiBold',sans-serif] font-semibold text-[15px] whitespace-nowrap transition-colors duration-300 ${isActive ? 'text-[#928dd3]' : 'text-white/70 group-hover:text-white'}`}>
+          <p className={`font-['Archivo:SemiBold',sans-serif] font-semibold text-[15px] whitespace-nowrap transition-colors duration-300 ${isActive ? 'text-[#928dd3]' : 'text-white/60 group-hover:text-white'}`}>
             {label}
           </p>
         )}
@@ -67,7 +70,7 @@ export function Sidebar({ isCollapsed, onToggle }: { isCollapsed: boolean; onTog
 
   return (
     <div className={`content-stretch flex flex-col isolate items-start overflow-clip relative shrink-0 transition-all duration-300 z-[2] ${isCollapsed ? 'w-[80px]' : 'w-[400px]'}`} data-name="Sidebar">
-      <div className="bg-black content-stretch flex h-full flex-col items-start overflow-clip py-[24px] px-[24px] relative shrink-0 w-full z-[1]" data-name="Side Panel Menu">
+      <div className="bg-[#030308]/80 backdrop-blur-xl border-r border-white/[0.04] content-stretch flex h-full flex-col items-start overflow-clip py-[24px] px-[24px] relative shrink-0 w-full z-[1]" data-name="Side Panel Menu">
         <div className="flex items-center w-full mb-[16px]">
           {!isCollapsed && userRole === 'ADMIN' && <OwnerSelector />}
           {!isCollapsed && userRole === 'OWNER' && (

@@ -59,11 +59,12 @@ function PropertyCard({
 
   return (
     <div
-      className="bg-white/[0.02] backdrop-blur-md relative rounded-[16px] hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(255,255,255,0.04)] transition-all duration-300 group cursor-pointer"
+      className="glass-card relative rounded-[16px] hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.3)] transition-all duration-300 group cursor-pointer hover:border-white/[0.12]"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => onViewApartments?.(property)}
     >
+      <div className="absolute inset-0 bg-gradient-to-br from-[#928dd3]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-[16px]" />
       <div className="relative w-full h-[200px] overflow-hidden rounded-t-[16px]">
         <ImageWithFallback
           src={property.imageUrl}
@@ -76,10 +77,10 @@ function PropertyCard({
       <div className="p-[24px]">
         <div className="flex items-start justify-between mb-[12px]">
           <div className="flex-1">
-            <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] text-[17px] text-white mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
+            <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] text-[17px] text-white/90 mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
               {property.name}
             </p>
-            <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
+            <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-white/50" style={{ fontVariationSettings: "'wdth' 100" }}>
               {property.address}
             </p>
           </div>
@@ -95,7 +96,7 @@ function PropertyCard({
             </button>
 
             {showMenu && (
-              <div className="absolute top-[calc(100%+8px)] right-0 bg-[#0a0a0f]/95 backdrop-blur-2xl border border-white/10 rounded-[12px] shadow-[0_12px_40px_rgba(0,0,0,0.7)] min-w-[220px] z-[11] overflow-hidden py-2">
+              <div className="absolute top-[calc(100%+8px)] right-0 bg-[#0a0a0f]/95 backdrop-blur-2xl border border-white/[0.08] rounded-[12px] shadow-[0_12px_40px_rgba(0,0,0,0.8)] min-w-[220px] z-[11] overflow-hidden py-2">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -155,7 +156,7 @@ function PropertyCard({
         </div>
 
         <div className="mb-[16px]">
-          <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)] mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
+          <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[16px] text-[13px] text-white/50 mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
             Monthly Revenue
           </p>
           <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] text-[24px] text-[#928dd3] tracking-[-0.24px]">
@@ -165,21 +166,21 @@ function PropertyCard({
 
         {/* Additional info shown on hover */}
         <div className={`transition-all duration-300 overflow-hidden ${isHovered ? 'max-h-[100px] opacity-100' : 'max-h-0 opacity-0'}`}>
-          <div className="pt-[16px] border-t border-white/10">
+          <div className="pt-[16px] border-t border-white/[0.08]">
             <div className="flex gap-[24px]">
               <div>
-                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)] mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
+                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[16px] text-[13px] text-white/50 mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
                   Units
                 </p>
-                <p className="font-['Chivo:Black',sans-serif] font-black leading-[24px] text-[20px] text-white tracking-[-0.2px]">
+                <p className="font-['Chivo:Black',sans-serif] font-black leading-[24px] text-[20px] text-white/90 tracking-[-0.2px]">
                   {totalUnits}
                 </p>
               </div>
               <div>
-                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)] mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
+                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[16px] text-[13px] text-white/50 mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
                   Occupancy
                 </p>
-                <p className="font-['Chivo:Black',sans-serif] font-black leading-[24px] text-[20px] text-white tracking-[-0.2px]">
+                <p className="font-['Chivo:Black',sans-serif] font-black leading-[24px] text-[20px] text-white/90 tracking-[-0.2px]">
                   {occupancyPercentage}%
                 </p>
               </div>
@@ -188,7 +189,7 @@ function PropertyCard({
         </div>
       </div>
 
-      <div aria-hidden="true" className="absolute border border-solid border-white/10 group-hover:border-white/20 transition-colors inset-0 pointer-events-none rounded-[16px]" />
+      <div aria-hidden="true" className="absolute border border-white/[0.06] group-hover:border-white/[0.15] transition-colors inset-0 pointer-events-none rounded-[16px]" />
     </div>
   );
 }
@@ -290,21 +291,22 @@ export function Properties() {
   };
 
   return (
-    <div className="bg-black min-h-full w-full">
+    <div className="min-h-full w-full relative">
+      <div className="absolute inset-0 bg-gradient-to-b from-[#928dd3]/3 to-transparent pointer-events-none" />
       {/* Header */}
-      <div className="flex items-center justify-between py-8 px-12">
+      <div className="flex items-center justify-between py-8 px-12 relative">
         <div>
           <h1 className="font-black text-4xl text-white tracking-tight flex items-center gap-3" style={{ fontFamily: "'Chivo', sans-serif" }}>
             <Building2 className="text-[#928dd3]" size={36} />
             Properties
           </h1>
-          <p className="text-white/50 text-sm mt-2 font-['Archivo:Medium',sans-serif]">
+          <p className="text-white/40 text-sm mt-2 font-['Archivo:Medium',sans-serif]">
             Managing {properties.length} properties for {currentOwner.name}
           </p>
         </div>
         <button
           onClick={() => setShowCreateDialog(true)}
-          className="bg-gradient-to-r from-[#928dd3] to-[#a89be6] content-stretch flex gap-2 items-center justify-center px-[16px] py-[8px] relative rounded-[8px] shrink-0 hover:opacity-100 shadow-[0_0_15px_rgba(146,141,211,0.4)] hover:shadow-[0_0_25px_rgba(146,141,211,0.7)] ring-1 ring-white/20 hover:ring-white/50 hover:-translate-y-0.5 active:scale-95 transition-all duration-300"
+          className="bg-gradient-to-r from-[#928dd3] to-[#a89be6] content-stretch flex gap-2 items-center justify-center px-[16px] py-[8px] relative rounded-[10px] shrink-0 hover:opacity-100 shadow-[0_0_20px_rgba(146,141,211,0.3)] hover:shadow-[0_0_30px_rgba(146,141,211,0.5)] ring-1 ring-white/20 hover:ring-white/40 hover:-translate-y-0.5 active:scale-95 transition-all duration-300"
         >
           <Plus size={18} className="text-black" />
           <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] relative shrink-0 text-[15px] text-black whitespace-nowrap" style={{ fontVariationSettings: "'wdth' 100" }}>
@@ -324,7 +326,7 @@ export function Properties() {
           ))
         ) : properties.length === 0 ? (
           <div className="col-span-3 text-center py-12">
-            <p className="text-[rgba(255,255,255,0.6)] mb-4">No properties created yet</p>
+            <p className="text-white/40 mb-4">No properties created yet</p>
             <button
               onClick={() => setShowCreateDialog(true)}
               className="text-[#928dd3] hover:text-[#a89be6] transition-colors"

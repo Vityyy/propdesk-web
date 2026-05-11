@@ -142,7 +142,7 @@ function Header() {
 export function Navbar() {
   return (
     <div
-      className="bg-black content-stretch flex items-center justify-between py-[12px] px-[24px] relative shrink-0 w-full z-[3]"
+      className="bg-[#030308]/80 backdrop-blur-xl border-b border-white/[0.04] content-stretch flex items-center justify-between py-[12px] px-[24px] relative shrink-0 w-full z-[3]"
       data-name="Web App Nav Bar"
     >
       <Container />

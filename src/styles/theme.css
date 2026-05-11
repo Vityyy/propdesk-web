@@ -39,6 +39,13 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --glow-purple: rgba(146, 141, 211, 0.4);
+  --glow-purple-strong: rgba(146, 141, 211, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-surface: rgba(255, 255, 255, 0.03);
+  --success: #10b981;
+  --warning: #f59e0b;
+  --info: #3b82f6;
 }
 
 .dark {
@@ -76,6 +83,13 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
+  --glow-purple: rgba(146, 141, 211, 0.35);
+  --glow-purple-strong: rgba(146, 141, 211, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --glass-surface: rgba(255, 255, 255, 0.02);
+  --success: #10b981;
+  --warning: #f59e0b;
+  --info: #3b82f6;
 }
 
 @theme inline {
@@ -117,6 +131,13 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-glow-purple: var(--glow-purple);
+  --color-glow-purple-strong: var(--glow-purple-strong);
+  --color-glass-border: var(--glass-border);
+  --color-glass-surface: var(--glass-surface);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
 }
 
 @layer base {
@@ -127,11 +148,6 @@
   body {
     @apply bg-background text-foreground;
   }
-
-  /**
-  * Default typography styles for HTML elements (h1-h4, p, label, button, input).
-  * These are in @layer base, so Tailwind utility classes (like text-sm, text-lg) automatically override them.
-  */
 
   html {
     font-size: var(--font-size);
@@ -177,5 +193,45 @@
     font-size: var(--text-base);
     font-weight: var(--font-weight-normal);
     line-height: 1.5;
+  }
+}
+
+@layer utilities {
+  .glass-card {
+    @apply bg-white/[0.02] backdrop-blur-xl border border-white/[0.06];
+  }
+  
+  .glass-card-hover {
+    @apply hover:bg-white/[0.04] hover:border-white/[0.12] hover:shadow-lg hover:shadow-black/20;
+  }
+
+  .glow-purple {
+    box-shadow: 0 0 20px var(--glow-purple), 0 0 40px var(--glow-purple);
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#928dd3] to-[#b8a9f0];
+  }
+
+  .bg-grid-pattern {
+    background-image: 
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.5s ease-out forwards;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }

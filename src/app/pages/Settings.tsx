@@ -31,12 +31,12 @@ interface SettingItemProps {
 
 function SettingItem({ label, description, value, type, options, onChange }: SettingItemProps) {
   return (
-    <div className="content-stretch flex items-center justify-between py-[16px] px-[24px] relative shrink-0 w-full border-b border-[rgba(255,255,255,0.16)]">
+    <div className="content-stretch flex items-center justify-between py-[16px] px-[24px] relative shrink-0 w-full border-b border-white/[0.06]">
       <div className="flex-[1_0_0]">
-        <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
+        <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white/90 mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
           {label}
         </p>
-        <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
+        <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-white/50" style={{ fontVariationSettings: "'wdth' 100" }}>
           {description}
         </p>
       </div>
@@ -45,7 +45,7 @@ function SettingItem({ label, description, value, type, options, onChange }: Set
           <button
             onClick={() => onChange?.(!value)}
             className={`relative w-[44px] h-[24px] rounded-[12px] transition-colors ${
-              value ? 'bg-[#928dd3]' : 'bg-[rgba(255,255,255,0.16)]'
+              value ? 'bg-[#928dd3]' : 'bg-white/[0.1]'
             }`}
           >
             <div
@@ -60,7 +60,7 @@ function SettingItem({ label, description, value, type, options, onChange }: Set
             type="text"
             value={value as string}
             onChange={(e) => onChange?.(e.target.value)}
-            className="bg-black border border-[rgba(255,255,255,0.16)] rounded-[8px] px-[12px] py-[6px] text-white font-['Archivo:Medium',sans-serif] min-w-[200px]"
+            className="bg-white/[0.02] border border-white/[0.1] rounded-[8px] px-[12px] py-[6px] text-white/90 font-['Archivo:Medium',sans-serif] min-w-[200px]"
           />
         )}
         {type === 'select' && options && (
@@ -68,7 +68,7 @@ function SettingItem({ label, description, value, type, options, onChange }: Set
             <select
               value={value as string}
               onChange={(e) => onChange?.(e.target.value)}
-              className="bg-black border border-[rgba(255,255,255,0.16)] rounded-[8px] px-[12px] py-[6px] pr-[36px] text-white font-['Archivo:Medium',sans-serif] appearance-none cursor-pointer min-w-[150px]"
+              className="bg-white/[0.02] border border-white/[0.1] rounded-[8px] px-[12px] py-[6px] pr-[36px] text-white/90 font-['Archivo:Medium',sans-serif] appearance-none cursor-pointer min-w-[150px]"
             >
               {options.map((option) => (
                 <option key={option} value={option}>
@@ -88,11 +88,10 @@ function SettingItem({ label, description, value, type, options, onChange }: Set
 
 function SettingsSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-black rounded-[16px] w-full relative mb-[24px]">
-      <div aria-hidden="true" className="absolute border border-solid border-white inset-0 pointer-events-none rounded-[16px]" />
+    <div className="glass-card rounded-[16px] w-full relative mb-[24px]">
       <div className="overflow-clip rounded-[inherit] size-full">
-        <div className="py-[16px] px-[24px] border-b border-[rgba(255,255,255,0.16)]">
-          <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] text-[17px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
+        <div className="py-[16px] px-[24px] border-b border-white/[0.06]">
+          <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] text-[17px] text-white/90" style={{ fontVariationSettings: "'wdth' 100" }}>
             {title}
           </p>
         </div>
@@ -185,19 +184,20 @@ export function Settings() {
   }, [isAdmin, associatedOwners, navigate]);
 
   return (
-    <div className="bg-black min-h-full w-full">
+    <div className="min-h-full w-full relative">
+      <div className="absolute inset-0 bg-gradient-to-b from-[#928dd3]/3 to-transparent pointer-events-none" />
       <div className="content-stretch flex flex-col gap-[24px] items-start py-[24px] px-[48px] relative shrink-0 w-full">
         <div className="content-stretch flex items-center justify-between relative shrink-0 w-full">
           <p className="font-['Chivo:Black',sans-serif] font-black leading-[40px] relative shrink-0 text-[34px] text-white tracking-[-0.34px] whitespace-nowrap">
             Settings
           </p>
-          <button className="bg-[#928dd3] content-stretch flex items-center justify-center px-[16px] py-[8px] relative rounded-[8px] shrink-0 hover:bg-[#7f7ab8] transition-colors">
+          <button className="bg-gradient-to-r from-[#928dd3] to-[#a89be6] content-stretch flex items-center justify-center px-[16px] py-[8px] relative rounded-[10px] shrink-0 hover:opacity-90 shadow-[0_0_15px_rgba(146,141,211,0.3)] hover:shadow-[0_0_25px_rgba(146,141,211,0.5)] transition-all duration-300">
             <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] relative shrink-0 text-[15px] text-black whitespace-nowrap" style={{ fontVariationSettings: "'wdth' 100" }}>
               Save Changes
             </p>
           </button>
         </div>
-        <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] relative shrink-0 text-[15px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
+        <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] relative shrink-0 text-[15px] text-white/50" style={{ fontVariationSettings: "'wdth' 100" }}>
           Manage your account and application preferences
         </p>
       </div>
@@ -345,14 +345,14 @@ export function Settings() {
           />
         </SettingsSection>
 
-        <div className="bg-black rounded-[16px] p-[24px] w-full relative border border-[#FF6B6B]">
-          <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] text-[17px] text-white mb-[8px]" style={{ fontVariationSettings: "'wdth' 100" }}>
+        <div className="glass-card rounded-[16px] p-[24px] w-full relative border border-[#ff6b6b]/30">
+          <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] text-[17px] text-white/90 mb-[8px]" style={{ fontVariationSettings: "'wdth' 100" }}>
             Danger Zone
           </p>
-          <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] text-[15px] text-[rgba(255,255,255,0.6)] mb-[16px]" style={{ fontVariationSettings: "'wdth' 100" }}>
+          <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] text-[15px] text-white/50 mb-[16px]" style={{ fontVariationSettings: "'wdth' 100" }}>
             Irreversible actions that affect your account
           </p>
-          <button className="bg-[#FF6B6B] content-stretch flex items-center justify-center px-[16px] py-[8px] relative rounded-[8px] hover:bg-[#ff5252] transition-colors">
+          <button className="bg-[#FF6B6B] content-stretch flex items-center justify-center px-[16px] py-[8px] relative rounded-[8px] hover:bg-[#ff5252] transition-colors shadow-[0_0_15px_rgba(255,107,107,0.3)]">
             <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] relative shrink-0 text-[15px] text-black whitespace-nowrap" style={{ fontVariationSettings: "'wdth' 100" }}>
               Delete Account
             </p>
