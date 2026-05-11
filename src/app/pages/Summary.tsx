@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { useOwner } from '../context/OwnerContext';
 import { summaryService, SummaryResponse } from '../../services/summaryService';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
@@ -59,6 +60,7 @@ function MetricCard({ title, value, subtitle, trend }: MetricCardProps) {
 
 export function Summary() {
   const { currentOwner } = useOwner();
+  const navigate = useNavigate();
   const [summary, setSummary] = useState<SummaryResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -110,7 +112,11 @@ export function Summary() {
             Financial overview for {currentOwner?.name}
           </p>
         </div>
-        <button className="bg-gradient-to-r from-[#928dd3] to-[#a89be6] content-stretch flex gap-2 items-center justify-center px-[16px] py-[8px] relative rounded-[10px] shrink-0 hover:opacity-100 shadow-[0_0_20px_rgba(146,141,211,0.3)] hover:shadow-[0_0_30px_rgba(146,141,211,0.5)] ring-1 ring-white/20 hover:ring-white/40 hover:-translate-y-0.5 active:scale-95 transition-all duration-300">
+        <button
+          type="button"
+          onClick={() => navigate('/reports')}
+          className="bg-gradient-to-r from-[#928dd3] to-[#a89be6] content-stretch flex gap-2 items-center justify-center px-[16px] py-[8px] relative rounded-[10px] shrink-0 hover:opacity-100 shadow-[0_0_20px_rgba(146,141,211,0.3)] hover:shadow-[0_0_30px_rgba(146,141,211,0.5)] ring-1 ring-white/20 hover:ring-white/40 hover:-translate-y-0.5 active:scale-95 transition-all duration-300"
+        >
           <Download size={18} className="text-black" />
           <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] relative shrink-0 text-[15px] text-black whitespace-nowrap" style={{ fontVariationSettings: "'wdth' 100" }}>
             Export Report
@@ -122,7 +128,7 @@ export function Summary() {
         <MetricCard 
           title="Total Collected This Month" 
           value={formatCurrency(summary.monthlyBreakdown.grossRevenue - summary.monthlyBreakdown.totalExpenses)}
-          subtitle={`Gross: ${formatCurrency(summary.monthlyBreakdown.grossRevenue)} — Expenses: ${formatCurrency(summary.monthlyBreakdown.totalExpenses)}`}
+          subtitle={`Gross: ${formatCurrency(summary.monthlyBreakdown.grossRevenue)} - Expenses: ${formatCurrency(summary.monthlyBreakdown.totalExpenses)}`}
         />
         <MetricCard 
           title="Unpaid Apartments"
