@@ -383,7 +383,7 @@ export function Apartments() {
             </div>
           </div>
 
-          <div className="dark:bg-[#928dd3]/5 light:bg-[#928dd3]/10 dark:border-[#928dd3]/20 light:border-[#928dd3]/30 rounded-lg p-3 w-fit dark:text-[#928dd3] light:text-[#7c6bc7] text-sm flex gap-4 mt-2">
+          <div className="dark:bg-[#928dd3]/10 light:bg-[#928dd3]/15 dark:border-[#928dd3]/30 light:border-[#928dd3]/40 rounded-lg p-3 w-fit dark:text-[#928dd3] light:text-[#6b5cb8] text-sm flex gap-4 mt-2">
             <p><strong className="font-bold">Click:</strong> Select one</p>
             <p><strong className="font-bold">Ctrl + Click:</strong> Select multiple</p>
             <p><strong className="font-bold">Shift + Click:</strong> Select range</p>
@@ -517,7 +517,7 @@ className={`absolute top-11 left-3 backdrop-blur-sm px-2 py-1 rounded text-xs fo
                             {/* Delete button */}
                             <button
                               onClick={(e) => handleDeleteClick(e, apt)}
-                              className="bg-black/40 hover:bg-[#ff6b6b]/80 backdrop-blur-sm p-1.5 rounded transition-colors text-[#ff6b6b] hover:text-primary"
+                              className="dark:bg-black/40 light:bg-black/20 hover:bg-[#ff6b6b]/80 backdrop-blur-sm p-1.5 rounded transition-colors text-[#ff6b6b] hover:text-primary"
                               title="Delete apartment"
                             >
                               <TrashIcon />
@@ -526,7 +526,7 @@ className={`absolute top-11 left-3 backdrop-blur-sm px-2 py-1 rounded text-xs fo
                         </div>
 
                         {/* Lower half: Details */}
-                        <div className="p-4 flex flex-col gap-3 flex-1 bg-[#1a1a1a] rounded-b-xl overflow-visible">
+                        <div className="p-4 flex flex-col gap-3 flex-1 dark:bg-[#1a1a1a] light:bg-gray-200 rounded-b-xl overflow-visible">
                           <div className="flex justify-between items-center border-b border-[rgba(255,255,255,0.05)] pb-2">
                             <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Tenant</span>
                             <span className="text-sm text-primary font-medium truncate max-w-[140px]" title={apt.tenant?.name || 'Vacant'}>
@@ -546,7 +546,7 @@ className={`absolute top-11 left-3 backdrop-blur-sm px-2 py-1 rounded text-xs fo
                                     <line x1="12" y1="16" x2="12.01" y2="16" />
                                   </svg>
                                   {/* Tooltip */}
-                                  <span className="absolute bottom-full right-0 mb-1.5 hidden group-hover:block bg-[#1a1a1a] border border-[#f87171]/30 text-[#f87171] text-xs px-2 py-1 rounded-lg whitespace-nowrap shadow-xl z-50 pointer-events-none">
+                                  <span className="absolute bottom-full right-0 mb-1.5 hidden group-hover:block dark:bg-[#1a1a1a] light:bg-gray-200 dark:border-[#f87171]/30 light:border-[#ef4444]/40 dark:text-[#f87171] light:text-[#dc2626] text-xs px-2 py-1 rounded-lg whitespace-nowrap shadow-xl z-50 pointer-events-none">
                                     Unpaid rent — payment is pending
                                   </span>
                                 </span>
@@ -569,7 +569,7 @@ className={`absolute top-11 left-3 backdrop-blur-sm px-2 py-1 rounded text-xs fo
                                     </svg>
                                   </button>
                                   {/* Tooltip */}
-                                  <span className="absolute bottom-full right-0 mb-1.5 hidden group-hover:block bg-[#1a1a1a] border border-[#f59e0b]/30 text-[#f59e0b] text-xs px-2 py-1 rounded-lg whitespace-nowrap shadow-xl z-50 pointer-events-none">
+                                  <span className="absolute bottom-full right-0 mb-1.5 hidden group-hover:block dark:bg-[#1a1a1a] light:bg-gray-200 dark:border-[#f59e0b]/30 light:border-[#d97706]/40 dark:text-[#f59e0b] light:text-[#b45309] text-xs px-2 py-1 rounded-lg whitespace-nowrap shadow-xl z-50 pointer-events-none">
                                     Changes due to expenses. See details
                                   </span>
                                 </span>
@@ -594,7 +594,7 @@ className={`absolute top-11 left-3 backdrop-blur-sm px-2 py-1 rounded text-xs fo
                   {/* Add New Apartment Card */}
                   <div 
                     onClick={() => handleAddClick(floorNum, getNextAvailableApartmentNumber(floorNum, sortedApartmentNumbers))}
-                    className="flex flex-col rounded-xl overflow-hidden border border-[#4ade80]/30 transition-all hover:scale-[1.02] bg-[#4ade80]/5 hover:bg-[#4ade80]/10 cursor-pointer min-h-[290px] items-center justify-center text-[#4ade80]"
+                    className="flex flex-col rounded-xl overflow-hidden border transition-all hover:scale-[1.02] dark:bg-[#4ade80]/10 light:bg-[#4ade80]/15 dark:border-[#4ade80]/30 light:border-[#4ade80]/50 cursor-pointer min-h-[290px] items-center justify-center dark:text-[#4ade80] light:text-[#16a34a]"
                     title={`Add apartment to floor ${floorNum}`}
                   >
                     <PlusIcon />
