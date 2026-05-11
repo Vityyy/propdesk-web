@@ -344,7 +344,7 @@ export function Apartments() {
     return (
       <div className="min-h-full w-full flex items-center justify-center relative">
         <div className="absolute inset-0 bg-gradient-to-b from-[#928dd3]/3 to-transparent pointer-events-none" />
-        <p className="text-white/50">Loading apartments...</p>
+        <p className="text-tertiary">Loading apartments...</p>
       </div>
     );
   }
@@ -356,29 +356,29 @@ export function Apartments() {
         <div className="flex flex-col gap-[12px] w-full">
           <button
             onClick={() => navigate('/properties')}
-            className="text-white/40 hover:text-white/70 transition-colors self-start mb-4"
+            className="text-tertiary hover:text-secondary transition-colors self-start mb-4"
           >
             ← Back to Properties
           </button>
 
           <div className="flex items-center justify-between w-full">
             <div>
-              <p className="font-['Chivo:Black',sans-serif] font-black leading-[40px] text-[34px] text-white tracking-[-0.34px]">
+              <p className="font-['Chivo:Black',sans-serif] font-black leading-[40px] text-[34px] text-primary tracking-[-0.34px]">
                 Apartments
               </p>
-              <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] text-[15px] text-white/50" style={{ fontVariationSettings: "'wdth' 100" }}>
+              <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] text-[15px] text-tertiary" style={{ fontVariationSettings: "'wdth' 100" }}>
                 {property ? `Managing ${property.name}` : 'Loading property data...'}
               </p>
             </div>
 
             <div className="flex items-center gap-2">
-              <label className="text-white/40 text-sm font-semibold">Floor:</label>
+              <label className="text-tertiary text-sm font-semibold">Floor:</label>
               <input
                 type="number"
                 placeholder="Search floor..."
                 value={floorSearch}
                 onChange={e => setFloorSearch(e.target.value)}
-                className="bg-white/[0.02] border border-white/[0.1] rounded-lg px-3 py-1.5 text-white placeholder-white/25 text-sm focus:outline-none focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]/30 transition-colors w-32"
+                className="bg-white/[0.02] border border-white/[0.1] rounded-lg px-3 py-1.5 text-primary placeholder-white/25 text-sm focus:outline-none focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]/30 transition-colors w-32"
               />
             </div>
           </div>
@@ -394,13 +394,13 @@ export function Apartments() {
       <div className="px-[48px] pb-[48px] flex flex-col gap-12 relative">
         {selectedApartments.size > 0 && (
           <div className="sticky top-[24px] z-40 glass-card border border-[#928dd3]/30 rounded-xl p-4 shadow-2xl flex items-center justify-between animate-in fade-in slide-in-from-top-4">
-            <span className="text-white/90 font-semibold">
+            <span className="text-primary font-semibold">
               {selectedApartments.size} apartment{selectedApartments.size !== 1 ? 's' : ''} selected
             </span>
             <div className="flex gap-3">
               <button
                 onClick={() => setSelectedApartments(new Set())}
-                className="px-4 py-2 border border-white/[0.1] text-white/70 hover:bg-white/[0.05] hover:text-white rounded-lg transition-colors text-sm font-semibold"
+                className="px-4 py-2 border border-white/[0.1] text-secondary hover:bg-white/[0.05] hover:text-primary rounded-lg transition-colors text-sm font-semibold"
               >
                 Cancel
               </button>
@@ -415,11 +415,11 @@ export function Apartments() {
         )}
         {sortedFloors.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-white/40">No floors or apartments registered for this property.</p>
+            <p className="text-tertiary">No floors or apartments registered for this property.</p>
           </div>
         ) : filteredFloors.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-white/40">No floors match your search.</p>
+            <p className="text-tertiary">No floors match your search.</p>
           </div>
         ) : (
           filteredFloors.map(floorNum => {
@@ -429,7 +429,7 @@ export function Apartments() {
 
             return (
               <div key={floorNum} className="flex flex-col gap-6">
-                <h3 className="font-['Chivo:Black',sans-serif] font-black text-2xl text-white/80">
+                <h3 className="font-['Chivo:Black',sans-serif] font-black text-2xl text-secondary">
                   Floor {floorNum}
                 </h3>
 
@@ -473,12 +473,12 @@ export function Apartments() {
                       >
                         {/* Upper half: Background color & Icon */}
                         <div className={`relative h-[140px] flex items-center justify-center overflow-hidden rounded-t-xl ${bgClass}`}>
-                          <div className={`text-white opacity-90 drop-shadow-md ${isVacant ? 'opacity-50' : ''}`}>
+                          <div className={`text-primary opacity-90 drop-shadow-md ${isVacant ? 'opacity-50' : ''}`}>
                             <UserIcon />
                           </div>
 
                           {/* Apt number badge */}
-                          <div className="absolute top-3 left-3 bg-black/40 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold text-white tracking-wide">
+                          <div className="absolute top-3 left-3 bg-black/40 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold text-primary tracking-wide">
                             APT {aptNum}
                           </div>
 
@@ -487,7 +487,7 @@ export function Apartments() {
                             onClick={(e) => handleTogglePaymentStatus(e, apt)}
                             disabled={isStatusUpdating || isVacant}
                             className={`absolute top-11 left-3 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold tracking-wide flex items-center gap-1 border transition-colors ${isVacant
-                              ? 'bg-white/10 border-white/20 text-white/40'
+                              ? 'bg-white/10 border-white/20 text-tertiary'
                               : isPaid
                                 ? 'bg-[#4ade80]/15 border-[#4ade80]/40 text-[#4ade80] hover:bg-[#4ade80]/25'
                                 : 'bg-[#f59e0b]/15 border-[#f59e0b]/40 text-[#f59e0b] hover:bg-[#f59e0b]/25'
@@ -509,7 +509,7 @@ export function Apartments() {
                             {/* Edit button */}
                             <button
                               onClick={(e) => handleEditClick(e, apt)}
-                              className="bg-black/40 hover:bg-black/70 backdrop-blur-sm p-1.5 rounded transition-colors text-white"
+                              className="bg-black/40 hover:bg-black/70 backdrop-blur-sm p-1.5 rounded transition-colors text-primary"
                               title="Edit apartment data"
                             >
                               <EditIcon />
@@ -517,7 +517,7 @@ export function Apartments() {
                             {/* Delete button */}
                             <button
                               onClick={(e) => handleDeleteClick(e, apt)}
-                              className="bg-black/40 hover:bg-[#ff6b6b]/80 backdrop-blur-sm p-1.5 rounded transition-colors text-[#ff6b6b] hover:text-white"
+                              className="bg-black/40 hover:bg-[#ff6b6b]/80 backdrop-blur-sm p-1.5 rounded transition-colors text-[#ff6b6b] hover:text-primary"
                               title="Delete apartment"
                             >
                               <TrashIcon />
@@ -529,7 +529,7 @@ export function Apartments() {
                         <div className="p-4 flex flex-col gap-3 flex-1 bg-[#1a1a1a] rounded-b-xl overflow-visible">
                           <div className="flex justify-between items-center border-b border-[rgba(255,255,255,0.05)] pb-2">
                             <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Tenant</span>
-                            <span className="text-sm text-white font-medium truncate max-w-[140px]" title={apt.tenant?.name || 'Vacant'}>
+                            <span className="text-sm text-primary font-medium truncate max-w-[140px]" title={apt.tenant?.name || 'Vacant'}>
                               {apt.tenant ? apt.tenant.name : <span className="text-[rgba(255,255,255,0.3)] italic">Vacant</span>}
                             </span>
                           </div>
@@ -579,12 +579,12 @@ export function Apartments() {
 
                           <div className="flex justify-between items-center">
                             <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Area</span>
-                            <span className="text-sm text-white">{apt.squareMeters} m²</span>
+                            <span className="text-sm text-primary">{apt.squareMeters} m²</span>
                           </div>
 
                           <div className="flex justify-between items-center mt-auto pt-2">
                             <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Due</span>
-                            <span className="text-sm text-white">{apt.dueDate || '-'}</span>
+                            <span className="text-sm text-primary">{apt.dueDate || '-'}</span>
                           </div>
                         </div>
                       </div>

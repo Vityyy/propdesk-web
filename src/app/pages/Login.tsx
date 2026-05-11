@@ -52,21 +52,21 @@ export function Login() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#928dd3]/8 blur-[150px] rounded-full pointer-events-none" />
       <div className="absolute bottom-20 right-20 w-[300px] h-[300px] bg-[#928dd3]/5 blur-[100px] rounded-full pointer-events-none" />
       
-      <div className="bg-[#0a0a0f]/90 border border-white/[0.08] relative w-full max-w-[480px] rounded-[24px] shadow-[0_8px_40px_rgba(0,0,0,0.6)] backdrop-blur-xl z-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
+      <div className="dark:bg-[#0a0a0f]/95 light:bg-white dark:border-white/[0.08] light:border-black/[0.08] relative w-full max-w-[480px] rounded-[24px] shadow-[0_8px_40px_rgba(0,0,0,0.6)] backdrop-blur-xl z-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
         <div className="absolute inset-0 rounded-[24px] bg-gradient-to-br from-[#928dd3]/5 via-transparent to-transparent" />
         <div className="content-stretch flex flex-col gap-[20px] p-[28px] relative">
           <div className="flex flex-col gap-[6px]">
-            <p className="font-['Chivo:Black',sans-serif] font-black leading-[40px] text-[34px] tracking-[-0.34px] text-white">
+            <p className="font-['Chivo:Black',sans-serif] font-black leading-[40px] text-[34px] tracking-[-0.34px] text-primary">
               Login
             </p>
-            <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] text-[15px] text-white/50" style={{ fontVariationSettings: "'wdth' 100" }}>
+            <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] text-[15px] text-tertiary" style={{ fontVariationSettings: "'wdth' 100" }}>
               Sign in to open your dashboard.
             </p>
           </div>
 
           <form className="flex flex-col gap-[14px]" onSubmit={onSubmit}>
             <label className="flex flex-col gap-[8px]" htmlFor="login-name">
-              <span className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white/80" style={{ fontVariationSettings: "'wdth' 100" }}>
+              <span className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-secondary" style={{ fontVariationSettings: "'wdth' 100" }}>
                 Username
               </span>
               <input
@@ -76,12 +76,12 @@ export function Login() {
                 value={name}
                 onChange={(event) => setName(event.target.value)}
                 placeholder="Enter your username"
-                className="h-[48px] rounded-[12px] border border-white/[0.08] bg-white/[0.02] px-[16px] text-white placeholder-white/25 outline-none focus:border-[#928dd3] focus:bg-white/[0.05] focus:shadow-[0_0_0_3px_rgba(146,141,211,0.15)] transition-all duration-300"
+                className="h-[48px] rounded-[12px] border border-[var(--glass-border)] dark:bg-[#151520] light:bg-gray-50 px-[16px] text-primary placeholder:text-[var(--text-tertiary)] outline-none focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]/30 transition-all duration-300"
               />
             </label>
 
             <label className="flex flex-col gap-[8px]" htmlFor="login-password">
-              <span className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white/80" style={{ fontVariationSettings: "'wdth' 100" }}>
+              <span className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-secondary" style={{ fontVariationSettings: "'wdth' 100" }}>
                 Password
               </span>
               <div className="relative">
@@ -92,7 +92,7 @@ export function Login() {
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   placeholder="Enter your password"
-                  className="h-[48px] w-full rounded-[12px] border border-white/[0.08] bg-white/[0.02] px-[16px] pr-[90px] text-white placeholder-white/25 outline-none focus:border-[#928dd3] focus:bg-white/[0.05] focus:shadow-[0_0_0_3px_rgba(146,141,211,0.15)] transition-all duration-300"
+                  className="h-[48px] w-full rounded-[12px] border border-[var(--glass-border)] dark:bg-[#151520] light:bg-gray-50 px-[16px] pr-[90px] text-primary placeholder:text-[var(--text-tertiary)] outline-none focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]/30 transition-all duration-300"
                 />
                 <button
                   type="button"
@@ -121,7 +121,7 @@ export function Login() {
               {isSubmitting ? "Signing in…" : "Sign in"}
             </button>
 
-            <p className="text-center text-[13px] text-white/50">
+            <p className="text-center text-[13px] text-tertiary">
               Don&apos;t have an account?{" "}
               <Link to="/register" className="text-[#928dd3] hover:text-[#a89be6] transition-colors">
                 Register here

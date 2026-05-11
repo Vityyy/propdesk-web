@@ -30,22 +30,22 @@ function MetricCard({ title, value, subtitle, trend }: MetricCardProps) {
       <div className="overflow-clip rounded-[inherit] size-full relative">
         <div className="content-stretch flex flex-col gap-[16px] items-start p-[24px] relative w-full h-full">
           <div className="content-stretch flex items-center justify-between relative shrink-0 w-full">
-            <p className="flex-[1_0_0] font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] min-h-px min-w-px overflow-hidden relative text-[17px] text-ellipsis text-white/80 whitespace-nowrap" style={{ fontVariationSettings: "'wdth' 100" }}>
+            <p className="flex-[1_0_0] font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] min-h-px min-w-px overflow-hidden relative text-[17px] text-ellipsis text-secondary whitespace-nowrap" style={{ fontVariationSettings: "'wdth' 100" }}>
               {title}
             </p>
-            <button className="text-white/30 hover:text-white/70 transition-colors">
+            <button className="text-tertiary hover:text-primary/70 transition-colors">
               <MoreHorizontal size={20} />
             </button>
           </div>
           <div className="content-stretch flex flex-col gap-[4px] items-start relative shrink-0 w-full">
-            <p className="font-['Chivo:Black',sans-serif] font-black leading-[40px] overflow-hidden relative shrink-0 text-[34px] text-ellipsis text-white tracking-[-0.34px] w-full whitespace-nowrap">{value}</p>
+            <p className="font-['Chivo:Black',sans-serif] font-black leading-[40px] overflow-hidden relative shrink-0 text-[34px] text-ellipsis text-primary tracking-[-0.34px] w-full whitespace-nowrap">{value}</p>
             {subtitle && (
               <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[16px] relative shrink-0 text-[#928dd3] text-[13px] w-full" style={{ fontVariationSettings: "'wdth' 100" }}>
                 {subtitle}
               </p>
             )}
             {trend && (
-              <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] relative shrink-0 text-white/50 text-[13px] w-full" style={{ fontVariationSettings: "'wdth' 100" }}>
+              <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] relative shrink-0 text-tertiary text-[13px] w-full" style={{ fontVariationSettings: "'wdth' 100" }}>
                 {trend}
               </p>
             )}
@@ -102,11 +102,11 @@ export function Summary() {
       {/* Header */}
       <div className="flex items-center justify-between py-8 px-12 relative">
         <div>
-          <h1 className="font-black text-4xl text-white tracking-tight flex items-center gap-3" style={{ fontFamily: "'Chivo', sans-serif" }}>
+          <h1 className="font-black text-4xl text-primary tracking-tight flex items-center gap-3" style={{ fontFamily: "'Chivo', sans-serif" }}>
             <LineChartIcon className="text-[#928dd3]" size={36} />
             Summary
           </h1>
-          <p className="text-white/40 text-sm mt-2 font-['Archivo:Medium',sans-serif]">
+          <p className="text-tertiary text-sm mt-2 font-['Archivo:Medium',sans-serif]">
             Financial overview for {currentOwner?.name}
           </p>
         </div>
@@ -144,10 +144,10 @@ export function Summary() {
             <div className="content-stretch flex flex-col gap-[24px] items-start p-[24px] relative w-full">
               <div className="content-stretch flex items-center justify-between relative shrink-0 w-full">
                 <div>
-                  <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] relative shrink-0 text-[17px] text-white/80 whitespace-nowrap mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
+                  <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] relative shrink-0 text-[17px] text-secondary whitespace-nowrap mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
                     Total Revenue vs Net Profit
                   </p>
-                  <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-white/50" style={{ fontVariationSettings: "'wdth' 100" }}>
+                  <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-tertiary" style={{ fontVariationSettings: "'wdth' 100" }}>
                     Monthly comparison over time
                   </p>
                 </div>
@@ -176,7 +176,7 @@ export function Summary() {
       </div>
 
       <div className="px-[48px] pb-[48px]">
-        <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] mb-[16px] text-[24px] text-white/80 tracking-[-0.24px]">
+        <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] mb-[16px] text-[24px] text-secondary tracking-[-0.24px]">
           Monthly Breakdown
         </p>
         <div className="flex gap-[24px] flex-wrap">
@@ -184,10 +184,10 @@ export function Summary() {
             <div className="absolute inset-0 bg-gradient-to-br from-[#928dd3]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-[16px]" />
             <div className="overflow-clip rounded-[inherit] size-full relative">
               <div className="content-stretch flex flex-col gap-[8px] items-start p-[24px] relative w-full">
-                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white/50" style={{ fontVariationSettings: "'wdth' 100" }}>
+                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-tertiary" style={{ fontVariationSettings: "'wdth' 100" }}>
                   Gross Revenue
                 </p>
-                <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] text-[24px] text-white tracking-[-0.24px]">
+                <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] text-[24px] text-primary tracking-[-0.24px]">
                   {formatCurrency(summary.monthlyBreakdown.grossRevenue)}
                 </p>
               </div>
@@ -199,10 +199,10 @@ export function Summary() {
             <div className="absolute inset-0 bg-gradient-to-br from-[#ff6b6b]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-[16px]" />
             <div className="overflow-clip rounded-[inherit] size-full relative">
               <div className="content-stretch flex flex-col gap-[8px] items-start p-[24px] relative w-full">
-                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white/50" style={{ fontVariationSettings: "'wdth' 100" }}>
+                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-tertiary" style={{ fontVariationSettings: "'wdth' 100" }}>
                   Expenses & Fees
                 </p>
-                <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] text-[24px] text-white tracking-[-0.24px]">
+                <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] text-[24px] text-primary tracking-[-0.24px]">
                   {formatCurrency(summary.monthlyBreakdown.totalExpenses)}
                 </p>
               </div>
@@ -214,10 +214,10 @@ export function Summary() {
             <div className="absolute inset-0 bg-gradient-to-br from-[#f59e0b]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-[16px]" />
             <div className="overflow-clip rounded-[inherit] size-full relative">
               <div className="content-stretch flex flex-col gap-[8px] items-start p-[24px] relative w-full">
-                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white/50" style={{ fontVariationSettings: "'wdth' 100" }}>
+                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-tertiary" style={{ fontVariationSettings: "'wdth' 100" }}>
                   Admin Commission {summary.monthlyBreakdown.grossRevenue > 0 ? `(${Math.round((summary.monthlyBreakdown.adminCommission / summary.monthlyBreakdown.grossRevenue) * 100)}%)` : ''}
                 </p>
-                <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] text-[24px] text-white tracking-[-0.24px]">
+                <p className="font-['Chivo:Black',sans-serif] font-black leading-[32px] text-[24px] text-primary tracking-[-0.24px]">
                   {formatCurrency(summary.monthlyBreakdown.adminCommission)}
                 </p>
               </div>

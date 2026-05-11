@@ -58,10 +58,10 @@ function SummaryCard({ summary, total }: { summary: CategorySummary; total: numb
         >
           {summary.category}
         </span>
-        <span className="text-white/40 text-xs font-['Archivo:Medium',sans-serif]">{summary.count} fee{summary.count !== 1 ? 's' : ''}</span>
+        <span className="text-tertiary text-xs font-['Archivo:Medium',sans-serif]">{summary.count} fee{summary.count !== 1 ? 's' : ''}</span>
       </div>
       <div className="relative z-10">
-        <p className="font-black text-[32px] leading-tight text-white tracking-tight" style={{ fontFamily: "'Chivo', sans-serif" }}>
+        <p className="font-black text-[32px] leading-tight text-primary tracking-tight" style={{ fontFamily: "'Chivo', sans-serif" }}>
           {formatCurrency(summary.total)}
         </p>
         <p className="text-xs font-semibold mt-1" style={{ color: style.color }}>
@@ -106,12 +106,12 @@ function FeeRow({
         </span>
       </div>
       <div className="flex-[2_0_0]">
-        <p className="text-sm text-white font-['Archivo:SemiBold',sans-serif] font-semibold">{fee.description}</p>
-        <p className="text-xs text-white/40 mt-1 font-['Archivo:Medium',sans-serif]">APT {aptNumber}</p>
+        <p className="text-sm text-primary font-['Archivo:SemiBold',sans-serif] font-semibold">{fee.description}</p>
+        <p className="text-xs text-tertiary mt-1 font-['Archivo:Medium',sans-serif]">APT {aptNumber}</p>
       </div>
       <div className="flex-[1_0_0]">
-        <p className="text-lg font-black text-white tracking-tight" style={{ fontFamily: "'Chivo', sans-serif" }}>
-          {formatCurrency(fee.amount)}<span className="text-white/40 text-xs font-['Archivo:Medium',sans-serif] ml-1 font-normal">/mo</span>
+        <p className="text-lg font-black text-primary tracking-tight" style={{ fontFamily: "'Chivo', sans-serif" }}>
+          {formatCurrency(fee.amount)}<span className="text-tertiary text-xs font-['Archivo:Medium',sans-serif] ml-1 font-normal">/mo</span>
         </p>
       </div>
       <div className="w-20 flex justify-end">
@@ -294,11 +294,11 @@ export function MaintenanceFees() {
       {/* Header */}
       <div className="flex items-center justify-between py-8 px-12 relative">
         <div>
-          <h1 className="font-black text-4xl text-white tracking-tight flex items-center gap-3" style={{ fontFamily: "'Chivo', sans-serif" }}>
+          <h1 className="font-black text-4xl text-primary tracking-tight flex items-center gap-3" style={{ fontFamily: "'Chivo', sans-serif" }}>
             <Wrench className="text-[#928dd3]" size={36} />
             Maintenance Fees
           </h1>
-          <p className="text-white/40 text-sm mt-2 font-['Archivo:Medium',sans-serif]">
+          <p className="text-tertiary text-sm mt-2 font-['Archivo:Medium',sans-serif]">
             Monthly recurring fees for {currentOwner?.name ?? ''}
           </p>
         </div>
@@ -308,7 +308,7 @@ export function MaintenanceFees() {
           <div className="flex items-center gap-3 px-6 py-4 rounded-[16px] glass-card border border-white/[0.06] shadow-lg backdrop-blur-md hover:border-[#928dd3]/30 transition-colors">
             <div>
               <p className="text-[#928dd3] text-[11px] font-bold uppercase tracking-widest mb-1">Total / month</p>
-              <p className="font-black text-3xl text-white tracking-tight" style={{ fontFamily: "'Chivo', sans-serif" }}>
+              <p className="font-black text-3xl text-primary tracking-tight" style={{ fontFamily: "'Chivo', sans-serif" }}>
                 {formatCurrency(grandTotal)}
               </p>
             </div>
@@ -350,10 +350,10 @@ export function MaintenanceFees() {
       ) : allFees.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-32 gap-4">
           <div className="w-20 h-20 rounded-full bg-white/[0.02] border border-white/10 flex items-center justify-center mb-2">
-            <Wrench className="text-white/20" size={40} />
+            <Wrench className="text-primary/20" size={40} />
           </div>
-          <p className="text-white/50 text-lg font-['Archivo:SemiBold',sans-serif]">No maintenance fees assigned yet.</p>
-          <p className="text-white/30 text-sm max-w-md text-center">Open an apartment's edit dialog and navigate to the Maintenance Fees tab to assign recurring fees.</p>
+          <p className="text-tertiary text-lg font-['Archivo:SemiBold',sans-serif]">No maintenance fees assigned yet.</p>
+          <p className="text-tertiary text-sm max-w-md text-center">Open an apartment's edit dialog and navigate to the Maintenance Fees tab to assign recurring fees.</p>
         </div>
       ) : (
         <>
@@ -388,14 +388,14 @@ export function MaintenanceFees() {
 
             {/* Table header */}
             <div className="flex items-center py-4 px-6 border-b border-white/[0.06] bg-white/[0.02]">
-              <p className="flex-[1_0_0] text-[11px] font-bold uppercase tracking-widest text-white/40">Category</p>
-              <p className="flex-[2_0_0] text-[11px] font-bold uppercase tracking-widest text-white/40">Description / Apartment</p>
-              <p className="flex-[1_0_0] text-[11px] font-bold uppercase tracking-widest text-white/40">Monthly Cost</p>
-              <p className="w-20 text-right text-[11px] font-bold uppercase tracking-widest text-white/40">Actions</p>
+              <p className="flex-[1_0_0] text-[11px] font-bold uppercase tracking-widest text-tertiary">Category</p>
+              <p className="flex-[2_0_0] text-[11px] font-bold uppercase tracking-widest text-tertiary">Description / Apartment</p>
+              <p className="flex-[1_0_0] text-[11px] font-bold uppercase tracking-widest text-tertiary">Monthly Cost</p>
+              <p className="w-20 text-right text-[11px] font-bold uppercase tracking-widest text-tertiary">Actions</p>
             </div>
 
             {displayedFees.length === 0 ? (
-              <div className="py-16 text-center text-white/30 text-sm">No fees in this category.</div>
+              <div className="py-16 text-center text-tertiary text-sm">No fees in this category.</div>
             ) : (
               displayedFees.map((fee) => (
                 <FeeRow
@@ -410,15 +410,15 @@ export function MaintenanceFees() {
 
             {/* Footer total */}
             <div className="flex items-center justify-between px-6 py-5 border-t border-white/[0.06] bg-white/[0.02]">
-              <p className="text-white/40 text-sm font-['Archivo:Medium',sans-serif]">
+              <p className="text-tertiary text-sm font-['Archivo:Medium',sans-serif]">
                 {displayedFees.length} fee{displayedFees.length !== 1 ? 's' : ''} shown
               </p>
-              <p className="font-['Archivo:SemiBold',sans-serif] font-semibold text-white/90 text-sm">
+              <p className="font-['Archivo:SemiBold',sans-serif] font-semibold text-primary/90 text-sm">
                 Subtotal:{' '}
                 <span className="text-[#928dd3] font-black text-lg ml-2" style={{ fontFamily: "'Chivo', sans-serif" }}>
                   {formatCurrency(displayedFees.reduce((s, f) => s + f.amount, 0))}
                 </span>
-                <span className="text-white/30 text-xs font-normal ml-1">/mo</span>
+                <span className="text-tertiary text-xs font-normal ml-1">/mo</span>
               </p>
             </div>
           </div>
