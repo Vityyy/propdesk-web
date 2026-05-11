@@ -109,8 +109,8 @@ export function TenantDetailsDialog({ isOpen, tenant, onClose }: TenantDetailsDi
 
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-[var(--bg-deep)] border border-[var(--glass-border)] rounded-[16px] max-w-lg w-full max-h-[80vh] overflow-y-auto shadow-[0_8px_30px_rgba(0,0,0,0.8)] relative z-10">
-        <div className="p-6 pb-5 border-b border-[var(--glass-border)] flex items-start justify-between sticky top-0 bg-[var(--bg-deep)] z-10">
+      <div className="dark:bg-[#0a0a0f] light:bg-white border border-[var(--glass-border)] rounded-[16px] max-w-lg w-full max-h-[80vh] overflow-y-auto shadow-[0_8px_30px_rgba(0,0,0,0.8)] relative z-10">
+        <div className="p-6 pb-5 border-b border-[var(--glass-border)] flex items-start justify-between sticky top-0 dark:bg-[#0a0a0f] light:bg-white z-10">
           <div className="flex gap-4 items-center">
             <div className="w-12 h-12 rounded-full bg-[#928dd3]/20 text-[#928dd3] flex items-center justify-center text-lg font-bold font-['Chivo:Black',sans-serif] shrink-0">
               {getInitials(tenant.name)}
@@ -135,7 +135,7 @@ export function TenantDetailsDialog({ isOpen, tenant, onClose }: TenantDetailsDi
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-[var(--text-secondary)] bg-[var(--bg-subtle)] rounded-full transition-colors hover:text-[var(--text-primary)] hover:bg-[var(--glass-border)] shadow-sm"
+            className="p-2 text-[var(--text-secondary)] dark:bg-[#151520] light:bg-gray-100 rounded-full transition-colors hover:text-[var(--text-primary)] light:hover:bg-gray-200 dark:hover:bg-[#252530] shadow-sm"
           >
             <X size={16} />
           </button>
@@ -167,7 +167,7 @@ export function TenantDetailsDialog({ isOpen, tenant, onClose }: TenantDetailsDi
               {apartments.map((apt, idx) => (
                 <div
                   key={idx}
-                  className="bg-[var(--bg-subtle)] border border-[var(--glass-border)] rounded-[16px] p-4 hover:border-[var(--glass-border-hover)] transition-colors"
+                  className="dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] rounded-[16px] p-4 hover:border-[var(--glass-border-hover)] transition-colors"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div>

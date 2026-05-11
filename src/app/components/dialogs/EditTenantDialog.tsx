@@ -129,13 +129,13 @@ export function EditTenantDialog({ isOpen, tenant, onClose, onSuccess }: EditTen
 
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-[var(--bg-deep)] border border-[var(--glass-border)] rounded-[24px] max-w-md w-full shadow-[0_8px_30px_rgba(0,0,0,0.8)] relative z-10 overflow-hidden">
+      <div className="dark:bg-[#0a0a0f] light:bg-white border border-[var(--glass-border)] rounded-[24px] max-w-md w-full shadow-[0_8px_30px_rgba(0,0,0,0.8)] relative z-10 overflow-hidden">
         <div className="p-6 border-b border-[var(--glass-border)] flex items-center justify-between">
           <h2 className="font-['Chivo:Black',sans-serif] font-black text-[24px] text-[var(--text-primary)]">Edit Tenant</h2>
           <button
             type="button"
             onClick={handleClose}
-            className="p-2 text-[var(--text-secondary)] bg-[var(--bg-subtle)] rounded-full transition-colors hover:text-[var(--text-primary)] hover:bg-[var(--glass-border)] shadow-sm"
+            className="p-2 text-[var(--text-secondary)] dark:bg-[#151520] light:bg-gray-100 rounded-full transition-colors hover:text-[var(--text-primary)] light:hover:bg-gray-200 dark:hover:bg-[#252530] shadow-sm"
           >
             <X size={20} />
           </button>
@@ -148,10 +148,10 @@ export function EditTenantDialog({ isOpen, tenant, onClose, onSuccess }: EditTen
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className={`w-full px-4 py-3 bg-[var(--bg-subtle)] border rounded-[12px] text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none transition-all duration-300 hover:border-[var(--glass-border)] ${
+              className={`w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border rounded-[12px] text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none transition-all duration-300 hover:border-[var(--glass-border)] ${
                 validationErrors.name
                   ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500'
-                  : 'border-[var(--glass-border)] focus:border-[#928dd3] focus:bg-[var(--bg-subtle)] focus:ring-1 focus:ring-[#928dd3]'
+                  : 'border-[var(--glass-border)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]'
               }`}
               disabled={loading}
             />
@@ -166,10 +166,10 @@ export function EditTenantDialog({ isOpen, tenant, onClose, onSuccess }: EditTen
               type="email"
               value={formData.email || ''}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className={`w-full px-4 py-3 bg-[var(--bg-subtle)] border rounded-[12px] text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none transition-all duration-300 hover:border-[var(--glass-border)] ${
+              className={`w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border rounded-[12px] text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none transition-all duration-300 hover:border-[var(--glass-border)] ${
                 validationErrors.email
                   ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500'
-                  : 'border-[var(--glass-border)] focus:border-[#928dd3] focus:bg-[var(--bg-subtle)] focus:ring-1 focus:ring-[#928dd3]'
+                  : 'border-[var(--glass-border)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]'
               }`}
               disabled={loading}
             />
@@ -184,10 +184,10 @@ export function EditTenantDialog({ isOpen, tenant, onClose, onSuccess }: EditTen
               type="tel"
               value={formData.phone || ''}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              className={`w-full px-4 py-3 bg-[var(--bg-subtle)] border rounded-[12px] text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none transition-all duration-300 hover:border-[var(--glass-border)] ${
+              className={`w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border rounded-[12px] text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none transition-all duration-300 hover:border-[var(--glass-border)] ${
                 validationErrors.phone
                   ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500'
-                  : 'border-[var(--glass-border)] focus:border-[#928dd3] focus:bg-[var(--bg-subtle)] focus:ring-1 focus:ring-[#928dd3]'
+                  : 'border-[var(--glass-border)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]'
               }`}
               disabled={loading}
             />

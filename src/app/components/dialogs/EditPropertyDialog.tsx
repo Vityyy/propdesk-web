@@ -86,7 +86,7 @@ export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: Edi
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0" onClick={handleClose} />
-      <div className="bg-subtle border border-[var(--glass-border)] rounded-[24px] max-w-2xl w-full shadow-[0_8px_30px_rgba(0,0,0,0.2)] relative z-10">
+      <div className="dark:bg-[#0a0a0f] light:bg-white border border-[var(--glass-border)] rounded-[24px] max-w-2xl w-full shadow-[0_8px_30px_rgba(0,0,0,0.2)] relative z-10">
         <div className="p-6 border-b border-[var(--glass-border)] flex items-center justify-between">
           <h2 className="font-['Chivo:Black',sans-serif] font-black text-[24px] text-primary">
             Edit Property
@@ -94,7 +94,7 @@ export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: Edi
           <button
             type="button"
             onClick={handleClose}
-            className="p-2 text-secondary hover:text-primary bg-white/[0.05] hover:bg-white/[0.1] rounded-full transition-colors"
+            className="p-2 text-secondary dark:bg-[#151520] light:bg-gray-100 rounded-full transition-colors"
           >
             <X size={20} />
           </button>
@@ -114,9 +114,9 @@ export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: Edi
                   setValidationErrors({ ...validationErrors, name: '' });
                 }
               }}
-              className={`w-full px-4 py-3 bg-white/[0.03] border rounded-[12px] text-primary placeholder:text-tertiary transition-all duration-300 outline-none ${validationErrors.name
+              className={`w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border rounded-[12px] text-primary placeholder:text-tertiary transition-all duration-300 outline-none ${validationErrors.name
                   ? 'border-[#ff6b6b] focus:border-[#ff6b6b] focus:ring-1 focus:ring-[#ff6b6b]'
-                  : 'border-[var(--glass-border)] focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3]'
+                  : 'border-[var(--glass-border)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]'
                 }`}
               placeholder="Property Name"
             />
@@ -138,9 +138,9 @@ export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: Edi
                   setValidationErrors({ ...validationErrors, address: '' });
                 }
               }}
-              className={`w-full px-4 py-3 bg-white/[0.03] border rounded-[12px] text-primary placeholder:text-tertiary transition-all duration-300 outline-none ${validationErrors.address
+              className={`w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border rounded-[12px] text-primary placeholder:text-tertiary transition-all duration-300 outline-none ${validationErrors.address
                   ? 'border-[#ff6b6b] focus:border-[#ff6b6b] focus:ring-1 focus:ring-[#ff6b6b]'
-                  : 'border-[var(--glass-border)] focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3]'
+                  : 'border-[var(--glass-border)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]'
                 }`}
               placeholder="Property Address"
             />
@@ -162,9 +162,9 @@ export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: Edi
                   setValidationErrors({ ...validationErrors, imageUrl: '' });
                 }
               }}
-              className={`w-full px-4 py-3 bg-white/[0.03] border rounded-[12px] text-primary placeholder:text-tertiary transition-all duration-300 outline-none ${validationErrors.imageUrl
+              className={`w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border rounded-[12px] text-primary placeholder:text-tertiary transition-all duration-300 outline-none ${validationErrors.imageUrl
                   ? 'border-[#ff6b6b] focus:border-[#ff6b6b] focus:ring-1 focus:ring-[#ff6b6b]'
-                  : 'border-[var(--glass-border)] focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3]'
+                  : 'border-[var(--glass-border)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]'
                 }`}
               placeholder="https://example.com/property.jpg"
             />

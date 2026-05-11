@@ -35,7 +35,7 @@ export function ConfirmDeleteDialog({
 
   return (
     <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-subtle border border-[#ff6b6b]/30 rounded-2xl max-w-sm w-full shadow-2xl overflow-hidden">
+      <div className="dark:bg-[#0a0a0f] light:bg-white border border-[#ff6b6b]/30 rounded-2xl max-w-sm w-full shadow-2xl overflow-hidden">
         <div className="p-6 pb-0 flex flex-col items-center text-center">
           <div className="w-16 h-16 rounded-full bg-[#ff6b6b]/10 flex items-center justify-center mb-4 text-[#ff6b6b]">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

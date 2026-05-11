@@ -161,7 +161,7 @@ function ApartmentDataSection({
         <input
           type="number" step="0.01" value={rent}
           onChange={e => setRent(e.target.value)}
-          className="w-full px-4 py-3 bg-[var(--bg-subtle)] border border-[var(--glass-border)] focus:border-[#928dd3] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
+          className="w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] focus:border-[#928dd3] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
           placeholder="e.g. 1500.00"
         />
       </div>
@@ -170,7 +170,7 @@ function ApartmentDataSection({
         <input
           type="number" step="0.01" value={sqm}
           onChange={e => setSqm(e.target.value)}
-          className="w-full px-4 py-3 bg-[var(--bg-subtle)] border border-[var(--glass-border)] focus:border-[#928dd3] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
+          className="w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] focus:border-[#928dd3] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
           placeholder="e.g. 45.5"
         />
       </div>
@@ -182,7 +182,7 @@ function ApartmentDataSection({
           type="date"
           value={dueDate}
           onChange={e => setDueDate(e.target.value)}
-          className="w-full px-4 py-3 bg-[var(--bg-subtle)] border border-[var(--glass-border)] focus:border-[#928dd3] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-colors focus:outline-none [&::-webkit-calendar-picker-indicator]:opacity-40 [&::-webkit-calendar-picker-indicator]:p-1 [&::-webkit-calendar-picker-indicator]:rounded-md [&::-webkit-calendar-picker-indicator]:transition-all hover:[&::-webkit-calendar-picker-indicator]:opacity-100 hover:[&::-webkit-calendar-picker-indicator]:bg-[var(--bg-subtle)] hover:[&::-webkit-calendar-picker-indicator]:scale-110 hover:[&::-webkit-calendar-picker-indicator]:cursor-pointer"
+          className="w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] focus:border-[#928dd3] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
         />
       </div>
       <button
@@ -430,7 +430,7 @@ function TenantSection({
             <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Full Name *</label>
             <input
               type="text" value={name} onChange={e => setName(e.target.value)}
-              className="w-full px-4 py-3 bg-[var(--bg-subtle)] border border-[var(--glass-border)] focus:border-[#4ade80] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
+              className="w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] focus:border-[#4ade80] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
               placeholder="Tenant name"
             />
           </div>
@@ -439,7 +439,7 @@ function TenantSection({
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Phone</label>
               <input
                 type="tel" value={phone} onChange={e => setPhone(e.target.value)}
-                className="w-full px-4 py-3 bg-[var(--bg-subtle)] border border-[var(--glass-border)] focus:border-[#4ade80] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
+                className="w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] focus:border-[#4ade80] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
                 placeholder="+54 11 ..."
               />
             </div>
@@ -447,7 +447,7 @@ function TenantSection({
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Email (optional)</label>
               <input
                 type="email" value={email} onChange={e => setEmail(e.target.value)}
-                className="w-full px-4 py-3 bg-[var(--bg-subtle)] border border-[var(--glass-border)] focus:border-[#4ade80] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
+                className="w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] focus:border-[#4ade80] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
                 placeholder="email@example.com"
               />
             </div>
@@ -460,7 +460,7 @@ function TenantSection({
               type="date"
               value={dueDate}
               onChange={e => setDueDate(e.target.value)}
-              className="w-full px-4 py-3 bg-[var(--bg-subtle)] border border-[var(--glass-border)] focus:border-[#4ade80] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-colors focus:outline-none [&::-webkit-calendar-picker-indicator]:opacity-40 [&::-webkit-calendar-picker-indicator]:p-1 [&::-webkit-calendar-picker-indicator]:rounded-md [&::-webkit-calendar-picker-indicator]:transition-all hover:[&::-webkit-calendar-picker-indicator]:opacity-100 hover:[&::-webkit-calendar-picker-indicator]:bg-[var(--bg-subtle)] hover:[&::-webkit-calendar-picker-indicator]:scale-110 hover:[&::-webkit-calendar-picker-indicator]:cursor-pointer"
+              className="w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] focus:border-[#4ade80] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
             />
           </div>
 
@@ -481,7 +481,7 @@ function TenantSection({
                   type="text"
                   value={floorRanges}
                   onChange={(e) => setFloorRanges(e.target.value)}
-                  className="w-full px-3 py-2 bg-[var(--bg-subtle)] border border-[var(--glass-border)] rounded-lg text-[var(--text-primary)] text-sm focus:outline-none focus:border-[var(--glass-border-hover)]"
+                  className="w-full px-3 py-2 dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] rounded-lg text-[var(--text-primary)] text-sm focus:outline-none focus:border-[var(--glass-border-hover)]"
                   placeholder="1-5, 9"
                 />
               </div>
@@ -491,7 +491,7 @@ function TenantSection({
                   type="text"
                   value={apartmentRanges}
                   onChange={(e) => setApartmentRanges(e.target.value)}
-                  className="w-full px-3 py-2 bg-[var(--bg-subtle)] border border-[var(--glass-border)] rounded-lg text-[var(--text-primary)] text-sm focus:outline-none focus:border-[var(--glass-border-hover)]"
+                  className="w-full px-3 py-2 dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] rounded-lg text-[var(--text-primary)] text-sm focus:outline-none focus:border-[var(--glass-border-hover)]"
                   placeholder="1-4, 8, 10"
                 />
               </div>
@@ -634,7 +634,7 @@ function ExpensesSection({
           <label className="block text-xs text-[var(--text-tertiary)] mb-1">Amount ($)</label>
           <input
             type="number" step="0.01" value={amount} onChange={e => setAmount(e.target.value)}
-            className="w-full px-3 py-2.5 bg-[var(--bg-subtle)] border border-[var(--glass-border)] focus:border-[#f59e0b] rounded-lg text-[var(--text-primary)] text-sm placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
+            className="w-full px-3 py-2.5 dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] focus:border-[#f59e0b] rounded-lg text-[var(--text-primary)] text-sm placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
             placeholder="0.00"
           />
         </div>
@@ -642,7 +642,7 @@ function ExpensesSection({
           <label className="block text-xs text-[var(--text-tertiary)] mb-1">Description</label>
           <input
             type="text" value={description} onChange={e => setDescription(e.target.value)}
-            className="w-full px-3 py-2.5 bg-[var(--bg-subtle)] border border-[var(--glass-border)] focus:border-[#f59e0b] rounded-lg text-[var(--text-primary)] text-sm placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
+            className="w-full px-3 py-2.5 dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] focus:border-[#f59e0b] rounded-lg text-[var(--text-primary)] text-sm placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
             placeholder="e.g. Plumbing repair"
           />
         </div>
@@ -773,7 +773,7 @@ function MaintenanceFeesSection({
           <label className="block text-xs text-[var(--text-tertiary)] mb-1">Category</label>
           <select
             value={category} onChange={e => setCategory(e.target.value)}
-            className="w-full px-3 py-2.5 bg-[var(--bg-subtle)] border border-[var(--glass-border)] focus:border-[#38bdf8] rounded-lg text-[var(--text-primary)] text-sm transition-colors focus:outline-none"
+            className="w-full px-3 py-2.5 dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] focus:border-[#38bdf8] rounded-lg text-[var(--text-primary)] text-sm transition-colors focus:outline-none"
           >
             <option value="GENERAL">General</option>
             <option value="CLEANING">Cleaning</option>
@@ -785,7 +785,7 @@ function MaintenanceFeesSection({
           <label className="block text-xs text-[var(--text-tertiary)] mb-1">Monthly Amount ($)</label>
           <input
             type="number" step="0.01" value={amount} onChange={e => setAmount(e.target.value)}
-            className="w-full px-3 py-2.5 bg-[var(--bg-subtle)] border border-[var(--glass-border)] focus:border-[#38bdf8] rounded-lg text-[var(--text-primary)] text-sm placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
+            className="w-full px-3 py-2.5 dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] focus:border-[#38bdf8] rounded-lg text-[var(--text-primary)] text-sm placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
             placeholder="0.00"
           />
         </div>
@@ -794,7 +794,7 @@ function MaintenanceFeesSection({
         <label className="block text-xs text-[var(--text-tertiary)] mb-1">Description</label>
         <input
           type="text" value={description} onChange={e => setDescription(e.target.value)}
-          className="w-full px-3 py-2.5 bg-[var(--bg-subtle)] border border-[var(--glass-border)] focus:border-[#38bdf8] rounded-lg text-[var(--text-primary)] text-sm placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
+          className="w-full px-3 py-2.5 dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] focus:border-[#38bdf8] rounded-lg text-[var(--text-primary)] text-sm placeholder-[var(--text-tertiary)] transition-colors focus:outline-none"
           placeholder="e.g. Monthly hallway cleaning"
         />
       </div>
@@ -834,9 +834,9 @@ export function EditApartmentTabsDialog({
 
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-[var(--bg-deep)] border border-[var(--glass-border)] rounded-[24px] w-full max-w-lg shadow-[0_8px_30px_rgba(0,0,0,0.8)] flex flex-col max-h-[90vh] relative z-10">
+      <div className="dark:bg-[#0a0a0f] light:bg-white border border-[var(--glass-border)] rounded-[24px] w-full max-w-lg shadow-[0_8px_30px_rgba(0,0,0,0.8)] flex flex-col max-h-[90vh] relative z-10">
         {/* Header */}
-        <div className="p-6 border-b border-[var(--glass-border)] flex items-center justify-between shrink-0">
+        <div className="p-6 border-b border-[var(--glass-border)] flex items-center justify-between shrink-0 dark:bg-[#0a0a0f] light:bg-white">
           <div>
             <h2 className="font-black text-2xl text-[var(--text-primary)]" style={{ fontFamily: "'Chivo', sans-serif" }}>
               Edit Apartment
@@ -845,7 +845,7 @@ export function EditApartmentTabsDialog({
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-[var(--text-secondary)] bg-[var(--bg-subtle)] rounded-full transition-colors hover:text-[var(--text-primary)] hover:bg-[var(--glass-border)] shadow-sm"
+            className="p-2 text-[var(--text-secondary)] dark:bg-[#151520] light:bg-gray-100 rounded-full transition-colors hover:text-[var(--text-primary)] light:hover:bg-gray-200 dark:hover:bg-[#252530] shadow-sm"
           >
             <X size={20} />
           </button>

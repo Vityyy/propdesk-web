@@ -172,8 +172,8 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
       <div className="absolute inset-0" onClick={handleClose} />
-      <div className="bg-subtle border border-[var(--glass-border)] rounded-[24px] max-w-4xl w-full my-8 shadow-[0_8px_30px_rgba(0,0,0,0.2)] relative z-10">
-        <div className="p-6 border-b border-[var(--glass-border)] flex items-center justify-between sticky top-0 bg-subtle z-10 rounded-t-[24px]">
+      <div className="dark:bg-[#0a0a0f] light:bg-white border border-[var(--glass-border)] rounded-[24px] max-w-4xl w-full my-8 shadow-[0_8px_30px_rgba(0,0,0,0.2)] relative z-10">
+        <div className="p-6 border-b border-[var(--glass-border)] flex items-center justify-between sticky top-0 dark:bg-[#0a0a0f] light:bg-white z-10 rounded-t-[24px]">
           <h2 className="font-['Chivo:Black',sans-serif] font-black text-[24px] text-primary">
             Create property
           </h2>
@@ -182,7 +182,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
             onClick={handleClose}
             disabled={isSubmitting}
             aria-disabled={isSubmitting}
-            className={`p-2 text-secondary bg-white/[0.05] rounded-full transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:text-primary hover:bg-white/[0.1]'}`}
+            className={`p-2 text-secondary dark:bg-[#151520] light:bg-gray-100 rounded-full transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             <X size={20} />
           </button>
@@ -205,7 +205,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   disabled={isSubmitting}
-                  className="w-full px-4 py-3 bg-white/[0.03] border border-[var(--glass-border)] focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[12px] text-primary placeholder:text-tertiary transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[12px] text-primary placeholder:text-tertiary transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   placeholder="e.g. Sunset Apartments"
                 />
               </div>
@@ -219,7 +219,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   disabled={isSubmitting}
-                  className="w-full px-4 py-3 bg-white/[0.03] border border-[var(--glass-border)] focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[12px] text-primary placeholder:text-tertiary transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[12px] text-primary placeholder:text-tertiary transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   placeholder="e.g. 123 Main St, City, State"
                 />
               </div>
@@ -234,7 +234,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                 value={formData.imageUrl}
                 onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
                 disabled={isSubmitting}
-                className="w-full px-4 py-3 bg-white/[0.03] border border-[var(--glass-border)] focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[12px] text-primary placeholder:text-tertiary transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[12px] text-primary placeholder:text-tertiary transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="https://..."
               />
             </div>
@@ -276,7 +276,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                         value={rule.floorRanges}
                         onChange={(e) => updateRule(rule.id, 'floorRanges', e.target.value)}
                         disabled={isSubmitting}
-                        className="w-full px-4 py-2 bg-white/[0.03] border border-[var(--glass-border)] focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[8px] text-primary text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full px-4 py-2 dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[8px] text-primary text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                         placeholder="e.g. 1-5, 9, 11"
                       />
                     </div>
@@ -290,7 +290,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                         value={rule.apartmentNumberRanges}
                         onChange={(e) => updateRule(rule.id, 'apartmentNumberRanges', e.target.value)}
                         disabled={isSubmitting}
-                        className="w-full px-4 py-2 bg-white/[0.03] border border-[var(--glass-border)] focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[8px] text-primary text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full px-4 py-2 dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[8px] text-primary text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                         placeholder="e.g. 1-4, 8, 10"
                       />
                     </div>
@@ -305,7 +305,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                         onChange={(e) => updateRule(rule.id, 'squareMeters', e.target.value)}
                         min="1"
                         disabled={isSubmitting}
-                        className="w-full px-4 py-2 bg-white/[0.03] border border-[var(--glass-border)] focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[8px] text-primary text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full px-4 py-2 dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[8px] text-primary text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                         placeholder="e.g. 45"
                       />
                     </div>
@@ -320,7 +320,7 @@ export function CreatePropertyDialog({ isOpen, onClose, onSuccess }: CreatePrope
                         onChange={(e) => updateRule(rule.id, 'rentValue', e.target.value)}
                         min="0"
                         disabled={isSubmitting}
-                        className="w-full px-4 py-2 bg-white/[0.03] border border-[var(--glass-border)] focus:border-[#928dd3] focus:bg-white/[0.05] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[8px] text-primary text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full px-4 py-2 dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[8px] text-primary text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                         placeholder="e.g. 1500"
                       />
                     </div>

@@ -32,7 +32,7 @@ export function PropertyDetailsDialog({ isOpen, property, metrics, onClose }: Pr
       {/* Clicking outside closes dialog */}
       <div className="absolute inset-0" onClick={onClose} />
       
-      <div className="bg-subtle border border-[var(--glass-border)] rounded-[24px] max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.2)] relative z-10 flex flex-col">
+      <div className="dark:bg-[#0a0a0f] light:bg-white border border-[var(--glass-border)] rounded-[24px] max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.2)] relative z-10 flex flex-col">
         
         {/* Header Image Banner */}
         <div className="relative w-full h-[240px] shrink-0">

@@ -85,7 +85,7 @@ export function ApartmentFormDialog({
 
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-[var(--bg-deep)] border border-[var(--glass-border)] rounded-[24px] max-w-md w-full shadow-[0_8px_30px_rgba(0,0,0,0.8)] relative z-10">
+      <div className="dark:bg-[#0a0a0f] light:bg-white border border-[var(--glass-border)] rounded-[24px] max-w-md w-full shadow-[0_8px_30px_rgba(0,0,0,0.8)] relative z-10">
         <div className="p-6 border-b border-[var(--glass-border)] flex items-center justify-between">
           <div>
             <h2 className="font-['Chivo:Black',sans-serif] font-black text-2xl text-[var(--text-primary)]">
@@ -98,7 +98,7 @@ export function ApartmentFormDialog({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-[var(--text-secondary)] bg-[var(--bg-subtle)] rounded-full transition-colors hover:text-[var(--text-primary)] hover:bg-[var(--glass-border)] shadow-sm"
+            className="p-2 text-[var(--text-secondary)] dark:bg-[#151520] light:bg-gray-100 rounded-full transition-colors hover:text-[var(--text-primary)] light:hover:bg-gray-200 dark:hover:bg-[#252530] shadow-sm"
           >
             <X size={20} />
           </button>
@@ -127,7 +127,7 @@ export function ApartmentFormDialog({
               required={isAddMode}
               value={formData.rent}
               onChange={(e) => setFormData({ ...formData, rent: e.target.value })}
-              className="w-full px-4 py-3 bg-[var(--bg-subtle)] border border-[var(--glass-border)] hover:border-[var(--glass-border-hover)] focus:border-[#928dd3] focus:bg-[var(--bg-subtle)] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[12px] text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-all duration-300"
+              className="w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] hover:border-[var(--glass-border-hover)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[12px] text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-all duration-300"
               placeholder={isBulk ? 'Leave blank to keep unchanged' : 'e.g., 1500.00'}
             />
           </div>
@@ -142,7 +142,7 @@ export function ApartmentFormDialog({
               required={isAddMode}
               value={formData.squareMeters}
               onChange={(e) => setFormData({ ...formData, squareMeters: e.target.value })}
-              className="w-full px-4 py-3 bg-[var(--bg-subtle)] border border-[var(--glass-border)] hover:border-[var(--glass-border-hover)] focus:border-[#928dd3] focus:bg-[var(--bg-subtle)] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[12px] text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-all duration-300"
+              className="w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] hover:border-[var(--glass-border-hover)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3] outline-none rounded-[12px] text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-all duration-300"
               placeholder={isBulk ? 'Leave blank to keep unchanged' : 'e.g., 45.5'}
             />
           </div>
