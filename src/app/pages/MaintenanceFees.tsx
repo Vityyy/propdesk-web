@@ -6,6 +6,7 @@ import userService, {
   ApartmentGridResponse,
   OwnerApartmentsGridResponse,
 } from '../../services/userService';
+import { getMockOwnerGrid, isMockEnabled } from "../../utils/mockApi";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -226,7 +227,10 @@ export function MaintenanceFees() {
     const fetchFees = async () => {
       setLoading(true);
       try {
-        const ownerGrid: OwnerApartmentsGridResponse = await userService.getOwnerApartmentsGrid(currentOwner.id, { forceRefresh: true });
+        let ownerGrid: OwnerApartmentsGridResponse = await userService.getOwnerApartmentsGrid(currentOwner.id, { forceRefresh: true });
+        if (isMockEnabled() && Object.keys(ownerGrid).length === 0) {
+          ownerGrid = getMockOwnerGrid();
+        }
 
         const fees: FeeWithContext[] = [];
         Object.entries(ownerGrid).forEach(([propertyId, floorMap]) => {

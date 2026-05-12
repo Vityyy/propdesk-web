@@ -688,3 +688,5 @@ export const getMockResponse = <T>(url: string, method: string, body?: unknown):
   return undefined;
 };
 
+export const getMockOwnerGrid = (): OwnerApartmentsGridResponse => clone(mockOwnerGrid);
+
