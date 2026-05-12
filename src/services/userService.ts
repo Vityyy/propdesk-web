@@ -1,6 +1,7 @@
 import { API_ENDPOINTS } from "../config/api";
 import authService from "./authService";
 import { ApiError, apiRequest } from "../utils/httpUtils";
+import { isMockEnabled } from "../utils/mockApi";
 
 export interface PropertyCreateRequest {
   name: string;
@@ -155,6 +156,9 @@ export interface ExpenseResponse {
 const getRequiredToken = (): string => {
   const token = authService.getToken();
   if (!token) {
+    if (isMockEnabled()) {
+      return "mock-token";
+    }
     throw new ApiError("No authentication token", 401);
   }
   return token;

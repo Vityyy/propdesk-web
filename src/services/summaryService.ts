@@ -1,6 +1,7 @@
 import { API_BASE_URL } from "../config/api";
 import { apiRequest } from "../utils/httpUtils";
 import authService from "./authService";
+import { isMockEnabled } from "../utils/mockApi";
 
 export interface SummaryBreakdownData {
     grossRevenue: number;
@@ -30,6 +31,9 @@ export interface SummaryResponse {
 const getRequiredToken = (): string => {
     const token = authService.getToken();
     if (!token) {
+        if (isMockEnabled()) {
+            return "mock-token";
+        }
         throw new Error("No authentication token");
     }
     return token;

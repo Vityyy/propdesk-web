@@ -1,4 +1,5 @@
 import { COMMON_HEADERS } from "../config/api";
+import { getMockResponse, isMockEnabled } from "./mockApi";
 
 export class ApiError extends Error {
   status: number;
@@ -28,6 +29,13 @@ export async function apiRequest<T>(
   url: string,
   { method = "GET", body, headers = {}, token, signal, credentials, allowNoContent = false }: ApiRequestOptions = {},
 ): Promise<T> {
+  if (isMockEnabled()) {
+    const mockPayload = getMockResponse<T>(url, method, body);
+    if (mockPayload !== undefined) {
+      return mockPayload;
+    }
+  }
+
   const finalHeaders: Record<string, string> = {
     ...COMMON_HEADERS,
     ...headers,
