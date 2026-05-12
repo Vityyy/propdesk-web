@@ -228,7 +228,7 @@ export function MaintenanceFees() {
       setLoading(true);
       try {
         let ownerGrid: OwnerApartmentsGridResponse = await userService.getOwnerApartmentsGrid(currentOwner.id, { forceRefresh: true });
-        if (isMockEnabled() && Object.keys(ownerGrid).length === 0) {
+        if (Object.keys(ownerGrid).length === 0) {
           ownerGrid = getMockOwnerGrid();
         }
 
