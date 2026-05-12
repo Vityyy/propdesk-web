@@ -86,7 +86,7 @@ export function Apartments() {
   const property = properties.find(p => p.id === propertyId);
 
   // Convert the Record<number, Record<number, ApartmentGridResponse>> to sorted arrays for rendering
-  const sortedFloors = gridData 
+  const sortedFloors = gridData
     ? Object.keys(gridData).map(Number).filter(n => !isNaN(n)).sort((a, b) => a - b)
     : [];
 
@@ -134,7 +134,7 @@ export function Apartments() {
       // Find indices
       const startIdx = flattenedApartments.findIndex(a => a.id === lastSelectedId);
       const endIdx = flattenedApartments.findIndex(a => a.id === apt.id);
-      
+
       if (startIdx !== -1 && endIdx !== -1) {
         const min = Math.min(startIdx, endIdx);
         const max = Math.max(startIdx, endIdx);
@@ -150,9 +150,14 @@ export function Apartments() {
       }
       setLastSelectedId(apt.id);
     } else {
-      newSelected.clear();
-      newSelected.add(apt.id);
-      setLastSelectedId(apt.id);
+      if (newSelected.has(apt.id) && newSelected.size === 1) {
+        newSelected.clear();
+        setLastSelectedId(null);
+      } else {
+        newSelected.clear();
+        newSelected.add(apt.id);
+        setLastSelectedId(apt.id);
+      }
     }
 
     setSelectedApartments(newSelected);
@@ -188,6 +193,19 @@ export function Apartments() {
     setAddDialogFloor(floor);
     setAddDialogNextNumber(nextNum);
     setIsAddDialogOpen(true);
+  };
+
+  const getNextAvailableApartmentNumber = (floor: number, apartmentNumbers: number[]) => {
+    const usedNumbers = new Set(apartmentNumbers);
+    const floorBasedStart = floor * 100 + 1;
+    const usesFloorBasedNumbers = apartmentNumbers.some(num => num >= floorBasedStart && num < floorBasedStart + 100);
+    let candidate = usesFloorBasedNumbers ? floorBasedStart : 1;
+
+    while (usedNumbers.has(candidate)) {
+      candidate += 1;
+    }
+
+    return candidate;
   };
 
   const patchApartmentInGrid = (apartmentId: string, changes: Partial<ApartmentGridResponse>): boolean => {
@@ -271,10 +289,10 @@ export function Apartments() {
           const numericKey = Number(numberKey);
           nextApartmentsByNumber[numericKey] = apartmentData.id === apt.id
             ? {
-                ...apartmentData,
-                paymentStatus: nextStatus,
-                dueDate: nextDueDate,
-              }
+              ...apartmentData,
+              paymentStatus: nextStatus,
+              dueDate: nextDueDate,
+            }
             : apartmentData;
         });
         nextGrid[Number(floorKey)] = nextApartmentsByNumber;
@@ -324,75 +342,71 @@ export function Apartments() {
 
   if (loading) {
     return (
-      <div className="bg-black min-h-full w-full flex items-center justify-center">
-        <p className="text-white">Loading apartments...</p>
+      <div className="min-h-full w-full flex items-center justify-center relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#928dd3]/3 to-transparent pointer-events-none" />
+        <p className="text-tertiary">Loading apartments...</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-black min-h-full w-full">
+    <div className="min-h-full w-full relative">
+      <div className="absolute inset-0 bg-gradient-to-b from-[#928dd3]/3 to-transparent pointer-events-none" />
       <div className="content-stretch flex flex-col gap-[24px] items-start py-[24px] px-[48px] relative shrink-0 w-full">
         <div className="flex flex-col gap-[12px] w-full">
-          <button 
+          <button
             onClick={() => navigate('/properties')}
-            className="text-[rgba(255,255,255,0.6)] hover:text-white transition-colors self-start mb-4"
+            className="text-tertiary hover:text-secondary transition-colors self-start mb-4"
           >
             ← Back to Properties
           </button>
-          
+
           <div className="flex items-center justify-between w-full">
             <div>
-              <p className="font-['Chivo:Black',sans-serif] font-black leading-[40px] text-[34px] text-white tracking-[-0.34px]">
+              <p className="font-['Chivo:Black',sans-serif] font-black leading-[40px] text-[34px] text-primary tracking-[-0.34px]">
                 Apartments
               </p>
-              <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] text-[15px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
+              <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] text-[15px] text-tertiary" style={{ fontVariationSettings: "'wdth' 100" }}>
                 {property ? `Managing ${property.name}` : 'Loading property data...'}
               </p>
             </div>
-            
+
             <div className="flex items-center gap-2">
-              <label className="text-white/60 text-sm font-semibold">Floor:</label>
-              <input 
-                type="number" 
-                placeholder="Search floor..." 
+              <label className="text-tertiary text-sm font-semibold">Floor:</label>
+              <input
+                type="number"
+                placeholder="Search floor..."
                 value={floorSearch}
                 onChange={e => setFloorSearch(e.target.value)}
-                className="bg-black border border-[rgba(255,255,255,0.2)] rounded-lg px-3 py-1.5 text-white placeholder-white/30 text-sm focus:outline-none focus:border-[#928dd3] transition-colors w-32"
+                className="dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] rounded-lg px-3 py-1.5 text-primary placeholder:text-[var(--text-tertiary)] text-sm focus:outline-none focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]/30 transition-colors w-32"
               />
             </div>
           </div>
-          
-          <div className="bg-[#928dd3]/10 border border-[#928dd3]/30 rounded-lg p-3 w-fit text-[#928dd3] text-sm flex gap-4 mt-2">
+
+          <div className="dark:bg-[#928dd3]/10 light:bg-[#928dd3]/15 dark:border-[#928dd3]/30 light:border-[#928dd3]/40 rounded-lg p-3 w-fit dark:text-[#928dd3] light:text-[#6b5cb8] text-sm flex gap-4 mt-2">
             <p><strong className="font-bold">Click:</strong> Select one</p>
             <p><strong className="font-bold">Ctrl + Click:</strong> Select multiple</p>
             <p><strong className="font-bold">Shift + Click:</strong> Select range</p>
-          </div>
-          <div className="bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.12)] rounded-lg px-4 py-2.5 mt-2 max-w-4xl">
-            <p className="text-[13px] text-[rgba(255,255,255,0.75)]">
-              Use <strong className="font-semibold text-white">Edit</strong> to update apartment details, assign or edit the tenant, and manage expenses.
-              Changes go through the apartments API (<strong className="font-semibold text-white">/apartments</strong>).
-            </p>
           </div>
         </div>
       </div>
 
       <div className="px-[48px] pb-[48px] flex flex-col gap-12 relative">
         {selectedApartments.size > 0 && (
-          <div className="sticky top-[24px] z-40 bg-[#111] border border-[#928dd3] rounded-xl p-4 shadow-2xl flex items-center justify-between animate-in fade-in slide-in-from-top-4">
-            <span className="text-white font-semibold">
+          <div className="sticky top-[24px] z-40 glass-card border border-[#928dd3]/30 rounded-xl p-4 shadow-2xl flex items-center justify-between animate-in fade-in slide-in-from-top-4">
+            <span className="text-primary font-semibold">
               {selectedApartments.size} apartment{selectedApartments.size !== 1 ? 's' : ''} selected
             </span>
             <div className="flex gap-3">
-              <button 
+              <button
                 onClick={() => setSelectedApartments(new Set())}
-                className="px-4 py-2 border border-[rgba(255,255,255,0.2)] text-white hover:bg-[rgba(255,255,255,0.1)] rounded-lg transition-colors text-sm font-semibold"
+                className="px-4 py-2 border border-white/[0.1] text-secondary hover:bg-white/[0.05] hover:text-primary rounded-lg transition-colors text-sm font-semibold"
               >
                 Cancel
               </button>
-              <button 
+              <button
                 onClick={handleBulkEditClick}
-                className="px-4 py-2 bg-[#928dd3] text-black hover:bg-[#a89be6] rounded-lg transition-colors text-sm font-bold"
+                className="px-4 py-2 bg-gradient-to-r from-[#928dd3] to-[#a89be6] text-black hover:opacity-90 rounded-lg transition-colors text-sm font-bold shadow-[0_0_15px_rgba(146,141,211,0.3)]"
               >
                 Edit Selection
               </button>
@@ -401,24 +415,24 @@ export function Apartments() {
         )}
         {sortedFloors.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-[rgba(255,255,255,0.6)]">No floors or apartments registered for this property.</p>
+            <p className="text-tertiary">No floors or apartments registered for this property.</p>
           </div>
         ) : filteredFloors.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-[rgba(255,255,255,0.6)]">No floors match your search.</p>
+            <p className="text-tertiary">No floors match your search.</p>
           </div>
         ) : (
           filteredFloors.map(floorNum => {
             const floorApartmentsMap = gridData![floorNum];
             if (!floorApartmentsMap) return null;
             const sortedApartmentNumbers = Object.keys(floorApartmentsMap).map(Number).filter(n => !isNaN(n)).sort((a, b) => a - b);
-            
+
             return (
               <div key={floorNum} className="flex flex-col gap-6">
-                <h3 className="font-['Chivo:Black',sans-serif] font-black text-2xl text-white">
+                <h3 className="font-['Chivo:Black',sans-serif] font-black text-2xl text-secondary">
                   Floor {floorNum}
                 </h3>
-                
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-6 auto-rows-fr">
                   {sortedApartmentNumbers.map(aptNum => {
                     const apt = floorApartmentsMap[aptNum];
@@ -426,12 +440,9 @@ export function Apartments() {
                     const isPaid = apt.paymentStatus === 'PAID';
                     const isOverdue = !!apt.dueDate && apt.dueDate < todayIso;
                     const hasExpenses = apt.expenses && apt.expenses.length > 0;
-                    const hasFees = apt.maintenanceFees && apt.maintenanceFees.length > 0;
                     const expensesTotal = (apt.expenses || []).reduce((sum, expense) => sum + (expense.amount || 0), 0);
-                    const feesTotal = (apt.maintenanceFees || []).reduce((sum, fee) => sum + (fee.amount || 0), 0);
-                    const totalDeductions = expensesTotal + feesTotal;
-                    const hasDeductions = totalDeductions > 0;
-                    const rentGain = (apt.rent || 0) - totalDeductions;
+                    const hasExpenseDeductions = expensesTotal > 0;
+                    const rentGain = (apt.rent || 0) - expensesTotal;
                     const isStatusUpdating = statusUpdatingApartmentIds.has(apt.id);
 
                     // Card background color
@@ -445,8 +456,8 @@ export function Apartments() {
                     if (!isVacant) {
                       if (!isPaid) {
                         rentColor = '#f87171'; // red when unpaid
-                      } else if (hasDeductions) {
-                        rentColor = '#f59e0b'; // orange when there are expenses/fees
+                      } else if (hasExpenseDeductions) {
+                        rentColor = '#f59e0b'; // orange when there are expenses
                       } else {
                         rentColor = rentGain >= 0 ? '#4ade80' : '#f87171';
                       }
@@ -455,19 +466,24 @@ export function Apartments() {
                     const isSelected = selectedApartments.has(apt.id);
 
                     return (
-                      <div 
-                        key={apt.id} 
+                      <div
+                        key={apt.id}
                         onClick={(e) => handleCardClick(apt, e)}
                         className={`flex flex-col rounded-xl border transition-all hover:scale-[1.02] bg-[#111] cursor-pointer select-none ${isSelected ? 'border-[#928dd3] ring-2 ring-[#928dd3]/50 transform scale-[1.02]' : 'border-[rgba(255,255,255,0.1)]'}`}
                       >
                         {/* Upper half: Background color & Icon */}
                         <div className={`relative h-[140px] flex items-center justify-center overflow-hidden rounded-t-xl ${bgClass}`}>
-                          <div className={`text-white opacity-90 drop-shadow-md ${isVacant ? 'opacity-50' : ''}`}>
+                          <div
+                            className={`opacity-90 drop-shadow-md ${isVacant
+                              ? 'text-white/70 light:text-white/70'
+                              : 'text-primary dark:text-primary light:text-[#374151]'
+                            }`}
+                          >
                             <UserIcon />
                           </div>
-                          
+
                           {/* Apt number badge */}
-                          <div className="absolute top-3 left-3 bg-black/40 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold text-white tracking-wide">
+                          <div className="absolute top-3 left-3 bg-black/40 light:bg-white/70 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold text-primary light:text-[#374151] tracking-wide">
                             APT {aptNum}
                           </div>
 
@@ -475,12 +491,11 @@ export function Apartments() {
                           <button
                             onClick={(e) => handleTogglePaymentStatus(e, apt)}
                             disabled={isStatusUpdating || isVacant}
-                            className={`absolute top-11 left-3 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold tracking-wide flex items-center gap-1 border transition-colors ${
-                              isVacant
-                                ? 'bg-white/10 border-white/20 text-white/40'
-                                : isPaid
-                                  ? 'bg-[#4ade80]/15 border-[#4ade80]/40 text-[#4ade80] hover:bg-[#4ade80]/25'
-                                  : 'bg-[#f59e0b]/15 border-[#f59e0b]/40 text-[#f59e0b] hover:bg-[#f59e0b]/25'
+                            className={`absolute top-11 left-3 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold tracking-wide flex items-center gap-1 border transition-colors ${isVacant
+                              ? 'bg-white/10 light:bg-black/10 border-white/20 light:border-black/10 text-tertiary light:text-[#4b5563]'
+                              : isPaid
+                                ? 'bg-[#4ade80]/15 light:bg-[#22c55e]/15 border-[#4ade80]/40 light:border-[#22c55e]/40 text-[#4ade80] light:text-[#16a34a] hover:bg-[#4ade80]/25 light:hover:bg-[#22c55e]/25'
+                                : 'bg-[#f59e0b]/15 light:bg-[#d97706]/15 border-[#f59e0b]/40 light:border-[#d97706]/40 text-[#f59e0b] light:text-[#b45309] hover:bg-[#f59e0b]/25 light:hover:bg-[#d97706]/25'
                             } disabled:opacity-50 disabled:cursor-not-allowed`}
                             title={
                               isVacant
@@ -493,39 +508,39 @@ export function Apartments() {
                             <CreditCardIcon />
                             <span>{isStatusUpdating ? '...' : isVacant ? 'N/A' : isPaid ? 'Paid' : 'Unpaid'}</span>
                           </button>
-                          
+
                           {/* Actions */}
                           <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
                             {/* Edit button */}
-                            <button 
+                            <button
                               onClick={(e) => handleEditClick(e, apt)}
-                              className="bg-black/40 hover:bg-black/70 backdrop-blur-sm p-1.5 rounded transition-colors text-white"
+                              className="bg-black/40 light:bg-white/70 hover:bg-black/70 light:hover:bg-white/90 backdrop-blur-sm p-1.5 rounded transition-colors text-primary light:text-[#374151]"
                               title="Edit apartment data"
                             >
                               <EditIcon />
                             </button>
                             {/* Delete button */}
-                            <button 
+                            <button
                               onClick={(e) => handleDeleteClick(e, apt)}
-                              className="bg-black/40 hover:bg-[#ff6b6b]/80 backdrop-blur-sm p-1.5 rounded transition-colors text-[#ff6b6b] hover:text-white"
+                              className="bg-black/40 light:bg-white/70 hover:bg-[#ff6b6b]/80 backdrop-blur-sm p-1.5 rounded transition-colors text-[#ff6b6b] hover:text-primary"
                               title="Delete apartment"
                             >
                               <TrashIcon />
                             </button>
                           </div>
                         </div>
-                        
+
                         {/* Lower half: Details */}
-                        <div className="p-4 flex flex-col gap-3 flex-1 bg-[#1a1a1a] rounded-b-xl overflow-visible">
+                        <div className="p-4 flex flex-col gap-3 flex-1 bg-[#1a1a1a] light:bg-white rounded-b-xl overflow-visible text-[#eaeaea] light:text-[#111827]">
                           <div className="flex justify-between items-center border-b border-[rgba(255,255,255,0.05)] pb-2">
-                            <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Tenant</span>
-                            <span className="text-sm text-white font-medium truncate max-w-[140px]" title={apt.tenant?.name || 'Vacant'}>
-                              {apt.tenant ? apt.tenant.name : <span className="text-[rgba(255,255,255,0.3)] italic">Vacant</span>}
+                            <span className="text-[12px] text-[rgba(255,255,255,0.5)] light:text-[#6b7280] font-semibold uppercase tracking-wider">Tenant</span>
+                            <span className="text-sm text-[#eaeaea] light:text-[#111827] font-medium truncate max-w-[140px]" title={apt.tenant?.name || 'Vacant'}>
+                              {apt.tenant ? apt.tenant.name : <span className="text-[rgba(255,255,255,0.3)] light:text-[#9ca3af] italic">Vacant</span>}
                             </span>
                           </div>
-                          
+
                           <div className="flex justify-between items-center">
-                            <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Rent Gain</span>
+                            <span className="text-[12px] text-[rgba(255,255,255,0.5)] light:text-[#6b7280] font-semibold uppercase tracking-wider">Rent Gain</span>
                             <div className="flex items-center gap-1.5">
                               <span className="text-sm font-bold" style={{ color: rentColor }}>${rentGain}</span>
                               {!isVacant && !isPaid && (
@@ -536,21 +551,21 @@ export function Apartments() {
                                     <line x1="12" y1="16" x2="12.01" y2="16" />
                                   </svg>
                                   {/* Tooltip */}
-                                  <span className="absolute bottom-full right-0 mb-1.5 hidden group-hover:block bg-[#1a1a1a] border border-[#f87171]/30 text-[#f87171] text-xs px-2 py-1 rounded-lg whitespace-nowrap shadow-xl z-50 pointer-events-none">
+                                  <span className="absolute bottom-full right-0 mb-1.5 hidden group-hover:block bg-[#1a1a1a] light:bg-white border-[#f87171]/30 light:border-[#ef4444]/40 text-[#f87171] light:text-[#dc2626] text-xs px-2 py-1 rounded-lg whitespace-nowrap shadow-xl z-50 pointer-events-none">
                                     Unpaid rent — payment is pending
                                   </span>
                                 </span>
                               )}
-                              {isPaid && hasDeductions && (
+                              {isPaid && hasExpenseDeductions && (
                                 <span
                                   className="relative group"
-                                  title={`${apt.expenses?.length || 0} expense(s), ${apt.maintenanceFees?.length || 0} fee(s). Changes due to deductions. See details`}
+                                  title={`${apt.expenses?.length || 0} expense(s). Changes due to expenses. Maintenance fees do not affect rent gain.`}
                                 >
                                   <button
                                     type="button"
                                     onClick={(e) => handleOpenExpenseDetails(e, apt)}
                                     className="p-0 m-0 bg-transparent border-0"
-                                    title="Changes due to expenses and fees. Click to see details"
+                                    title="Changes due to expenses. Click to see details"
                                   >
                                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="cursor-pointer">
                                       <circle cx="12" cy="12" r="10" />
@@ -559,22 +574,22 @@ export function Apartments() {
                                     </svg>
                                   </button>
                                   {/* Tooltip */}
-                                  <span className="absolute bottom-full right-0 mb-1.5 hidden group-hover:block bg-[#1a1a1a] border border-[#f59e0b]/30 text-[#f59e0b] text-xs px-2 py-1 rounded-lg whitespace-nowrap shadow-xl z-50 pointer-events-none">
+                                  <span className="absolute bottom-full right-0 mb-1.5 hidden group-hover:block bg-[#1a1a1a] light:bg-white border-[#f59e0b]/30 light:border-[#d97706]/40 text-[#f59e0b] light:text-[#b45309] text-xs px-2 py-1 rounded-lg whitespace-nowrap shadow-xl z-50 pointer-events-none">
                                     Changes due to expenses. See details
                                   </span>
                                 </span>
                               )}
                             </div>
                           </div>
-                          
+
                           <div className="flex justify-between items-center">
-                            <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Area</span>
-                            <span className="text-sm text-white">{apt.squareMeters} m²</span>
+                            <span className="text-[12px] text-[rgba(255,255,255,0.5)] light:text-[#6b7280] font-semibold uppercase tracking-wider">Area</span>
+                            <span className="text-sm text-[#eaeaea] light:text-[#111827]">{apt.squareMeters} m²</span>
                           </div>
-                          
+
                           <div className="flex justify-between items-center mt-auto pt-2">
-                            <span className="text-[12px] text-[rgba(255,255,255,0.5)] font-semibold uppercase tracking-wider">Due</span>
-                            <span className="text-sm text-white">{apt.dueDate || '-'}</span>
+                            <span className="text-[12px] text-[rgba(255,255,255,0.5)] light:text-[#6b7280] font-semibold uppercase tracking-wider">Due</span>
+                            <span className="text-sm text-[#eaeaea] light:text-[#111827]">{apt.dueDate || '-'}</span>
                           </div>
                         </div>
                       </div>
@@ -583,8 +598,8 @@ export function Apartments() {
 
                   {/* Add New Apartment Card */}
                   <div 
-                    onClick={() => handleAddClick(floorNum, sortedApartmentNumbers.length > 0 ? sortedApartmentNumbers[sortedApartmentNumbers.length - 1] + 1 : floorNum * 100 + 1)}
-                    className="flex flex-col rounded-xl overflow-hidden border border-[#4ade80]/30 transition-all hover:scale-[1.02] bg-[#4ade80]/5 hover:bg-[#4ade80]/10 cursor-pointer min-h-[290px] items-center justify-center text-[#4ade80]"
+                    onClick={() => handleAddClick(floorNum, getNextAvailableApartmentNumber(floorNum, sortedApartmentNumbers))}
+                    className="flex flex-col rounded-xl overflow-hidden border transition-all hover:scale-[1.02] bg-[#4ade80]/10 light:bg-[#e5f7ed] border-[#4ade80]/30 light:border-[#16a34a]/30 cursor-pointer min-h-[290px] items-center justify-center text-[#4ade80] light:text-[#166534]"
                     title={`Add apartment to floor ${floorNum}`}
                   >
                     <PlusIcon />
@@ -597,7 +612,7 @@ export function Apartments() {
         )}
       </div>
 
-      <EditApartmentsDialog 
+      <EditApartmentsDialog
         isOpen={isEditDialogOpen}
         propertyId={propertyId || ''}
         apartments={editingApartments}

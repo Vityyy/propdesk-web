@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { X } from 'lucide-react';
 import type { Property } from '../../types/index';
 import userService from '../../../services/userService';
 
@@ -6,13 +7,14 @@ interface EditPropertyDialogProps {
   isOpen: boolean;
   property: Property | null;
   onClose: () => void;
-  onSuccess?: () => void;
+  onSuccess?: () => void | Promise<void>;
 }
 
 export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: EditPropertyDialogProps) {
   const [formData, setFormData] = useState({
     name: property?.name || '',
     address: property?.address || '',
+    imageUrl: property?.imageUrl || '',
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -21,6 +23,7 @@ export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: Edi
     setFormData({
       name: property?.name || '',
       address: property?.address || '',
+      imageUrl: property?.imageUrl || '',
     });
     setValidationErrors({});
   };
@@ -33,6 +36,15 @@ export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: Edi
     }
     if (!formData.address?.trim()) {
       errors.address = 'Address is required';
+    }
+    if (!formData.imageUrl?.trim()) {
+      errors.imageUrl = 'Image link is required';
+    } else {
+      try {
+        new URL(formData.imageUrl);
+      } catch {
+        errors.imageUrl = 'Image link must be a valid URL';
+      }
     }
 
     setValidationErrors(errors);
@@ -51,9 +63,10 @@ export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: Edi
       await userService.updateProperty(property.id, {
         propertyName: formData.name,
         propertyAddress: formData.address,
+        pictureUrl: formData.imageUrl,
       });
 
-      onSuccess?.();
+      await onSuccess?.();
       handleClose();
     } catch (error) {
       console.error('Error updating property:', error);
@@ -71,23 +84,25 @@ export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: Edi
   if (!isOpen || !property) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-[#111] border border-[rgba(255,255,255,0.16)] rounded-[16px] max-w-2xl w-full">
-        <div className="p-6 border-b border-[rgba(255,255,255,0.16)] flex items-center justify-between">
-          <h2 className="font-['Chivo:Black',sans-serif] font-black text-[20px] text-white">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0" onClick={handleClose} />
+      <div className="dark:bg-[#0a0a0f] light:bg-white border border-[var(--glass-border)] rounded-[24px] max-w-2xl w-full shadow-[0_8px_30px_rgba(0,0,0,0.2)] relative z-10">
+        <div className="p-6 border-b border-[var(--glass-border)] flex items-center justify-between">
+          <h2 className="font-['Chivo:Black',sans-serif] font-black text-[24px] text-primary">
             Edit Property
           </h2>
           <button
+            type="button"
             onClick={handleClose}
-            className="text-[rgba(255,255,255,0.6)] hover:text-white transition-colors"
+            className="p-2 text-secondary dark:bg-[#151520] light:bg-gray-100 rounded-full transition-colors"
           >
-            ✕
+            <X size={20} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-8 space-y-6">
           <div>
-            <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
+            <label className="block font-['Archivo:SemiBold',sans-serif] font-semibold text-secondary text-[14px] mb-2 uppercase tracking-wider">
               Name *
             </label>
             <input
@@ -99,18 +114,19 @@ export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: Edi
                   setValidationErrors({ ...validationErrors, name: '' });
                 }
               }}
-              className={`w-full px-4 py-2 bg-black border rounded-[8px] text-white placeholder-[rgba(255,255,255,0.4)] ${
-                validationErrors.name ? 'border-[#ff6b6b]' : 'border-[rgba(255,255,255,0.16)] focus:border-[#928dd3]'
-              }`}
+              className={`w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border rounded-[12px] text-primary placeholder:text-tertiary transition-all duration-300 outline-none ${validationErrors.name
+                  ? 'border-[#ff6b6b] focus:border-[#ff6b6b] focus:ring-1 focus:ring-[#ff6b6b]'
+                  : 'border-[var(--glass-border)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]'
+                }`}
               placeholder="Property Name"
             />
             {validationErrors.name && (
-              <p className="text-[#ff6b6b] text-xs mt-1">{validationErrors.name}</p>
+              <p className="text-[#ff6b6b] text-xs mt-2 font-medium">{validationErrors.name}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-[rgba(255,255,255,0.7)] text-sm mb-2">
+            <label className="block font-['Archivo:SemiBold',sans-serif] font-semibold text-secondary text-[14px] mb-2 uppercase tracking-wider">
               Address *
             </label>
             <input
@@ -122,29 +138,54 @@ export function EditPropertyDialog({ isOpen, property, onClose, onSuccess }: Edi
                   setValidationErrors({ ...validationErrors, address: '' });
                 }
               }}
-              className={`w-full px-4 py-2 bg-black border rounded-[8px] text-white placeholder-[rgba(255,255,255,0.4)] ${
-                validationErrors.address ? 'border-[#ff6b6b]' : 'border-[rgba(255,255,255,0.16)] focus:border-[#928dd3]'
-              }`}
+              className={`w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border rounded-[12px] text-primary placeholder:text-tertiary transition-all duration-300 outline-none ${validationErrors.address
+                  ? 'border-[#ff6b6b] focus:border-[#ff6b6b] focus:ring-1 focus:ring-[#ff6b6b]'
+                  : 'border-[var(--glass-border)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]'
+                }`}
               placeholder="Property Address"
             />
             {validationErrors.address && (
-              <p className="text-[#ff6b6b] text-xs mt-1">{validationErrors.address}</p>
+              <p className="text-[#ff6b6b] text-xs mt-2 font-medium">{validationErrors.address}</p>
             )}
           </div>
 
-          <div className="flex gap-3 pt-4 border-t border-[rgba(255,255,255,0.16)]">
+          <div>
+            <label className="block font-['Archivo:SemiBold',sans-serif] font-semibold text-secondary text-[14px] mb-2 uppercase tracking-wider">
+              Image Link *
+            </label>
+            <input
+              type="url"
+              value={formData.imageUrl}
+              onChange={(e) => {
+                setFormData({ ...formData, imageUrl: e.target.value });
+                if (validationErrors.imageUrl) {
+                  setValidationErrors({ ...validationErrors, imageUrl: '' });
+                }
+              }}
+              className={`w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border rounded-[12px] text-primary placeholder:text-tertiary transition-all duration-300 outline-none ${validationErrors.imageUrl
+                  ? 'border-[#ff6b6b] focus:border-[#ff6b6b] focus:ring-1 focus:ring-[#ff6b6b]'
+                  : 'border-[var(--glass-border)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]'
+                }`}
+              placeholder="https://example.com/property.jpg"
+            />
+            {validationErrors.imageUrl && (
+              <p className="text-[#ff6b6b] text-xs mt-2 font-medium">{validationErrors.imageUrl}</p>
+            )}
+          </div>
+
+          <div className="flex justify-end gap-3 pt-6 border-t border-[var(--glass-border)] mt-8">
             <button
               type="button"
               onClick={handleClose}
               disabled={isSubmitting}
-              className="flex-1 px-4 py-2 border border-[rgba(255,255,255,0.16)] text-white rounded-[8px] hover:bg-[rgba(255,255,255,0.05)] transition-colors disabled:opacity-50"
+              className="px-6 py-3 bg-transparent border border-[var(--glass-border)] hover:bg-white/[0.05] text-secondary font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] rounded-[12px] transition-colors disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 px-4 py-2 bg-[#928dd3] text-black font-semibold rounded-[8px] hover:bg-[#a89be6] transition-colors disabled:opacity-50"
+              className="px-6 py-3 bg-gradient-to-r from-[#928dd3] to-[#a89be6] hover:opacity-100 shadow-[0_0_15px_rgba(146,141,211,0.4)] hover:shadow-[0_0_25px_rgba(146,141,211,0.7)] text-black font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] rounded-[12px] transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
             >
               {isSubmitting ? 'Saving...' : 'Save Changes'}
             </button>

@@ -25,6 +25,7 @@ export interface UserResponse {
 }
 
 const ACCESS_TOKEN_STORAGE_KEY = "gdsi_access_token";
+const SELECTED_OWNER_STORAGE_KEY = "selectedOwnerId";
 
 function readStoredToken(): string | null {
   if (typeof window === "undefined") {
@@ -57,6 +58,18 @@ function clearStoredToken(): void {
 
   try {
     localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
+  } catch {
+    // ignore storage failures
+  }
+}
+
+function clearSelectedOwner(): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    sessionStorage.removeItem(SELECTED_OWNER_STORAGE_KEY);
   } catch {
     // ignore storage failures
   }
@@ -120,6 +133,7 @@ const authService = {
   clearToken(): void {
     inMemoryAccessToken = null;
     clearStoredToken();
+    clearSelectedOwner();
   },
 
   isSessionValidB(): boolean {
@@ -163,6 +177,7 @@ const authService = {
       throw new ApiError("Respuesta de login sin token", 500, response);
     }
 
+    clearSelectedOwner();
     this.setToken(token);
     return response;
   },

@@ -13,10 +13,10 @@ export const ROUTES_PERMISSIONS = {
   summary: ['ADMIN', 'OWNER'] as const,
   properties: ['ADMIN', 'OWNER'] as const,
   "properties/:propertyId/apartments": ['ADMIN', 'OWNER'] as const,
-  tenants: ['ADMIN'] as const,
-  maintenanceFees: ['ADMIN'] as const,
-  reports: ['ADMIN'] as const,
-  settings: ['ADMIN', 'OWNER'] as const,
+  tenants: ['ADMIN', 'OWNER'] as const,
+  "maintenance-fees": ['ADMIN', 'OWNER'] as const,
+  reports: ['ADMIN', 'OWNER'] as const,
+  settings: [] as const,
 } as const;
 
 /**
@@ -27,7 +27,7 @@ export const ROUTES_COMPONENTS = {
   properties: Properties,
   "properties/:propertyId/apartments": Apartments,
   tenants: Tenants,
-  maintenanceFees: MaintenanceFees,
+  "maintenance-fees": MaintenanceFees,
   reports: Reports,
   settings: Settings,
 } as const;

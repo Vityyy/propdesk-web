@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { ApiError } from '../../utils/httpUtils';
 import authService from '../../services/authService';
 import userService, {
-  type AdminSummary,
   type OwnerAdminAssociationResponse,
-  type OwnerAssociationRequestSummary,
   type OwnerSummary,
 } from '../../services/userService';
 import svgPaths from "../../imports/svg-zayt9vop9f";
@@ -32,12 +31,12 @@ interface SettingItemProps {
 
 function SettingItem({ label, description, value, type, options, onChange }: SettingItemProps) {
   return (
-    <div className="content-stretch flex items-center justify-between py-[16px] px-[24px] relative shrink-0 w-full border-b border-[rgba(255,255,255,0.16)]">
+    <div className="content-stretch flex items-center justify-between py-[16px] px-[24px] relative shrink-0 w-full border-b border-white/[0.06]">
       <div className="flex-[1_0_0]">
-        <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
+        <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-primary mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
           {label}
         </p>
-        <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
+        <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-tertiary" style={{ fontVariationSettings: "'wdth' 100" }}>
           {description}
         </p>
       </div>
@@ -46,7 +45,7 @@ function SettingItem({ label, description, value, type, options, onChange }: Set
           <button
             onClick={() => onChange?.(!value)}
             className={`relative w-[44px] h-[24px] rounded-[12px] transition-colors ${
-              value ? 'bg-[#928dd3]' : 'bg-[rgba(255,255,255,0.16)]'
+              value ? 'bg-[#928dd3]' : 'bg-white/[0.1]'
             }`}
           >
             <div
@@ -61,7 +60,7 @@ function SettingItem({ label, description, value, type, options, onChange }: Set
             type="text"
             value={value as string}
             onChange={(e) => onChange?.(e.target.value)}
-            className="bg-black border border-[rgba(255,255,255,0.16)] rounded-[8px] px-[12px] py-[6px] text-white font-['Archivo:Medium',sans-serif] min-w-[200px]"
+            className="bg-white/[0.02] border border-white/[0.1] rounded-[8px] px-[12px] py-[6px] text-primary font-['Archivo:Medium',sans-serif] min-w-[200px]"
           />
         )}
         {type === 'select' && options && (
@@ -69,7 +68,7 @@ function SettingItem({ label, description, value, type, options, onChange }: Set
             <select
               value={value as string}
               onChange={(e) => onChange?.(e.target.value)}
-              className="bg-black border border-[rgba(255,255,255,0.16)] rounded-[8px] px-[12px] py-[6px] pr-[36px] text-white font-['Archivo:Medium',sans-serif] appearance-none cursor-pointer min-w-[150px]"
+              className="bg-white/[0.02] border border-white/[0.1] rounded-[8px] px-[12px] py-[6px] pr-[36px] text-primary font-['Archivo:Medium',sans-serif] appearance-none cursor-pointer min-w-[150px]"
             >
               {options.map((option) => (
                 <option key={option} value={option}>
@@ -89,11 +88,10 @@ function SettingItem({ label, description, value, type, options, onChange }: Set
 
 function SettingsSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-black rounded-[16px] w-full relative mb-[24px]">
-      <div aria-hidden="true" className="absolute border border-solid border-white inset-0 pointer-events-none rounded-[16px]" />
+    <div className="glass-card rounded-[16px] w-full relative mb-[24px]">
       <div className="overflow-clip rounded-[inherit] size-full">
-        <div className="py-[16px] px-[24px] border-b border-[rgba(255,255,255,0.16)]">
-          <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] text-[17px] text-white" style={{ fontVariationSettings: "'wdth' 100" }}>
+        <div className="py-[16px] px-[24px] border-b border-white/[0.06]">
+          <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] text-[17px] text-primary" style={{ fontVariationSettings: "'wdth' 100" }}>
             {title}
           </p>
         </div>
@@ -104,6 +102,7 @@ function SettingsSection({ title, children }: { title: string; children: React.R
 }
 
 export function Settings() {
+  const navigate = useNavigate();
   const isOwner = authService.getCurrentUserRole() === 'OWNER';
   const isAdmin = authService.getCurrentUserRole() === 'ADMIN';
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -116,18 +115,9 @@ export function Settings() {
   const [currency, setCurrency] = useState('USD');
   const [timezone, setTimezone] = useState('EST');
   const [language, setLanguage] = useState('English');
-  const [admins, setAdmins] = useState<AdminSummary[]>([]);
-  const [selectedAdminId, setSelectedAdminId] = useState('');
-  const [adminCut, setAdminCut] = useState('10');
   const [associatedAdmin, setAssociatedAdmin] = useState<OwnerAdminAssociationResponse | null>(null);
-  const [associatedOwners, setAssociatedOwners] = useState<OwnerSummary[]>([]);
-  const [pendingOwnerRequests, setPendingOwnerRequests] = useState<OwnerAssociationRequestSummary[]>([]);
-  const [adminAssociationMessage, setAdminAssociationMessage] = useState<string | null>(null);
   const [adminAssociationError, setAdminAssociationError] = useState<string | null>(null);
-  const [ownerAssociationMessage, setOwnerAssociationMessage] = useState<string | null>(null);
-  const [ownerAssociationError, setOwnerAssociationError] = useState<string | null>(null);
-  const [isAssociatingAdmin, setIsAssociatingAdmin] = useState(false);
-  const [acceptingOwnerId, setAcceptingOwnerId] = useState<string | null>(null);
+  const [associatedOwners, setAssociatedOwners] = useState<OwnerSummary[]>([]);
 
   useEffect(() => {
     if (!isOwner) {
@@ -136,33 +126,22 @@ export function Settings() {
 
     let ignore = false;
 
-    // Loads the admin options used by the owner association flow.
-    const loadAdmins = async () => {
+    const loadAssociatedAdmin = async () => {
       setAdminAssociationError(null);
 
       try {
-        const [availableAdmins, currentAssociation] = await Promise.all([
-          userService.listAdmins(),
-          userService.getAssociatedAdmin(),
-        ]);
-        if (ignore) {
-          return;
-        }
-
-        setAdmins(availableAdmins);
-        setAssociatedAdmin(currentAssociation);
-        setSelectedAdminId((currentAdminId) => currentAdminId || currentAssociation?.adminId || availableAdmins[0]?.id || '');
-        if (currentAssociation?.adminCut != null) {
-          setAdminCut(String(currentAssociation.adminCut));
+        const currentAssociation = await userService.getAssociatedAdmin();
+        if (!ignore) {
+          setAssociatedAdmin(currentAssociation);
         }
       } catch (error) {
         if (!ignore) {
-          setAdminAssociationError(error instanceof ApiError ? error.message : 'Could not load admins');
+          setAdminAssociationError(error instanceof ApiError ? error.message : 'Could not load associated administrator');
         }
       }
     };
 
-    loadAdmins();
+    loadAssociatedAdmin();
 
     return () => {
       ignore = true;
@@ -177,29 +156,15 @@ export function Settings() {
     let ignore = false;
 
     const loadAdminAssociationData = async () => {
-      setOwnerAssociationError(null);
-
       try {
         const owners = await userService.listMyOwners();
         if (!ignore) {
           setAssociatedOwners(owners);
         }
       } catch (error) {
-        if (!ignore) {
-          setOwnerAssociationError(error instanceof ApiError ? error.message : 'Could not load associated owners');
-        }
+        console.error('Could not load associated owners', error);
       }
 
-      try {
-        const requests = await userService.listPendingOwnerRequests();
-        if (!ignore) {
-          setPendingOwnerRequests(requests);
-        }
-      } catch (error) {
-        if (!ignore) {
-          setOwnerAssociationError(error instanceof ApiError ? error.message : 'Could not load owner requests');
-        }
-      }
     };
 
     loadAdminAssociationData();
@@ -209,63 +174,30 @@ export function Settings() {
     };
   }, [isAdmin]);
 
-  // Associates the current owner with the selected admin using the backend API.
-  const handleAssociateAdmin = async () => {
-    if (!selectedAdminId || isAssociatingAdmin) {
+  // Redirect admin without owners back to select-owner
+  useEffect(() => {
+    if (!isAdmin || associatedOwners.length > 0) {
       return;
     }
 
-    try {
-      setAdminAssociationError(null);
-      setAdminAssociationMessage(null);
-      setIsAssociatingAdmin(true);
-
-      const response = await userService.associateAdmin({
-        adminId: selectedAdminId,
-        adminCut: adminCut.trim() ? Number(adminCut) : undefined,
-      });
-
-      setAssociatedAdmin(response);
-      setAdminAssociationMessage(`Association request sent to ${response.adminName}.`);
-    } catch (error) {
-      setAdminAssociationError(error instanceof ApiError ? error.message : 'Could not associate admin');
-    } finally {
-      setIsAssociatingAdmin(false);
-    }
-  };
-
-  const handleAcceptOwner = async (request: OwnerAssociationRequestSummary) => {
-    try {
-      setOwnerAssociationError(null);
-      setOwnerAssociationMessage(null);
-      setAcceptingOwnerId(request.ownerId);
-
-      const response = await userService.acceptOwnerRequest(request.ownerId);
-      const remainingRequests = pendingOwnerRequests.filter((pendingRequest) => pendingRequest.ownerId !== request.ownerId);
-      setOwnerAssociationMessage(`${response.ownerName} is now associated with your admin account.`);
-      setPendingOwnerRequests(remainingRequests);
-      setAssociatedOwners((currentOwners) => [...currentOwners, { id: response.ownerId, name: response.ownerName }]);
-    } catch (error) {
-      setOwnerAssociationError(error instanceof ApiError ? error.message : 'Could not associate owner');
-    } finally {
-      setAcceptingOwnerId(null);
-    }
-  };
+    navigate('/select-owner', { replace: true });
+  }, [isAdmin, associatedOwners, navigate]);
 
   return (
-    <div className="bg-black min-h-full w-full">
+    <div className="min-h-full w-full relative">
+      <div className="absolute inset-0 bg-gradient-to-b from-[#928dd3]/3 to-transparent pointer-events-none" />
       <div className="content-stretch flex flex-col gap-[24px] items-start py-[24px] px-[48px] relative shrink-0 w-full">
         <div className="content-stretch flex items-center justify-between relative shrink-0 w-full">
-          <p className="font-['Chivo:Black',sans-serif] font-black leading-[40px] relative shrink-0 text-[34px] text-white tracking-[-0.34px] whitespace-nowrap">
+          <p className="font-['Chivo:Black',sans-serif] font-black leading-[40px] relative shrink-0 text-[34px] text-primary tracking-[-0.34px] whitespace-nowrap">
             Settings
           </p>
-          <button className="bg-[#928dd3] content-stretch flex items-center justify-center px-[16px] py-[8px] relative rounded-[8px] shrink-0 hover:bg-[#7f7ab8] transition-colors">
+          <button className="bg-gradient-to-r from-[#928dd3] to-[#a89be6] content-stretch flex items-center justify-center px-[16px] py-[8px] relative rounded-[10px] shrink-0 hover:opacity-90 shadow-[0_0_15px_rgba(146,141,211,0.3)] hover:shadow-[0_0_25px_rgba(146,141,211,0.5)] transition-all duration-300">
             <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] relative shrink-0 text-[15px] text-black whitespace-nowrap" style={{ fontVariationSettings: "'wdth' 100" }}>
               Save Changes
             </p>
           </button>
         </div>
-        <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] relative shrink-0 text-[15px] text-[rgba(255,255,255,0.6)]" style={{ fontVariationSettings: "'wdth' 100" }}>
+        <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] relative shrink-0 text-[15px] text-tertiary" style={{ fontVariationSettings: "'wdth' 100" }}>
           Manage your account and application preferences
         </p>
       </div>
@@ -343,7 +275,7 @@ export function Settings() {
         {isOwner && (
           <SettingsSection title="Associated Administrator">
             <div className="px-[24px] py-[20px] space-y-4">
-              {!associatedAdmin && (
+              {!associatedAdmin && !adminAssociationError && (
                 <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)]">
                   You do not have an associated administrator yet.
                 </p>
@@ -351,7 +283,7 @@ export function Settings() {
 
               {associatedAdmin && (
                 <div className="rounded-[8px] border border-[rgba(255,255,255,0.16)] px-[12px] py-[10px]">
-                  <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white">
+                  <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-primary">
                     {associatedAdmin.adminName}
                   </p>
                   <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)]">
@@ -364,123 +296,12 @@ export function Settings() {
                   </p>
                 </div>
               )}
-            </div>
-          </SettingsSection>
-        )}
-
-        {isOwner && (
-          <SettingsSection title="Administrator Association">
-            <div className="px-[24px] py-[20px] space-y-4">
-              <div>
-                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white mb-[4px]">
-                  Select Administrator
-                </p>
-                <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)] mb-[12px]">
-                  Choose the admin you want to ask for management of your properties.
-                </p>
-                <select
-                  value={selectedAdminId}
-                  onChange={(event) => setSelectedAdminId(event.target.value)}
-                  className="bg-black border border-[rgba(255,255,255,0.16)] rounded-[8px] px-[12px] py-[10px] text-white w-full"
-                >
-                  <option value="" disabled>
-                    Select an admin
-                  </option>
-                  {admins.map((admin) => (
-                    <option key={admin.id} value={admin.id}>
-                      {admin.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white mb-[4px]">
-                  Admin Cut
-                </p>
-                <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)] mb-[12px]">
-                  Define the percentage you offer this admin for managing your portfolio.
-                </p>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.1"
-                  value={adminCut}
-                  onChange={(event) => setAdminCut(event.target.value)}
-                  className="bg-black border border-[rgba(255,255,255,0.16)] rounded-[8px] px-[12px] py-[10px] text-white w-full"
-                />
-              </div>
-
-              {adminAssociationMessage && (
-                <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[#0DC44A]">
-                  {adminAssociationMessage}
-                </p>
-              )}
 
               {adminAssociationError && (
                 <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[#FF6B6B]">
                   {adminAssociationError}
                 </p>
               )}
-
-              <button
-                onClick={handleAssociateAdmin}
-                disabled={!selectedAdminId || isAssociatingAdmin}
-                className="bg-[#928dd3] content-stretch flex items-center justify-center px-[16px] py-[10px] relative rounded-[8px] shrink-0 hover:bg-[#7f7ab8] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-black whitespace-nowrap">
-                  {isAssociatingAdmin ? 'Associating...' : 'Associate Administrator'}
-                </p>
-              </button>
-            </div>
-          </SettingsSection>
-        )}
-
-        {isAdmin && (
-          <SettingsSection title="Owner Requests">
-            <div className="px-[24px] py-[20px] space-y-4">
-              <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)]">
-                Review owner requests and accept the ones you want to manage.
-              </p>
-
-              {pendingOwnerRequests.length === 0 && (
-                <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)]">
-                  No pending owner requests.
-                </p>
-              )}
-
-              {pendingOwnerRequests.map((request) => (
-                <div key={request.ownerId} className="rounded-[8px] border border-[rgba(255,255,255,0.16)] px-[12px] py-[10px]">
-                  <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white">
-                    {request.ownerName}
-                  </p>
-                  <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[rgba(255,255,255,0.6)] mb-[12px]">
-                    Offered percentage: {request.adminCut ?? 0}%
-                  </p>
-                  <button
-                    onClick={() => handleAcceptOwner(request)}
-                    disabled={acceptingOwnerId === request.ownerId}
-                    className="bg-[#928dd3] content-stretch flex items-center justify-center px-[16px] py-[10px] relative rounded-[8px] shrink-0 hover:bg-[#7f7ab8] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                  >
-                    <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-black whitespace-nowrap">
-                      {acceptingOwnerId === request.ownerId ? 'Accepting...' : 'Accept Owner'}
-                    </p>
-                  </button>
-                </div>
-              ))}
-
-              {ownerAssociationMessage && (
-                <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[#0DC44A]">
-                  {ownerAssociationMessage}
-                </p>
-              )}
-
-              {ownerAssociationError && (
-                <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[16px] text-[13px] text-[#FF6B6B]">
-                  {ownerAssociationError}
-                </p>
-              )}
-
             </div>
           </SettingsSection>
         )}
@@ -496,7 +317,7 @@ export function Settings() {
 
               {associatedOwners.map((owner) => (
                 <div key={owner.id} className="rounded-[8px] border border-[rgba(255,255,255,0.16)] px-[12px] py-[10px]">
-                  <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-white">
+                  <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-primary">
                     {owner.name}
                   </p>
                 </div>
@@ -524,14 +345,14 @@ export function Settings() {
           />
         </SettingsSection>
 
-        <div className="bg-black rounded-[16px] p-[24px] w-full relative border border-[#FF6B6B]">
-          <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] text-[17px] text-white mb-[8px]" style={{ fontVariationSettings: "'wdth' 100" }}>
+        <div className="glass-card rounded-[16px] p-[24px] w-full relative border border-[#ff6b6b]/30">
+          <p className="font-['Archivo:ExtraBold',sans-serif] font-extrabold leading-[24px] text-[17px] text-primary mb-[8px]" style={{ fontVariationSettings: "'wdth' 100" }}>
             Danger Zone
           </p>
-          <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] text-[15px] text-[rgba(255,255,255,0.6)] mb-[16px]" style={{ fontVariationSettings: "'wdth' 100" }}>
+          <p className="font-['Archivo:Medium',sans-serif] font-medium leading-[20px] text-[15px] text-tertiary mb-[16px]" style={{ fontVariationSettings: "'wdth' 100" }}>
             Irreversible actions that affect your account
           </p>
-          <button className="bg-[#FF6B6B] content-stretch flex items-center justify-center px-[16px] py-[8px] relative rounded-[8px] hover:bg-[#ff5252] transition-colors">
+          <button className="bg-[#FF6B6B] content-stretch flex items-center justify-center px-[16px] py-[8px] relative rounded-[8px] hover:bg-[#ff5252] transition-colors shadow-[0_0_15px_rgba(255,107,107,0.3)]">
             <p className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] relative shrink-0 text-[15px] text-black whitespace-nowrap" style={{ fontVariationSettings: "'wdth' 100" }}>
               Delete Account
             </p>

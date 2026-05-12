@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { X } from 'lucide-react';
 import type { Tenant } from '../../types/index';
 import { useOwner } from '../../context/OwnerContext';
 import userService from '../../../services/userService';
@@ -127,21 +128,30 @@ export function EditTenantDialog({ isOpen, tenant, onClose, onSuccess }: EditTen
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
-      <div className="bg-[#1a1a1a] border border-[rgba(255,255,255,0.2)] rounded-lg p-8 w-full max-w-md shadow-xl">
-        <h2 className="text-2xl font-bold text-white mb-6">Edit Tenant</h2>
+    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+      <div className="dark:bg-[#0a0a0f] light:bg-white border border-[var(--glass-border)] rounded-[24px] max-w-md w-full shadow-[0_8px_30px_rgba(0,0,0,0.8)] relative z-10 overflow-hidden">
+        <div className="p-6 border-b border-[var(--glass-border)] flex items-center justify-between">
+          <h2 className="font-['Chivo:Black',sans-serif] font-black text-[24px] text-[var(--text-primary)]">Edit Tenant</h2>
+          <button
+            type="button"
+            onClick={handleClose}
+            className="p-2 text-[var(--text-secondary)] dark:bg-[#151520] light:bg-gray-100 rounded-full transition-colors hover:text-[var(--text-primary)] light:hover:bg-gray-200 dark:hover:bg-[#252530] shadow-sm"
+          >
+            <X size={20} />
+          </button>
+        </div>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 space-y-5">
           <div>
-            <label className="block text-sm font-semibold text-white mb-2">Full Name</label>
+            <label className="block text-[var(--text-secondary)] text-sm font-semibold mb-2 uppercase tracking-wider">Full Name</label>
             <input
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className={`w-full px-3 py-2 bg-[#111] border rounded-lg text-white placeholder-white/30 focus:outline-none transition-colors ${
+              className={`w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border rounded-[12px] text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none transition-all duration-300 hover:border-[var(--glass-border)] ${
                 validationErrors.name
-                  ? 'border-red-500 focus:border-red-500'
-                  : 'border-[rgba(255,255,255,0.2)] focus:border-[#928dd3]'
+                  ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500'
+                  : 'border-[var(--glass-border)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]'
               }`}
               disabled={loading}
             />
@@ -151,15 +161,15 @@ export function EditTenantDialog({ isOpen, tenant, onClose, onSuccess }: EditTen
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-white mb-2">Email</label>
+            <label className="block text-[var(--text-secondary)] text-sm font-semibold mb-2 uppercase tracking-wider">Email</label>
             <input
               type="email"
               value={formData.email || ''}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className={`w-full px-3 py-2 bg-[#111] border rounded-lg text-white placeholder-white/30 focus:outline-none transition-colors ${
+              className={`w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border rounded-[12px] text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none transition-all duration-300 hover:border-[var(--glass-border)] ${
                 validationErrors.email
-                  ? 'border-red-500 focus:border-red-500'
-                  : 'border-[rgba(255,255,255,0.2)] focus:border-[#928dd3]'
+                  ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500'
+                  : 'border-[var(--glass-border)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]'
               }`}
               disabled={loading}
             />
@@ -169,15 +179,15 @@ export function EditTenantDialog({ isOpen, tenant, onClose, onSuccess }: EditTen
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-white mb-2">Phone</label>
+            <label className="block text-[var(--text-secondary)] text-sm font-semibold mb-2 uppercase tracking-wider">Phone</label>
             <input
               type="tel"
               value={formData.phone || ''}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              className={`w-full px-3 py-2 bg-[#111] border rounded-lg text-white placeholder-white/30 focus:outline-none transition-colors ${
+              className={`w-full px-4 py-3 dark:bg-[#151520] light:bg-gray-50 border rounded-[12px] text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none transition-all duration-300 hover:border-[var(--glass-border)] ${
                 validationErrors.phone
-                  ? 'border-red-500 focus:border-red-500'
-                  : 'border-[rgba(255,255,255,0.2)] focus:border-[#928dd3]'
+                  ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500'
+                  : 'border-[var(--glass-border)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]'
               }`}
               disabled={loading}
             />
@@ -186,18 +196,18 @@ export function EditTenantDialog({ isOpen, tenant, onClose, onSuccess }: EditTen
             )}
           </div>
 
-          <div className="flex gap-3 pt-4">
+          <div className="flex gap-3 pt-6 border-t border-[var(--glass-border)] mt-6">
             <button
               type="button"
               onClick={handleClose}
-              className="flex-1 px-4 py-2 border border-[rgba(255,255,255,0.2)] text-white hover:bg-[rgba(255,255,255,0.1)] rounded-lg transition-colors font-semibold disabled:opacity-50"
+              className="flex-1 px-4 py-3 bg-transparent border border-[var(--glass-border)] text-[var(--text-primary)] font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] rounded-[12px] transition-colors hover:bg-[var(--bg-subtle)] disabled:opacity-50"
               disabled={loading}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-[#928dd3] text-black hover:bg-[#a89be6] rounded-lg transition-colors font-semibold disabled:opacity-50"
+              className="flex-1 px-4 py-3 bg-gradient-to-r from-[#928dd3] to-[#a89be6] text-black font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] rounded-[12px] transition-all duration-300 disabled:opacity-50 hover:opacity-100 shadow-[0_0_15px_rgba(146,141,211,0.4)] hover:shadow-[0_0_25px_rgba(146,141,211,0.7)] active:scale-95"
               disabled={loading}
             >
               {loading ? 'Saving...' : 'Save Changes'}

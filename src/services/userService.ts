@@ -45,6 +45,7 @@ export interface PropertyResponse {
   id: string;
   name: string;
   address: string;
+  imageUrl: string;
   ownerId: string;
 }
 
@@ -212,7 +213,15 @@ export const userService = {
     });
   },
 
- 
+  // Rejects a pending owner request for the authenticated admin.
+  rejectOwnerRequest(ownerId: string): Promise<void> {
+    return apiRequest<void>(API_ENDPOINTS.ADMINS.REJECT_OWNER_REQUEST(ownerId), {
+      method: "DELETE",
+      token: getRequiredToken(),
+    });
+  },
+
+
   listProperties(currentOwnerId: string): Promise<PropertyResponse[]> {
     return apiRequest<PropertyResponse[]>(API_ENDPOINTS.PROPERTIES.LIST(currentOwnerId), {
       method: "GET",
@@ -236,7 +245,7 @@ export const userService = {
     });
   },
 
-  updateProperty(propertyId: string, data: { propertyName?: string; propertyAddress?: string }): Promise<PropertyResponse> {
+  updateProperty(propertyId: string, data: { propertyName?: string; propertyAddress?: string; pictureUrl?: string }): Promise<PropertyResponse> {
     return apiRequest<PropertyResponse>(`${API_ENDPOINTS.PROPERTIES.BASE}/${propertyId}`, {
       method: "PUT",
       body: data,

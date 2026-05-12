@@ -24,6 +24,7 @@ export const API_ENDPOINTS = {
     GET_MY_OWNERS: `${API_BASE_URL}/admins/me/owners`,
     GET_PENDING_OWNER_REQUESTS: `${API_BASE_URL}/admins/me/owner-requests`,
     ACCEPT_OWNER_REQUEST: (ownerId: string) => `${API_BASE_URL}/admins/me/owners/${ownerId}/accept`,
+    REJECT_OWNER_REQUEST: (ownerId: string) => `${API_BASE_URL}/admins/me/owner-requests/${ownerId}`,
   },
   OWNERS: {
     GET_ASSOCIATED_ADMIN: `${API_BASE_URL}/owners/me/admin`,
