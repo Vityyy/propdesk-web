@@ -651,12 +651,12 @@ export const getMockResponse = <T>(url: string, method: string, body?: unknown):
     return clone(mockProperties) as T;
   }
 
-  if (methodUpper === "GET" && path.endsWith("/apartments") && parsed.searchParams.has("ownerId")) {
-    return clone(mockApartments) as T;
-  }
-
   if (methodUpper === "GET" && path.endsWith("/properties/apartments")) {
     return clone(mockOwnerGrid) as T;
+  }
+
+  if (methodUpper === "GET" && path.endsWith("/apartments") && parsed.searchParams.has("ownerId")) {
+    return clone(mockApartments) as T;
   }
 
   const propertyGridMatch = path.match(/\/properties\/([^/]+)\/apartments$/);
