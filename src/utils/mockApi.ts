@@ -38,6 +38,11 @@ export const isMockEnabled = (): boolean => {
     return false;
   }
 
+  const searchParams = new URLSearchParams(window.location.search);
+  if (searchParams.get("mock") === "1") {
+    return true;
+  }
+
   if (window.location.hostname.includes("onrender.com")) {
     return true;
   }
@@ -682,14 +687,4 @@ export const getMockResponse = <T>(url: string, method: string, body?: unknown):
 
   return undefined;
 };
-
-
-
-
-
-
-
-
-
-
 
