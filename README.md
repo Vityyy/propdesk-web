@@ -1,4 +1,4 @@
-# GDSI Frontend
+# PropDesk WEB
 
 React + TypeScript + Vite frontend for RMS.
 
