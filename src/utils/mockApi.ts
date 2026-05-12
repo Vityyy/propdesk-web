@@ -235,7 +235,7 @@ const mockPropertyGrids: Record<string, PropertyApartmentsGridResponse> = {
         tenant: tenants["tenant-liam"],
         expenses: [createExpense("exp-aurora-201-1", 480, "HVAC tune-up")],
         maintenanceFees: [createFee("fee-aurora-201-1", "GENERAL", "Building insurance", 170)],
-        dueDate: "2026-05-03",
+        dueDate: "2026-05-26",
       }),
       202: createApartment({
         id: "apt-aurora-202",
@@ -244,9 +244,9 @@ const mockPropertyGrids: Record<string, PropertyApartmentsGridResponse> = {
         squareMeters: 84,
         paymentStatus: "PAID",
         tenant: tenants["tenant-zoe"],
-        expenses: [createExpense("exp-aurora-202-1", 370, "Window repairs")],
+        expenses: [],
         maintenanceFees: [createFee("fee-aurora-202-1", "CLEANING", "Deep clean", 95)],
-        dueDate: "2026-05-01",
+        dueDate: "2026-05-24",
       }),
       203: createApartment({
         id: "apt-aurora-203",
@@ -257,7 +257,7 @@ const mockPropertyGrids: Record<string, PropertyApartmentsGridResponse> = {
         tenant: tenants["tenant-julian"],
         expenses: [createExpense("exp-aurora-203-1", 410, "Boiler check")],
         maintenanceFees: [createFee("fee-aurora-203-1", "AMENITIES", "Rooftop deck", 115)],
-        dueDate: "2026-05-07",
+        dueDate: "2026-05-28",
       }),
       204: createApartment({
         id: "apt-aurora-204",
@@ -277,9 +277,9 @@ const mockPropertyGrids: Record<string, PropertyApartmentsGridResponse> = {
         squareMeters: 78,
         paymentStatus: "PAID",
         tenant: tenants["tenant-bella"],
-        expenses: [createExpense("exp-aurora-205-1", 360, "Plumbing service")],
+        expenses: [],
         maintenanceFees: [createFee("fee-aurora-205-1", "GENERAL", "Landscaping", 105)],
-        dueDate: "2026-05-05",
+        dueDate: "2026-05-29",
       }),
     },
     3: {
@@ -292,7 +292,7 @@ const mockPropertyGrids: Record<string, PropertyApartmentsGridResponse> = {
         tenant: tenants["tenant-ryan"],
         expenses: [createExpense("exp-aurora-301-1", 520, "Roof inspection")],
         maintenanceFees: [createFee("fee-aurora-301-1", "AMENITIES", "Gym upkeep", 135)],
-        dueDate: "2026-05-06",
+        dueDate: "2026-05-30",
       }),
       302: createApartment({
         id: "apt-aurora-302",
@@ -312,9 +312,9 @@ const mockPropertyGrids: Record<string, PropertyApartmentsGridResponse> = {
         squareMeters: 83,
         paymentStatus: "PAID",
         tenant: tenants["tenant-grace"],
-        expenses: [createExpense("exp-aurora-303-1", 390, "Water heater")],
+        expenses: [],
         maintenanceFees: [createFee("fee-aurora-303-1", "CLEANING", "Lobby cleaning", 90)],
-        dueDate: "2026-05-08",
+        dueDate: "2026-05-27",
       }),
       304: createApartment({
         id: "apt-aurora-304",
@@ -334,9 +334,9 @@ const mockPropertyGrids: Record<string, PropertyApartmentsGridResponse> = {
         squareMeters: 80,
         paymentStatus: "PAID",
         tenant: tenants["tenant-nathan"],
-        expenses: [createExpense("exp-aurora-305-1", 370, "Facade wash")],
+        expenses: [],
         maintenanceFees: [createFee("fee-aurora-305-1", "SECURITY", "Access control", 120)],
-        dueDate: "2026-05-06",
+        dueDate: "2026-05-26",
       }),
     },
   },
@@ -670,6 +670,8 @@ export const getMockResponse = <T>(url: string, method: string, body?: unknown):
 
   return undefined;
 };
+
+
 
 
 
