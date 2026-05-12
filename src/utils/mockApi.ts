@@ -38,6 +38,10 @@ export const isMockEnabled = (): boolean => {
     return false;
   }
 
+  if (window.location.hostname.includes("onrender.com")) {
+    return true;
+  }
+
   try {
     return window.localStorage.getItem("gdsi_mock_data") === "true";
   } catch {
@@ -496,3 +500,4 @@ export const getMockResponse = <T>(url: string, method: string, body?: unknown):
 
   return undefined;
 };
+
