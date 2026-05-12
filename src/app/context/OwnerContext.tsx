@@ -3,6 +3,7 @@ import type { Property, Tenant, Unit } from '../types/index';
 import authService from '../../services/authService';
 import { userService } from '../../services/userService';
 import { useAuth } from './AuthContext';
+import { isMockEnabled } from "../../utils/mockApi";
 
 interface Owner {
   id: string;
@@ -29,10 +30,18 @@ const fallbackOwner: Owner = {
   totalRevenue: '$0',
 }
 
-const buildSessionOwner = (): Owner => ({
-  ...fallbackOwner,
-  id: authService.getCurrentUserId() ?? fallbackOwner.id,
-});
+const buildSessionOwner = (): Owner => {
+  const sessionOwner = {
+    ...fallbackOwner,
+    id: authService.getCurrentUserId() ?? fallbackOwner.id,
+  };
+
+  if (isMockEnabled()) {
+    return { ...sessionOwner, name: "Arthur Miller" };
+  }
+
+  return sessionOwner;
+};
 
 const OwnerContext = createContext<OwnerContextType | undefined>(undefined);
 
