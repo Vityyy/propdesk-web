@@ -16,7 +16,7 @@ Built with React, TypeScript and Vite. It connects to the PropDesk backend API t
 
 This frontend consumes the PropDesk backend API:
 
-- [PropDesk API](https://github.com/tu-user/propdesk-api)
+- [PropDesk API](https://github.com/Vityyy/propdesk-api)
 
 Configure the backend URL with:
 
