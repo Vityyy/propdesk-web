@@ -221,31 +221,39 @@ export function MaintenanceFees() {
   const [deletingFeeId, setDeletingFeeId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
+  const buildFeesFromGrid = (ownerGrid: OwnerApartmentsGridResponse): FeeWithContext[] => {
+    const fees: FeeWithContext[] = [];
+    Object.entries(ownerGrid).forEach(([propertyId, floorMap]) => {
+      Object.values(floorMap).forEach((aptMap) => {
+        Object.values(aptMap as Record<number, ApartmentGridResponse>).forEach((apt) => {
+          (apt.maintenanceFees ?? []).forEach((fee) => {
+            fees.push({ ...fee, apartmentId: apt.id, apartmentNumber: apt.number, propertyId });
+          });
+        });
+      });
+    });
+
+    return fees;
+  };
+
   useEffect(() => {
     if (!currentOwner?.id) return;
 
     const fetchFees = async () => {
       setLoading(true);
+      const mockEnabled = isMockEnabled();
       try {
         let ownerGrid: OwnerApartmentsGridResponse = await userService.getOwnerApartmentsGrid(currentOwner.id, { forceRefresh: true });
-        if (Object.keys(ownerGrid).length === 0) {
+        if (Object.keys(ownerGrid).length === 0 && mockEnabled) {
           ownerGrid = getMockOwnerGrid();
         }
 
-        const fees: FeeWithContext[] = [];
-        Object.entries(ownerGrid).forEach(([propertyId, floorMap]) => {
-          Object.values(floorMap).forEach((aptMap) => {
-            Object.values(aptMap as Record<number, ApartmentGridResponse>).forEach((apt) => {
-              (apt.maintenanceFees ?? []).forEach((fee) => {
-                fees.push({ ...fee, apartmentId: apt.id, apartmentNumber: apt.number, propertyId });
-              });
-            });
-          });
-        });
-
-        setAllFees(fees);
+        setAllFees(buildFeesFromGrid(ownerGrid));
       } catch (err) {
         console.error('Failed to load maintenance fees', err);
+        if (mockEnabled) {
+          setAllFees(buildFeesFromGrid(getMockOwnerGrid()));
+        }
       } finally {
         setLoading(false);
       }
