@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Mail, X } from "lucide-react";
 import userService, { type OwnerAssociationRequestSummary } from "../../services/userService";
 import { ApiError } from "../../utils/httpUtils";
@@ -6,7 +7,7 @@ import { ApiError } from "../../utils/httpUtils";
 function MailboxIcon({ count }: { count: number }) {
   return (
     <div className="relative">
-      <Mail size={22} className={count > 0 ? "text-[#928dd3]" : "text-white/60"} />
+      <Mail size={22} className={count > 0 ? "text-[#928dd3]" : ""} />
       {count > 0 && (
         <div className="absolute -top-2 -right-2 bg-gradient-to-r from-[#928dd3] to-[#a89be6] text-black rounded-full w-5 h-5 flex items-center justify-center text-[11px] font-bold shadow-sm">
           {count > 9 ? "9+" : count}
@@ -59,8 +60,8 @@ function PendingRequestsModal({ isOpen, onClose, requests, onAccept, onReject }:
     return null;
   }
 
-  return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+  return createPortal(
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100] p-4 backdrop-blur-sm">
       <div className="bg-subtle border border-[var(--glass-border)] rounded-[16px] shadow-[0_8px_30px_rgba(0,0,0,0.2)] max-w-md w-full relative overflow-hidden flex flex-col max-h-[85vh]">
         {/* Header */}
         <div className="p-6 pb-5 border-b border-[var(--glass-border)] flex items-center justify-between bg-subtle shrink-0">
@@ -122,7 +123,8 @@ function PendingRequestsModal({ isOpen, onClose, requests, onAccept, onReject }:
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -176,10 +178,10 @@ export function AdminRequestsMailbox() {
     <>
       <button
         onClick={() => setIsModalOpen(true)}
-        className={`relative inline-flex items-center justify-center rounded-full border px-3.5 py-3.5 transition-all duration-300 hover:-translate-y-0.5 ${
+        className={`relative inline-flex items-center justify-center transition-all duration-300 hover:-translate-y-0.5 ${
           pendingRequests.length > 0 
-            ? "border-[#928dd3]/50 bg-[#928dd3]/20 shadow-[0_0_20px_rgba(146,141,211,0.3)] hover:border-[#928dd3]/80 hover:bg-[#928dd3]/30 hover:shadow-[0_0_30px_rgba(146,141,211,0.5)]" 
-            : "border-white/20 bg-white/10 hover:border-white/40 hover:bg-white/20 hover:shadow-[0_8px_20px_rgba(255,255,255,0.08)]"
+            ? "rounded-full border px-3.5 py-3.5 border-[#928dd3]/50 bg-[#928dd3]/20 shadow-[0_0_20px_rgba(146,141,211,0.3)] hover:border-[#928dd3]/80 hover:bg-[#928dd3]/30 hover:shadow-[0_0_30px_rgba(146,141,211,0.5)]" 
+            : "p-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/10 text-secondary hover:text-primary"
         }`}
         data-name="admin-mailbox"
         type="button"

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { ApiError } from "../../../utils/httpUtils";
 import userService, {
@@ -99,8 +100,8 @@ export function HireAdminDialog({ isOpen, onClose, onSuccess }: HireAdminDialogP
     return null;
   }
 
-  return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+  return createPortal(
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100] p-4 backdrop-blur-sm">
       <div className="dark:bg-[#0a0a0f] light:bg-white border border-[var(--glass-border)] rounded-[16px] shadow-[0_8px_30px_rgba(0,0,0,0.8)] max-w-md w-full relative overflow-hidden">
         {/* Header */}
         <div className="p-6 pb-5 border-b border-[var(--glass-border)] flex items-center justify-between dark:bg-[#0a0a0f] light:bg-white">
@@ -187,6 +188,7 @@ export function HireAdminDialog({ isOpen, onClose, onSuccess }: HireAdminDialogP
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
