@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Mail, X } from "lucide-react";
 import userService, { type OwnerAssociationRequestSummary } from "../../services/userService";
 import { ApiError } from "../../utils/httpUtils";
@@ -59,7 +60,7 @@ function PendingRequestsModal({ isOpen, onClose, requests, onAccept, onReject }:
     return null;
   }
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
       <div className="bg-subtle border border-[var(--glass-border)] rounded-[16px] shadow-[0_8px_30px_rgba(0,0,0,0.2)] max-w-md w-full relative overflow-hidden flex flex-col max-h-[85vh]">
         {/* Header */}
@@ -122,7 +123,8 @@ function PendingRequestsModal({ isOpen, onClose, requests, onAccept, onReject }:
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -156,6 +158,7 @@ export function AdminRequestsMailbox() {
     try {
       await userService.acceptOwnerRequest(ownerId);
       setPendingRequests((prev) => prev.filter((request) => request.ownerId !== ownerId));
+      window.location.reload();
     } catch (err) {
       const errorMessage = err instanceof ApiError ? err.message : (err instanceof Error ? err.message : "Failed to accept request");
       throw new Error(errorMessage);
