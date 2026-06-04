@@ -10,7 +10,7 @@ export function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
   const { theme, toggleTheme } = useTheme();
-  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
 
   const ThemeToggle = () => (
     <button
@@ -25,7 +25,7 @@ export function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const nameRef = useRef<HTMLInputElement | null>(null);
+  const emailRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
 
   const handleEnterToNext = (
@@ -41,8 +41,8 @@ export function Login() {
   };
 
   const canSubmit = useMemo(
-    () => name.trim().length > 0 && password.trim().length > 0 && !isSubmitting,
-    [name, password, isSubmitting]
+    () => email.trim().length > 0 && password.trim().length > 0 && !isSubmitting,
+    [email, password, isSubmitting]
   );
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -56,12 +56,12 @@ export function Login() {
       setError(null);
       setIsSubmitting(true);
 
-      await login({ name: name.trim(), password: password.trim() });
+      await login({ email: email.trim(), password: password.trim() });
       navigate("/", { replace: true });
     } catch (error) {
       if (error instanceof ApiError) {
         if (error.status === 401) {
-          setError("Incorrect username or password.");
+          setError("Incorrect email or password.");
         } else {
           setError(`Error ${error.status}: ${error.message || "Could not sign in."}`);
         }
@@ -95,19 +95,19 @@ export function Login() {
           </div>
 
           <form className="flex flex-col gap-[14px]" onSubmit={onSubmit}>
-            <label className="flex flex-col gap-[8px]" htmlFor="login-name">
+            <label className="flex flex-col gap-[8px]" htmlFor="login-email">
               <span className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-secondary" style={{ fontVariationSettings: "'wdth' 100" }}>
-                Username
+                Email
               </span>
               <input
-                id="login-name"
-                type="text"
-                autoComplete="username"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
+                id="login-email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
                 onKeyDown={(event) => handleEnterToNext(event, passwordRef)}
-                ref={nameRef}
-                placeholder="Enter your username"
+                ref={emailRef}
+                placeholder="Enter your email"
                 className="h-[48px] rounded-[12px] border border-[var(--glass-border)] dark:bg-[#151520] light:bg-white light:border-black/10 px-[16px] text-primary light:text-[#111827] placeholder:text-[var(--text-tertiary)] light:placeholder:text-[#9ca3af] outline-none transition-all duration-300 hover:border-[#928dd3]/40 hover:shadow-[0_0_0_3px_rgba(146,141,211,0.12)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]/30"
               />
             </label>
