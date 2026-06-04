@@ -23,6 +23,7 @@ export function Register() {
     </button>
   );
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -30,6 +31,7 @@ export function Register() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const nameRef = useRef<HTMLInputElement | null>(null);
+  const emailRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
   const confirmRef = useRef<HTMLInputElement | null>(null);
 
@@ -48,6 +50,7 @@ export function Register() {
   const canSubmit = useMemo(() => {
     if (isSubmitting) return false;
     if (name.trim().length === 0) return false;
+    if (email.trim().length === 0) return false;
     if (password.trim().length === 0) return false;
     if (confirmPassword.trim().length === 0) return false;
     if (password !== confirmPassword) return false;
@@ -68,7 +71,7 @@ export function Register() {
       setIsSubmitting(true);
 
       await signup(
-        { name: name.trim(), password: password.trim() },
+        { name: name.trim(), email: email.trim(), password: password.trim() },
         userType
       );
       navigate("/", { replace: true });
@@ -146,9 +149,26 @@ export function Register() {
                 autoComplete="username"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                onKeyDown={(event) => handleEnterToNext(event, passwordRef)}
+                onKeyDown={(event) => handleEnterToNext(event, emailRef)}
                 ref={nameRef}
                 placeholder="Choose a username"
+                className="h-[48px] rounded-[12px] border border-[var(--glass-border)] dark:bg-[#151520] light:bg-white light:border-black/10 px-[16px] text-primary light:text-[#111827] placeholder:text-[var(--text-tertiary)] light:placeholder:text-[#9ca3af] outline-none transition-all duration-300 hover:border-[#928dd3]/40 hover:shadow-[0_0_0_3px_rgba(146,141,211,0.12)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]/30"
+              />
+            </label>
+
+            <label className="flex flex-col gap-[8px]" htmlFor="register-email">
+              <span className="font-['Archivo:SemiBold',sans-serif] font-semibold leading-[20px] text-[15px] text-secondary" style={{ fontVariationSettings: "'wdth' 100" }}>
+                Email
+              </span>
+              <input
+                id="register-email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                onKeyDown={(event) => handleEnterToNext(event, passwordRef)}
+                ref={emailRef}
+                placeholder="Enter your email"
                 className="h-[48px] rounded-[12px] border border-[var(--glass-border)] dark:bg-[#151520] light:bg-white light:border-black/10 px-[16px] text-primary light:text-[#111827] placeholder:text-[var(--text-tertiary)] light:placeholder:text-[#9ca3af] outline-none transition-all duration-300 hover:border-[#928dd3]/40 hover:shadow-[0_0_0_3px_rgba(146,141,211,0.12)] focus:border-[#928dd3] focus:ring-1 focus:ring-[#928dd3]/30"
               />
             </label>

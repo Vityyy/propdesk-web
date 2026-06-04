@@ -28,11 +28,13 @@ export interface NewPropertyCreateRequest {
 export interface AdminSummary {
   id: string;
   name: string;
+  email: string;
 }
 
 export interface OwnerSummary {
   id: string;
   name: string;
+  email: string;
 }
 
 export interface OwnerAssociationRequestSummary {

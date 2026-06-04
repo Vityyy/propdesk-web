@@ -15,7 +15,7 @@ interface HireAdminDialogProps {
 
 export function HireAdminDialog({ isOpen, onClose, onSuccess }: HireAdminDialogProps) {
   const [admins, setAdmins] = useState<AdminSummary[]>([]);
-  const [adminUsername, setAdminUsername] = useState("");
+  const [adminEmail, setAdminEmail] = useState("");
   const [adminCut, setAdminCut] = useState("10");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,7 +51,7 @@ export function HireAdminDialog({ isOpen, onClose, onSuccess }: HireAdminDialogP
   }, [isOpen]);
 
   const handleHire = async () => {
-    if (!adminUsername.trim() || loading) {
+    if (!adminEmail.trim() || loading) {
       return;
     }
 
@@ -60,8 +60,8 @@ export function HireAdminDialog({ isOpen, onClose, onSuccess }: HireAdminDialogP
       setError(null);
       setSuccess(false);
 
-      const normalizedUsername = adminUsername.trim();
-      const matchedAdmin = admins.find((admin) => admin.name.trim() === normalizedUsername);
+      const normalizedEmail = adminEmail.trim().toLowerCase();
+      const matchedAdmin = admins.find((admin) => admin.email.trim().toLowerCase() === normalizedEmail);
 
       if (!matchedAdmin) {
         setError("Admin seleccionado no existe");
@@ -89,7 +89,7 @@ export function HireAdminDialog({ isOpen, onClose, onSuccess }: HireAdminDialogP
   };
 
   const handleClose = () => {
-    setAdminUsername("");
+    setAdminEmail("");
     setAdminCut("10");
     setError(null);
     setSuccess(false);
@@ -115,25 +115,25 @@ export function HireAdminDialog({ isOpen, onClose, onSuccess }: HireAdminDialogP
         </div>
 
         <div className="p-6">
-          {/* Admin Username Input */}
+          {/* Admin Email Input */}
           <div className="mb-5">
             <label className="block font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] text-[var(--text-secondary)] mb-2">
-              Admin Username
+              Admin Email
             </label>
             <input
               type="text"
-              value={adminUsername}
-              onChange={(e) => setAdminUsername(e.target.value)}
-              placeholder="Enter admin username..."
+              value={adminEmail}
+              onChange={(e) => setAdminEmail(e.target.value)}
+              placeholder="Enter admin email..."
               className="w-full dark:bg-[#151520] light:bg-gray-50 border border-[var(--glass-border)] rounded-[8px] px-4 py-2.5 text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none focus:border-[#928dd3] transition-all duration-300 font-['Archivo:Medium',sans-serif]"
             />
             <p className="font-['Archivo:Medium',sans-serif] font-medium text-[12px] text-[var(--text-tertiary)] mt-2">
-              Type the exact username of the admin you want to hire
+              Type the exact email of the admin you want to hire
             </p>
           </div>
 
           {/* Admin Cut */}
-          {adminUsername.trim() && (
+          {adminEmail.trim() && (
             <div className="mb-5 animate-in fade-in slide-in-from-top-2 duration-300">
               <label className="block font-['Archivo:SemiBold',sans-serif] font-semibold text-[14px] text-[var(--text-secondary)] mb-2">
                 Admin Commission (%)
@@ -180,7 +180,7 @@ export function HireAdminDialog({ isOpen, onClose, onSuccess }: HireAdminDialogP
             </button>
             <button
               onClick={handleHire}
-              disabled={!adminUsername.trim() || loading}
+              disabled={!adminEmail.trim() || loading}
               className="flex-1 px-4 py-2.5 bg-gradient-to-r from-[#928dd3] to-[#a89be6] text-black font-['Archivo:SemiBold',sans-serif] font-semibold text-sm rounded-[8px] transition-all duration-300 hover:opacity-90 shadow-[0_0_15px_rgba(146,141,211,0.4)] hover:shadow-[0_0_25px_rgba(146,141,211,0.7)] disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed"
             >
               {loading ? "Hiring..." : "Hire Admin"}
