@@ -2,7 +2,7 @@ import { API_ENDPOINTS } from "../config/api";
 import { ApiError, apiRequest } from "../utils/httpUtils";
 
 export interface LoginRequest {
-  name: string;
+  email: string;
   password: string;
 }
 
@@ -14,6 +14,7 @@ export interface TokenResponse {
 
 export interface SignUpRequest {
   name: string;
+  email: string;
   password: string;
 }
 
